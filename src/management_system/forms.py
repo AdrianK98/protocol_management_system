@@ -19,7 +19,7 @@ class EmployeeForm(forms.ModelForm):
 class ProtocolForm(forms.ModelForm):
     class Meta:
         model = Protocol
-        fields = "__all__"
+        fields = ['employee','description','is_return']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args,**kwargs)

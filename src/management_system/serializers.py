@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Item
+from .models import Item, Protocol
 from users.models import Employee
 
 
@@ -23,4 +23,17 @@ class EmployeeSerializer(serializers.ModelSerializer):
             "user_surname",
             "user_department",
             "user_location",
+        )
+
+class ProtocolSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Protocol
+        fields = (
+            "id",
+            "created",
+            "barcode",
+            "modified",
+            "description",
+            "is_return",
+            "employee",
         )

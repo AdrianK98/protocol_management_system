@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect
 from django.http import HttpResponse, HttpResponseNotFound
 from django.contrib.auth.decorators import login_required
 from rest_framework import generics
-from .serializers import ItemSerializer,EmployeeSerializer
+from .serializers import ItemSerializer,EmployeeSerializer,ProtocolSerializer
 from .forms import EmployeeForm, ProtocolForm, ItemForm
 
 
@@ -29,20 +29,46 @@ def newProtocol(request):
     protocolForm = ProtocolForm(request.POST or None)
     itemForm = ItemForm(request.POST or None)
     if request.method == 'POST':
-        if protocolForm.is_valid() and itemForm.is_valid():
-            try:
-                newProtocol = protocolForm.save()
-                newItem = itemForm.save()
-                ProtocolItem(protocol_id=newProtocol,item_id=newItem).save()
-                return redirect("home")
-            except:
-                print("An exception occurred")
+            if protocolForm.is_valid() and itemForm.is_valid():
+                try:
+                    newProtocol = protocolForm.save()
+                    newItem = itemForm.save()
+                    ProtocolItem(protocol_id=newProtocol,item_id=newItem).save()
+                    if 'saveAndEnd' in request.POST:
+                        return redirect("home")
+                    elif 'saveAndContinue' in request.POST:
+                        return redirect("addNextItem",pk=newProtocol.id)
+                    
+                except:
+                    print("An exception occurred")
 
     context={
             "protocolForm":protocolForm,
             "itemForm":itemForm
         }
     return render(request, "management_system/new_protocol.html", context)
+
+@login_required
+def addNextItem(request,pk):
+    itemForm = ItemForm(request.POST or None)
+    if request.method == 'POST':
+            newProtocol = Protocol.objects.get(id=pk)
+            if itemForm.is_valid():
+                try:
+                    newItem = itemForm.save()
+                    ProtocolItem(protocol_id=newProtocol,item_id=newItem).save()
+                    if 'saveAndEnd' in request.POST:
+                        return redirect("home")
+                    elif 'saveAndContinue' in request.POST:
+                        return redirect("addNextItem",pk=newProtocol.id)
+                    
+                except:
+                    print("An exception occurred")    
+    context={
+            "itemForm":itemForm
+        }
+    return render(request, "management_system/new_protocol_next_item.html", context)
+
 
 @login_required
 def protocolsView(request):
@@ -100,3 +126,12 @@ class EmployeeList(generics.ListCreateAPIView):
 class EmployeeDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
+
+class ProtocolList(generics.ListCreateAPIView):
+    queryset = Protocol.objects.all()
+    serializer_class = ProtocolSerializer
+
+
+class ProtocolDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Protocol.objects.all()
+    serializer_class = ProtocolSerializer
