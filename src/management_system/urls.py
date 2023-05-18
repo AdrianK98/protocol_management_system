@@ -24,6 +24,7 @@ urlpatterns = [
     path("employees/",views.showEmployees, name="employees" ),
     path("new_protocol/",views.newProtocol, name="newprotocol" ),
     path("protocols/",views.protocolsView, name="protocollist" ),
+    path("protocols/<int:pk>",views.singleProtocolView, name="singleProtocol" ),
     path("add_employee/",views.addEmployeeView, name="newemployee" ),
     path("items/",views.itemsView, name="itemsView" ),
     path("api/items",views.ItemList.as_view()),

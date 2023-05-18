@@ -1,11 +1,21 @@
 {% extends 'main.html' %}
-
+{% load crispy_forms_tags %}
 
 {% block content %}
 
 
 
-  Dodaj nowe przekazanie
-
+  <h1>Nowy protokół</h1>
+  <form method="POST" enctype="multipart/form-data">
+ 
+    <!-- Security token -->
+    {% csrf_token %}
+ 
+    <!-- Using the formset -->
+    {{ protocolForm|crispy }}
+    {{ itemForm|crispy }}
+     
+    <button type="submit" class="btn btn-primary mt-3">Zapisz</button>
+</form>
 
 {% endblock content %}
