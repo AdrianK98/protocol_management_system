@@ -4,4 +4,4 @@ from django.http import HttpResponse, HttpResponseNotFound
 
 
 def mainView(request):
-    return HttpResponse("xx")
+    return render(request, "management_system/home.html", {})
