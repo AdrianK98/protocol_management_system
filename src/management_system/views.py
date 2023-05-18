@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseNotFound
 from django.contrib.auth.decorators import login_required
 from rest_framework import generics
 from .serializers import ItemSerializer,EmployeeSerializer
+from .forms import EmployeeForm
 # Create your views here.
 from users.models import Employee
 from .models import Item
@@ -30,7 +31,13 @@ def protocolsView(request):
 
 @login_required
 def addEmployeeView(request):
-    return render(request, "management_system/add_new_employee.html", {})
+    form = EmployeeForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+    data={
+        "form":form
+    }
+    return render(request, "management_system/add_new_employee.html", data)
     
 @login_required
 def itemsView(request):

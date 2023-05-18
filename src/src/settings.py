@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'management_system',
     'users',
     'rest_framework',
+    'crispy_forms',
     
 ]
 
@@ -135,3 +136,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "home"
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
