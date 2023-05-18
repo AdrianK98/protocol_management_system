@@ -16,9 +16,19 @@ Including another URLconf
 """
 
 from django.urls import path, include
-
+from rest_framework.urlpatterns import format_suffix_patterns
 from . import views
 
 urlpatterns = [
-    path("",views.mainView, name="startingPage" ),
+    path("",views.mainView, name="home" ),
+    path("employees/",views.showEmployees, name="employees" ),
+    path("new_protocol/",views.newProtocol, name="newprotocol" ),
+    path("protocols/",views.protocolsView, name="protocollist" ),
+    path("add_employee/",views.addEmployeeView, name="newemployee" ),
+    path("items/",views.itemsView, name="itemsView" ),
+    path("api/items",views.ItemList.as_view()),
+    path("api/items/<int:pk>",views.ItemDetail.as_view()),
+    path("api/employees",views.EmployeeList.as_view()),
+    path("api/employees/<int:pk>",views.EmployeeDetail.as_view()),
 ]
+

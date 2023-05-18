@@ -16,6 +16,9 @@ django-celery-results = "^2.4.0"
 django-celery-beat = "^2.4.0"
 flower = "^1.2.0"
 psycopg2 = "^2.9.6"
+django-extensions = "^3.2.1"
+djangorestframework = "^3.14.0"
+Pygments = "^2.15.1"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^2.20.0"

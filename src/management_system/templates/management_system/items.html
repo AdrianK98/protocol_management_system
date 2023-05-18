@@ -1,0 +1,14 @@
+{% extends 'main.html' %}
+
+
+{% block content %}
+
+        {% for item in itemList %}
+
+        {{item.item_name}}
+        {{item.item_it}}
+        {{item.item_sn}}
+        <br>
+
+        {%endfor%}  
+{% endblock content %}

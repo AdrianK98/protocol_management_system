@@ -1,14 +1,27 @@
 {% extends 'main.html' %}
 
+{% block styles%}
+
+{% endblock styles%}
+
+
+
+
+
+
 
 {% block content %}
 
-<h2>Log In</h2>
+
+
+<main class="form-signin text-center">
 <form method="post">
   {% csrf_token %}
   {{ form.as_p }}
-  <button type="submit">Log In</button>
+  <button class="btn btn-lg btn-primary" type="submit">Login</button>
 </form>
+</main>
+
 {% endblock content %}
 
 

@@ -1,0 +1,14 @@
+{% extends 'main.html' %}
+
+
+{% block content %}
+
+    {% for employee in employeeList%}
+
+        {{employee.user_name}}
+        {{employee.user_surname}}
+        <br>
+
+    {%endfor%}   
+
+{% endblock content %}
