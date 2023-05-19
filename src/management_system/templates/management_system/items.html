@@ -5,9 +5,11 @@
 
         {% for item in itemList %}
 
-        {{item.item_name}}
-        {{item.item_it|default_if_none:""}}
-        {{item.item_sn|default_if_none:""}}
+        <b>Nazwa:</b>{{item.item_name}} <br>
+        <b>IT:</b>{{item.item_it|default_if_none:""}}<br>
+        <b>S/N:</b>{{item.item_sn|default_if_none:""}}<br>
+        <a class="btn btn-primary" href="{% url 'singleItem' item.id %}" role="button">Zobacz</a>
         <br>
+        <hr>
         {%endfor%}  
 {% endblock content %}

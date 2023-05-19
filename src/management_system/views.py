@@ -107,6 +107,25 @@ def singleProtocolView(request,pk):
     }
     return render(request, "management_system/single_protocol.html", context)
 
+@login_required
+def singleEmployeeView(request,pk):
+    employee = Employee.objects.get(id=pk)
+    context={
+        "protocols":Protocol.objects.filter(employee=employee),
+        "items":Item.objects.filter(item_user=employee)
+    }
+    return render(request, "management_system/single_employee.html", context)
+
+@login_required
+def singleItemView(request,pk):
+    item=Item.objects.get(id=pk)
+    context={
+        "item":item,
+        "protocolList":ProtocolItem.objects.filter(item_id=item)
+
+    }
+    return render(request, "management_system/single_item.html", context)
+
 
 
 class ItemList(generics.ListCreateAPIView):

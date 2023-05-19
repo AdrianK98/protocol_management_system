@@ -7,11 +7,14 @@ from datetime import datetime
 
 from django.core.files import File
 # Create your models here.
+
+
 class Item(models.Model):
     item_name = models.CharField('Nazwa Przedmiotu',max_length=200)
     item_it = models.CharField('Numer IT',max_length=200,blank=True,null=True)
     item_sn = models.CharField('Numer S/N',max_length=200,blank=True,null=True)
     item_kk = models.CharField("Numer KK",max_length=200,blank=True,null=True)
+    item_user = models.ForeignKey("users.Employee", on_delete=models.PROTECT,null=True,blank=True,verbose_name="Pracownik")
 
 
     def __str__(self):

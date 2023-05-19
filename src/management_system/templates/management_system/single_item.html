@@ -1,0 +1,30 @@
+{% extends 'main.html' %}
+
+
+{% block content %}
+
+        <h1>{{item.item_name}} </h1>
+        <b>IT: </b>{{item.item_it|default_if_none:""}}<br>
+        <b>S/N: </b>{{item.item_sn|default_if_none:""}}<br>
+        <b>Aktualny właściciel:</b>{{item.item_user|default_if_none:" brak"}}
+
+        <br>
+        <br>
+
+        <div class="card w-100" >
+                <ul class="list-group list-group-flush">
+            
+                  {% for protocol in protocolList %}
+                    <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 " href="{% url 'singleProtocol' protocol.protocol_id.id%}">
+                    <li class="list-group-item">{{protocol.protocol_id.barcode}} | {{protocol.protocol_id.employee}} | {{protocol.protocol_id.created}} | {{protocol.protocol_id.is_return|yesno:"Zwrot,Przekazanie"}}</li>
+                    </a>
+                  
+                  
+                  {%endfor%}  
+            
+                </ul>
+        </div>
+
+
+ 
+{% endblock content %}

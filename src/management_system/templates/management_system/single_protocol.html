@@ -8,9 +8,9 @@
   <h2>{{protocol.is_return|yesno:"Zwrot,Przekazanie"}} dla {{protocol.employee}} z {{protocol.created}}</h2>
 
   {% for item in items%}
-  {{item.item_id.item_name}}
-  {{item.item_id.item_sn|default_if_none:""}}
-  {{item.item_id.item_it|default_if_none:""}}
+  <b>Nazwa:  </b>{{item.item_id.item_name}} <br>
+  <b>S/N:  </b>{{item.item_id.item_sn|default_if_none:""}}<br>
+  <b>IT:  </b>{{item.item_id.item_it|default_if_none:""}}<br>
   
   <br>
   {% endfor %}
