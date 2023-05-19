@@ -22,7 +22,8 @@ from . import views
 urlpatterns = [
     path("",views.mainView, name="home" ),
     path("employees/",views.showEmployees, name="employees" ),
-    path("employees/<int:pk>",views.singleEmployeeView, name="singleEmployee" ),
+    path("employees/<int:pk>/items",views.singleEmployeeItemsView, name="singleEmployee" ),
+    path("employees/<int:pk>/protocols",views.singleEmployeeProtocolsView, name="singleEmployeeProtocols" ),
     path("new_protocol/",views.newProtocol, name="newprotocol" ),
     path("new_protocol/next/<int:pk>",views.addNextItem, name="addNextItem" ),
     path("protocols/",views.protocolsView, name="protocollist" ),

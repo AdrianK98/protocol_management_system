@@ -7,9 +7,11 @@ from .serializers import ItemSerializer,EmployeeSerializer,ProtocolSerializer
 from .forms import EmployeeForm, ProtocolForm, ItemForm
 
 
+
 # Create your views here.
 from users.models import Employee
 from .models import Item,Protocol, ProtocolItem
+
 
 
 @login_required
@@ -108,15 +110,32 @@ def singleProtocolView(request,pk):
     }
     return render(request, "management_system/single_protocol.html", context)
 
+
 @login_required
-def singleEmployeeView(request,pk):
+def singleEmployeeItemsView(request,pk):
     employee = Employee.objects.get(id=pk)
     context={
         "employee":employee,
-        "protocols":Protocol.objects.filter(employee=employee),
         "items":Item.objects.filter(item_user=employee)
     }
-    return render(request, "management_system/single_employee.html", context)
+    return render(request, "management_system/single_employee_items.html", context)
+
+@login_required
+def singleEmployeeProtocolsView(request,pk):
+    employee = Employee.objects.get(id=pk)
+    protocolItems={}
+
+    protocolsList = Protocol.objects.filter(employee=employee)
+    for protocol in protocolsList:
+        protocolItems[protocol.id]=ProtocolItem.objects.filter(protocol_id=protocol)
+
+    print(protocolItems)
+    context={
+        "employee":employee,
+        "dataSet":protocolItems,
+        "protocols":protocolsList
+    }
+    return render(request, "management_system/single_employee_protocols.html", context)
 
 @login_required
 def singleItemView(request,pk):
@@ -144,6 +163,7 @@ def employeeItemsReturn(request, employee_id):
         return render(request, "management_system/return_items.html", context)
     else:
         return HttpResponse("Something went wrong!")
+
 
 class ItemList(generics.ListCreateAPIView):
     queryset = Item.objects.all()
