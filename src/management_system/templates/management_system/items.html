@@ -7,7 +7,8 @@
 
         <b>Nazwa:</b>{{item.item_name}} <br>
         <b>IT:</b>{{item.item_it|default_if_none:""}}<br>
-        <b>S/N:</b>{{item.item_sn|default_if_none:""}}<br><br>
+        <b>S/N:</b>{{item.item_sn|default_if_none:""}}<br>
+        <b>Aktualny właściciel:</b>{{item.item_user|default_if_none:"Brak"}}<br><br>
         <a class="btn btn-primary" href="{% url 'singleItem' item.id %}" role="button">Wyświetl</a>
         <br>
         <hr>

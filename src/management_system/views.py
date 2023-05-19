@@ -149,11 +149,27 @@ def singleItemView(request,pk):
 @login_required
 def employeeItemsReturn(request, employee_id):
     if request.method == "POST":
+        if 'confirmButton' in request.POST:
+            currentEmployee = Employee.objects.get(id=employee_id)
+            newProtocol = Protocol(employee=currentEmployee,is_return=True)
+            newProtocol.save()
+            listOfItemId = request.session['itemsId']
+            for itemid in listOfItemId:
+                itemObj = Item.objects.get(id=itemid)
+                itemObj.item_user = None
+                itemObj.save()
+
+                newProtocolItem = ProtocolItem(protocol_id=newProtocol,item_id=itemObj)
+                newProtocolItem.save()
+            return redirect('singleEmployee',pk=employee_id)
+        
         listOfItemId = json.loads(request.POST.get("idList"))
         # Process the idList and employee_id as needed
         itemList=[]
         for list_id in listOfItemId:
             itemList.append(Item.objects.get(id=list_id))
+        
+        request.session["itemsId"] = listOfItemId
 
         context={
             "dataList":itemList,

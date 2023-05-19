@@ -11,9 +11,14 @@
   {{item}}
   <br>
 {% endfor %}
-<a class="btn btn-success"  role="button">Potwierdź</a>
-<a class="btn btn-danger"  role="button">Anuluj</a>
 
+
+<form method="POST" enctype="multipart/form-data">
+  {% csrf_token %}
+
+<button class="btn btn-success" type="submit" name="confirmButton">Potwierdź</button>
+<a class="btn btn-danger"  href="javascript:history.back()" role="button">Anuluj</a>
+</form>
 
 
 
