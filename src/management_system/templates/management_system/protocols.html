@@ -16,7 +16,7 @@
 
       {% for protocol in protocolList %}
         <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 " href="{% url 'singleProtocol' protocol.id%}">
-        <li class="list-group-item">{{protocol.barcode}} | {{protocol.employee}} | {{protocol.created}} | {{protocol.is_return|yesno:"Zwrot,Przekazanie"}}</li>
+        <li class="list-group-item">{{protocol.id}} | {{protocol.employee}} | {{protocol.created}} | {{protocol.is_return|yesno:"Zwrot,Przekazanie"}}</li>
         </a>
       
       

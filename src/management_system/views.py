@@ -129,7 +129,6 @@ def singleEmployeeProtocolsView(request,pk):
     for protocol in protocolsList:
         protocolItems[protocol.id]=ProtocolItem.objects.filter(protocol_id=protocol)
 
-    print(protocolItems)
     context={
         "employee":employee,
         "dataSet":protocolItems,

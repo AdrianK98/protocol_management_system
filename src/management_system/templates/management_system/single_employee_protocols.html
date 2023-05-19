@@ -2,18 +2,20 @@
 
 
 {% block content %}
-<a class="btn btn-dark" href="{% url 'singleEmployee' employee.id %}" role="button">Sprzęt</a>
+<h2>Protokoły {{employee}}</h2>
+<a class="btn btn-dark float-end me-5" href="{% url 'singleEmployee' employee.id %}" role="button">Sprzęt</a>
 
 
 
 
-    <div class="container text-center">
+    <div class="container text-center mt-5">
         <div class="row">
           <div class="col"><b>ID</b></div>
-          <div class="col-2"><b>Data Przekazania: </b></div>
-          <div class="col-2"><b>xx: </b></div>
-          <div class="col"><b>Działanie: </b></div>
-          <div class="col-6"></div>
+          <div class="col-2"><b>Data Przekazania</b></div>
+          <div class="col-2"><b>Pracownik</b></div>
+          <div class="col"><b>Działanie</b></div>
+          <div class="col-3"><b>Sprzęt</b></div>
+          <div class="col"></div>
 
         {% for protocol in protocols%}
 
@@ -27,17 +29,18 @@
         
 
         <hr>
-            <div class="row mt-2">
+            <div class="row m-1">
                 <div class="col">{{protocol.id}}</div>
                 <div class="col-2">{{protocol.created}}</div>
-                <div class="col-2">{{item.item_sn|default_if_none:""}}</div>
+                <div class="col-2">{{protocol.employee}}</div>
                 <div class="col">{{protocol.is_return|yesno:"Zwrot,Przekazanie"}}</div>
-                <div class="col-6">
+                <div class="col-3">
                     {% for item in value %}
                     {{item.item_id.item_name|default_if_none:""}}  {{item.item_id.item_it|default_if_none:""}}<br>
                     {% endfor%}
-
+                    
                 </div>
+                <div class="col"><a class="btn btn-primary" href="{%url 'singleProtocol' protocol.id%}"role="button">Wyświetl</a></div>
                 
             </div>
             {% endif%}

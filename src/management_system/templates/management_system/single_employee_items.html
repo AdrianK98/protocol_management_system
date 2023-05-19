@@ -2,12 +2,13 @@
 
 
 {% block content %}
-<a class="btn btn-dark" href="{% url 'singleEmployeeProtocols' employee.id %}" role="button">Protokoły</a>
+<h2>Sprzęt na stanie {{employee}}</h2>
+<a class="btn btn-dark float-end me-5" href="{% url 'singleEmployeeProtocols' employee.id %}" role="button">Protokoły</a>
 
 
 
 
-    <div class="container text-center">
+    <div class="container text-center mt-5">
         <div class="row">
           <div class="col"><b>Nazwa sprzętu: </b></div>
           <div class="col"><b>IT: </b></div>
