@@ -1,0 +1,20 @@
+{% extends 'main.html' %}
+
+
+{% block content %}
+
+
+<h1>Zdanie sprzętu dla {{employee}}</h1>
+
+
+{% for item in dataList %}
+  {{item}}
+  <br>
+{% endfor %}
+<a class="btn btn-success"  role="button">Potwierdź</a>
+<a class="btn btn-danger"  role="button">Anuluj</a>
+
+
+
+
+{% endblock content %}

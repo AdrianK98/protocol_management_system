@@ -2,6 +2,7 @@ from django.shortcuts import render,redirect
 from django.http import HttpResponse, HttpResponseNotFound
 from django.contrib.auth.decorators import login_required
 from rest_framework import generics
+import json
 from .serializers import ItemSerializer,EmployeeSerializer,ProtocolSerializer
 from .forms import EmployeeForm, ProtocolForm, ItemForm
 
@@ -111,6 +112,7 @@ def singleProtocolView(request,pk):
 def singleEmployeeView(request,pk):
     employee = Employee.objects.get(id=pk)
     context={
+        "employee":employee,
         "protocols":Protocol.objects.filter(employee=employee),
         "items":Item.objects.filter(item_user=employee)
     }
@@ -126,7 +128,22 @@ def singleItemView(request,pk):
     }
     return render(request, "management_system/single_item.html", context)
 
+@login_required
+def employeeItemsReturn(request, employee_id):
+    if request.method == "POST":
+        listOfItemId = json.loads(request.POST.get("idList"))
+        # Process the idList and employee_id as needed
+        itemList=[]
+        for list_id in listOfItemId:
+            itemList.append(Item.objects.get(id=list_id))
 
+        context={
+            "dataList":itemList,
+            "employee":Employee.objects.get(id=employee_id)
+        }
+        return render(request, "management_system/return_items.html", context)
+    else:
+        return HttpResponse("Something went wrong!")
 
 class ItemList(generics.ListCreateAPIView):
     queryset = Item.objects.all()

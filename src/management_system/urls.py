@@ -36,5 +36,7 @@ urlpatterns = [
     path("api/employees/<int:pk>",views.EmployeeDetail.as_view()),
     path("api/protocols",views.ProtocolList.as_view()),
     path("api/protocols/<int:pk>",views.ProtocolDetail.as_view()),
+    path("employees/<int:employee_id>/returns", views.employeeItemsReturn, name="employeeReturns"),
+
 ]
 

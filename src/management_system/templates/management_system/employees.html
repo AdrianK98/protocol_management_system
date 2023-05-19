@@ -29,7 +29,7 @@
                 <div class="col">{{employee.user_surname}}</div>
                 <div class="col">{{employee.user_department|default_if_none:""}}</div>
                 <div class="col">{{employee.user_location|default_if_none:""}}</div>
-                <div class="col"><a class="btn btn-primary" href="{% url 'singleEmployee' employee.id %}" role="button">Zobacz</a></div>
+                <div class="col"><a class="btn btn-info" href="{% url 'singleEmployee' employee.id %}" role="button">Info</a></div>
                 <div class="col-5"></div>
                 
             </div>

@@ -5,6 +5,8 @@
 
 
 
+
+
     <div class="container text-center">
         <div class="row">
           <div class="col"><b>Nazwa sprzętu: </b></div>
@@ -23,16 +25,65 @@
                 <div class="col-2">{{item.item_sn|default_if_none:""}}</div>
                 <div class="col">{{item.item_kk|default_if_none:""}}</div>
                 <div class="col"><a class="btn btn-primary" href="{% url 'singleItem' item.id %}" role="button">Zobacz</a></div>
-                <div class="col"><a class="btn btn-danger" href="#" role="button">Zdaj</a></div>
+                <div class="col"><a class="btn btn-danger zdajBtn"  role="button" data-item-id="{{item.id}}">-</a></div>
                 <div class="col-6"></div>
                 
             </div>
             
         {%endfor%}  
         <hr>
+
+        <form id="returnItemForm" action="{% url 'employeeReturns' employee.id %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="idList" id="idListInput">
+            <button type="submit" class="btn btn-danger">Zdaj sprzęt</button>
+          </form>
+
     </div>
+    <script>
+        // Define an empty array to store the IDs
+        var idList = [];
+        var submitForm = document.getElementById("returnItemForm");
+        submitForm.style.display = "none";
+        // Function to handle button click
+        function handleButtonClick(event) {
+            // Get the button element
+            var button = event.target;
+
+            // Get the data-item-id attribute value
+            var itemId = button.getAttribute("data-item-id");
+
+            // Check if the itemId is already in the idList
+            if (!idList.includes(itemId)) {
+                // Append the itemId to the idList
+                idList.push(itemId);
+
+                // Disable the button
+                button.disabled = true;
+
+                // Change the class of the button
+                button.className = "btn btn-secondary zdajBtn";
+                var idListInput = document.getElementById("idListInput");
+                idListInput.value = JSON.stringify(idList);
 
 
+                submitForm.style.display = "block";
+
+
+
+                // Print the updated idList
+                console.log(idList);
+            }
+        }
+
+        // Get all buttons with "zdajBtn" in their class
+        var buttons = document.querySelectorAll(".zdajBtn");
+
+        // Attach the handleButtonClick function to each button's click event
+        buttons.forEach(function(button) {
+            button.addEventListener("click", handleButtonClick);
+        });
+    </script>
 
 
 
