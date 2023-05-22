@@ -17,6 +17,11 @@
                             <button type="button" class="btn btn-warning text-black fw-bold"><span class="ms-1 d-none d-sm-inline">Nowe przekazanie</span></button>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{% url 'newprotocolReturn' %}" class="nav-link align-middle px-0">
+                            <button type="button" class="btn btn-danger text-black fw-bold"><span class="ms-1 d-none d-sm-inline">Nowy zwrot</span></button>
+                        </a>
+                    </li>
 
                     <li>
                         <a href="{% url 'employees' %}" class="nav-link px-0 align-middle">
@@ -33,6 +38,9 @@
                     <li>
                         <a href="{% url 'itemsView' %}" class="nav-link px-0 align-middle">
                             <i class="fs-4 bi-people"></i> <span class="ms-1 d-none d-sm-inline">Sprzęt</span> </a>
+                    </li>                    <li>
+                        <a href="{% url 'itemsAddNew' %}" class="nav-link px-0 align-middle">
+                            <i class="fs-4 bi-people"></i> <span class="ms-1 d-none d-sm-inline">Dodaj nowy sprzęt</span> </a>
                     </li>
                 </ul>
                 <hr>

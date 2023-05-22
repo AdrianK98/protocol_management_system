@@ -1,0 +1,33 @@
+{% extends 'main.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+
+
+<h1>Nowy sprzęt</h1>
+<form method="POST" enctype="multipart/form-data">
+
+  <!-- Security token -->
+  {% csrf_token %}
+
+  <!-- Using the formset -->
+  {{ itemForm|crispy }}
+  {% comment %} <button id="show-employee-btn" class="btn btn-secondary mt-3" type="button">Dodaj pracownika</button> {% endcomment %}
+  <hr>
+
+   
+  <button type="submit" class="btn btn-success mt-3" name="saveAndEnd">Zapisz</button>
+
+</form>
+
+
+<script>
+        {% comment %} $(document).ready(function() {
+            $('#show-employee-btn').click(function() {
+                $('#search-items').toggle();
+                $('#show-employee-btn').hide();
+            });
+        }); {% endcomment %}
+</script>
+{% endblock content %}

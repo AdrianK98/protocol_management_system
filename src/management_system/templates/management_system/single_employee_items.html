@@ -25,7 +25,7 @@
                 <div class="col">{{item.item_it}}</div>
                 <div class="col-2">{{item.item_sn|default_if_none:""}}</div>
                 <div class="col">{{item.item_kk|default_if_none:""}}</div>
-                <div class="col"><a class="btn btn-primary" href="{% url 'singleItem' item.id %}" role="button">Zobacz</a></div>
+                <div class="col"><a class="btn btn-primary" href="{% url 'singleItem' item.id %}" role="button">Wyświetl</a></div>
                 <div class="col"><a class="btn btn-danger zdajBtn"  role="button" data-item-id="{{item.id}}">-</a></div>
                 <div class="col-6"></div>
                 

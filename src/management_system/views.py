@@ -4,8 +4,8 @@ from django.contrib.auth.decorators import login_required
 from rest_framework import generics
 import json
 from .serializers import ItemSerializer,EmployeeSerializer,ProtocolSerializer
-from .forms import EmployeeForm, ProtocolForm, ItemForm
-
+from .forms import EmployeeForm, ProtocolFormAdd, ItemForm, ProtocolFormReturn
+from django.contrib import messages
 
 
 # Create your views here.
@@ -16,8 +16,33 @@ from .models import Item,Protocol, ProtocolItem
 
 @login_required
 def mainView(request):
-
+    
     return render(request, "management_system/home.html", {})
+
+@login_required
+def newProtocolReturnConfirm(request):
+    if request.method == 'POST':
+        print(request.POST)
+        if 'saveAndEnd' in request.POST:
+
+            item_id = request.session.get('item_to_return_id')
+            employee_id = request.session.get('employee_item_to_return_id')
+            item=Item.objects.get(id=item_id)
+            employee=Employee.objects.get(id=employee_id)
+
+            newProtocol = Protocol(employee=employee,is_return=True)
+            newProtocol.save()
+            newItemProtocol = ProtocolItem(protocol_id=newProtocol,item_id=item).save()
+            item.item_user = None
+            item.save()
+            return redirect("home")
+        
+
+        elif 'saveAndContinue' in request.POST:
+            return redirect("home")
+
+    context={}
+    return render(request, "management_system/confirm_add_protocol.html", context)
 
 @login_required
 def showEmployees(request):
@@ -27,16 +52,103 @@ def showEmployees(request):
     }
     return render(request, "management_system/employees.html", context)
 
+
 @login_required
-def newProtocol(request):
-    protocolForm = ProtocolForm(request.POST or None)
+def itemsAddNew(request):
     itemForm = ItemForm(request.POST or None)
     if request.method == 'POST':
-            if protocolForm.is_valid() and itemForm.is_valid():
+        if itemForm.is_valid():
+            try:
+                newItem = itemForm.save()
+                return redirect('home')
+            except:
+                print('ERROR OCCURED!')
+
+    context={
+        'itemForm':itemForm
+    }
+    return render(request, "management_system/items_add_new.html", context)
+
+
+
+
+
+@login_required
+def newProtocolReturn(request):
+    protocolForm = ProtocolFormReturn(request.POST or None)
+
+    if request.method == 'POST':
+        if protocolForm.is_valid():
+            try:
+                protocolFormData = protocolForm.cleaned_data
+
+                #CHECK IF ITEM THAT WE WANT TO RETURN BELONG TO USER WE WANT TO TAKE IT FROM
+                #IF IS RETURN AND USER ITEM IS EMPLOYEE AND ITEM USER IS NOT EMPY
+                if protocolFormData['item'].item_user == protocolFormData['employee']:
+                    protocolFormData['item'].item_user = None
+                    protocolFormData['item'].save()
+                    print('OK')
+
+                #IF IS RETURN AND USER ITEM IS NOT EMPLOYEE AND ITEM USER IS NOT EMPTY
+                elif protocolFormData['item'].item_user != protocolFormData['employee'] and protocolFormData['item'].item_user :
+                    messages.error(request, 'Nie można zwrócic, przedmiot jest używany przez innego użytkownika')
+                    return redirect('newProtocol')
+                    #CANT COMPLETE
+                
+                #IF IS RETURN AND USER ITEM IS NOT EMPLOYEE AND ITEM USER IS NOT EMPTY
+                elif protocolFormData['item'].item_user != protocolFormData['employee'] and protocolFormData['item'].item_user is None:
+                    request.session['item_to_return_id'] = protocolFormData['item'].id
+                    request.session['employee_item_to_return_id'] = protocolFormData['employee'].id
+
+                    context={
+                        'message':'Przedmiot nie należy do żadnego pracownika',
+                    }
+                    return render(request,"management_system/confirm_add_protocol.html",context)
+                    #TODO add cofirm button
+
+
+                newProtocol = protocolForm.save(commit=False)
+                newProtocol.is_return = True
+                newProtocol.save()
+
+                ProtocolItem(protocol_id=newProtocol,item_id=protocolFormData['item']).save()
+                if 'saveAndEnd' in request.POST:
+                    return redirect("home")
+                elif 'saveAndContinue' in request.POST:
+                    return redirect("addNextItem",pk=newProtocol.id)
+                
+            except:
+                print("An exception occurred")
+
+    context={
+            "protocolForm":protocolForm,
+        }
+    return render(request, "management_system/new_protocol_return.html", context)
+
+
+@login_required
+def newProtocolAdd(request):
+    protocolForm = ProtocolFormAdd(request.POST or None)
+    # itemForm = ItemForm(request.POST or None)
+    if request.method == 'POST':
+            if protocolForm.is_valid():
                 try:
-                    newProtocol = protocolForm.save()
-                    newItem = itemForm.save()
-                    ProtocolItem(protocol_id=newProtocol,item_id=newItem).save()
+                    protocolFormData = protocolForm.cleaned_data
+                    #IF ITS NOT RETURN AND USER ITEM IS NOT EMPLOYEE AND ITEM USER IS NOT EMPTY
+                    if protocolFormData['item'].item_user != protocolFormData['employee'] and protocolFormData['item'].item_user:
+                        return HttpResponse('CANT DO IT')
+                        #TODO ADD RETURNING PROTOCOL FROM ACTUAL ITEM USER AND ADD CONFIRM 
+
+                    
+                    else:
+                        protocolFormData['item'].item_user = protocolFormData['employee']
+                        protocolFormData['item'].save()
+                    
+
+                    newProtocol = protocolForm.save(commit=False)
+                    newProtocol.is_return = False
+                    newProtocol.save()
+                    ProtocolItem(protocol_id=newProtocol,item_id=protocolFormData['item']).save()
                     if 'saveAndEnd' in request.POST:
                         return redirect("home")
                     elif 'saveAndContinue' in request.POST:
@@ -47,9 +159,9 @@ def newProtocol(request):
 
     context={
             "protocolForm":protocolForm,
-            "itemForm":itemForm
+            # "itemForm":itemForm
         }
-    return render(request, "management_system/new_protocol.html", context)
+    return render(request, "management_system/new_protocol_add.html", context)
 
 @login_required
 def addNextItem(request,pk):
@@ -154,6 +266,7 @@ def employeeItemsReturn(request, employee_id):
             newProtocol = Protocol(employee=currentEmployee,is_return=True)
             newProtocol.save()
             listOfItemId = request.session['itemsId']
+            del request.session['itemsId']
             for itemid in listOfItemId:
                 itemObj = Item.objects.get(id=itemid)
                 itemObj.item_user = None

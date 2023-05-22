@@ -16,18 +16,46 @@ class EmployeeForm(forms.ModelForm):
         
 
 
-class ProtocolForm(forms.ModelForm):
+class ProtocolFormAdd(forms.ModelForm):
+
     class Meta:
         model = Protocol
-        fields = ['employee','description','is_return']
+        fields = ['employee','item']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args,**kwargs)
         for field in self.fields: 
             self.fields[field].widget.attrs.update({'class':'w-25 m-2'})
+        self.fields['item'].widget.attrs.update({'id':'search-items'})
+        self.fields['employee'].widget.attrs.update({'id':'search-employee'})
 
-        self.fields['is_return'].widget.attrs.update({'class':'w-1'})
+    item = forms.ModelChoiceField(
+        queryset=Item.objects.filter(item_user__isnull=True),
+        required=True,  
+    )
+    
 
+
+class ProtocolFormReturn(forms.ModelForm):
+    item = forms.ModelChoiceField(queryset=Item.objects.filter(item_user__isnull=False), required=True,)
+
+    class Meta:
+        model = Protocol
+        fields = ['employee','item']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args,**kwargs)
+        for field in self.fields: 
+            self.fields[field].widget.attrs.update({'class':'w-25 m-2'})
+        self.fields['item'].widget.attrs.update({'id':'search-items'})
+        self.fields['employee'].widget.attrs.update({'id':'search-employee'})
+
+    # item = forms.ModelChoiceField(
+    #     queryset=Item.objects.filter(item_user__isnull=False),
+    #     required=True,  
+    # )
+
+    
 class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
@@ -37,3 +65,5 @@ class ItemForm(forms.ModelForm):
         super().__init__(*args,**kwargs)
         for field in self.fields: 
             self.fields[field].widget.attrs.update({'class':'w-25 m-2'})
+        self.fields['item_user'].widget.attrs.update({'id':'search-items','style':'display: none;'})
+# 

@@ -5,7 +5,7 @@
 
 
 
-  <h1>Nowy protokół</h1>
+  <h1>Nowy zwrot</h1>
   <form method="POST" enctype="multipart/form-data">
  
     <!-- Security token -->
@@ -14,9 +14,17 @@
     <!-- Using the formset -->
     {{ protocolForm|crispy }}
     <hr>
-    {{ itemForm|crispy }}
+    {% if messages %}
+    <div class="alert alert-danger">
+        {% for message in messages %}
+        
+          <strong>Uwaga!</strong> {{message}}.
+   
+        {% endfor %}
+    </div>
+{% endif %}
      
-    <button type="submit" class="btn btn-primary mt-3" name="saveAndEnd">Zapisz</button>
+    <button type="submit" class="btn btn-success mt-3" name="saveAndEnd">Zapisz</button>
     <button type="submit" class="btn btn-secondary mt-3" name="saveAndContinue">Dodaj Kolejny</button>
 </form>
 
