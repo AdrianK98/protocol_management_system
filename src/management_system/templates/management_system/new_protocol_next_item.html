@@ -14,6 +14,16 @@
     <!-- Using the formset -->
     {{ itemForm|crispy }}
      
+    {% if messages %}
+    <div class="alert alert-danger">
+        {% for message in messages %}
+        
+          <strong>Uwaga!</strong> {{message}}.
+   
+        {% endfor %}
+    </div>
+{% endif %}
+
     <button type="submit" class="btn btn-primary mt-3" name="saveAndEnd">Zapisz</button>
     <button type="submit" class="btn btn-secondary mt-3" name="saveAndContinue">Dodaj Kolejny</button>
 </form>

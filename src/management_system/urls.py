@@ -24,11 +24,11 @@ urlpatterns = [
     path("employees/",views.showEmployees, name="employees" ),
     path("employees/<int:pk>/items",views.singleEmployeeItemsView, name="singleEmployee" ),
     path("employees/<int:pk>/protocols",views.singleEmployeeProtocolsView, name="singleEmployeeProtocols" ),
-    path("new_protocol/add",views.newProtocolAdd, name="newprotocol" ),
+    path("new_protocol/add",views.NewProtocolAdd.as_view(), name="newprotocol" ),
     path("new_protocol/return",views.newProtocolReturn, name="newprotocolReturn" ),
     path("new_protocol/confirm/",views.newProtocolReturnConfirm, name="newprotocolconfirm" ),
-    path("new_protocol/next/<int:pk>",views.addNextItem, name="addNextItem" ),
-    path("protocols/",views.protocolsView, name="protocollist" ),
+    path("new_protocol/next/<str:status>/<int:pk>",views.AddNextItem.as_view(), name="addNextItem" ),
+    path("protocols/",views.ProtocolsView.as_view(), name="protocollist" ),
     path("protocols/<int:pk>",views.singleProtocolView, name="singleProtocol" ),
     path("add_employee/",views.addEmployeeView, name="newemployee" ),
     path("items/",views.itemsView, name="itemsView" ),
@@ -41,6 +41,7 @@ urlpatterns = [
     path("api/protocols",views.ProtocolList.as_view()),
     path("api/protocols/<int:pk>",views.ProtocolDetail.as_view()),
     path("employees/<int:employee_id>/returns", views.employeeItemsReturn, name="employeeReturns"),
+
 
 ]
 

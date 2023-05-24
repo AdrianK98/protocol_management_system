@@ -1,6 +1,6 @@
 from django import forms
 from users.models import Employee
-from .models import Protocol, Item
+from .models import Protocol, Item,ProtocolItem
 
 
 class EmployeeForm(forms.ModelForm):
@@ -50,11 +50,14 @@ class ProtocolFormReturn(forms.ModelForm):
         self.fields['item'].widget.attrs.update({'id':'search-items'})
         self.fields['employee'].widget.attrs.update({'id':'search-employee'})
 
+
     # item = forms.ModelChoiceField(
     #     queryset=Item.objects.filter(item_user__isnull=False),
     #     required=True,  
     # )
 
+class ProtocolFormReturnNext(forms.Form):
+    item = forms.ModelChoiceField(queryset=Item.objects.filter(item_user__isnull=False), required=True,)
     
 class ItemForm(forms.ModelForm):
     class Meta:
@@ -66,4 +69,13 @@ class ItemForm(forms.ModelForm):
         for field in self.fields: 
             self.fields[field].widget.attrs.update({'class':'w-25 m-2'})
         self.fields['item_user'].widget.attrs.update({'id':'search-items','style':'display: none;'})
+
+class ProtocolItemForm(forms.Form):
+    item = forms.ModelChoiceField(
+        queryset=Item.objects.filter(item_user__isnull=True),
+        required=True,  
+    )
+
+
+
 # 
