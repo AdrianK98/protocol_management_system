@@ -7,7 +7,7 @@
 
   <h2>Protokoły </h2>
   <form action="{% url 'protocollist' %}" method="get">
-    <input name="q" type="text" placeholder="Search...">
+    <input name="q" type="text" placeholder="Search..." value='{{q_value}}'>
   </form>
 
 
@@ -26,8 +26,27 @@
 
     </ul>
   </div>
+
+  <div class="container p-4">
+    <div class="pagination justify-content-center">
+        <span class="step-links">
+          {% if protocolList.has_previous %}
+              <a href="?page=1&q={{q_value}}">&laquo; first</a>
+              <a href="?page={{ protocolList.previous_page_number }}&q={{q_value}}">previous</a>
+          {% endif %}
+
+            <span class="current">
+                Page {{ protocolList.number }} of {{ protocolList.paginator.num_pages }}
+            </span>
+
+          {% if protocolList.has_next %}
+              <a href="?page={{ protocolList.next_page_number }}&q={{q_value}}">next</a>
+              <a href="?page={{ protocolList.paginator.num_pages }}&q={{q_value}}">last &raquo;</a>
+          {% endif %}
+        </span>
+        </div>
+    </div>
+  <!--end of Pagination-->
   
-
-
 
 {% endblock content %}

@@ -58,6 +58,11 @@ class ProtocolFormReturn(forms.ModelForm):
 
 class ProtocolFormReturnNext(forms.Form):
     item = forms.ModelChoiceField(queryset=Item.objects.filter(item_user__isnull=False), required=True,)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args,**kwargs)
+        for field in self.fields: 
+            self.fields[field].widget.attrs.update({'class':'w-25 m-2'})
+        self.fields['item'].widget.attrs.update({'id':'search-items'})
     
 class ItemForm(forms.ModelForm):
     class Meta:
@@ -75,6 +80,12 @@ class ProtocolItemForm(forms.Form):
         queryset=Item.objects.filter(item_user__isnull=True),
         required=True,  
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args,**kwargs)
+        for field in self.fields: 
+            self.fields[field].widget.attrs.update({'class':'w-25 m-2'})
+        self.fields['item'].widget.attrs.update({'id':'search-items'})
 
 
 

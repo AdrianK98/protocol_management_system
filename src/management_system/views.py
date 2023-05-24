@@ -60,6 +60,7 @@ def newProtocolReturnConfirm(request):
 @login_required
 def showEmployees(request):
     employeeList = Employee.objects.all()
+
     context={
         "employeeList":employeeList
     }
@@ -217,7 +218,8 @@ class ProtocolsView(View):
             protocolQuery = protocols_paginator.page(1)
 
         context={
-            "protocolList":protocolQuery
+            "protocolList":protocolQuery,
+            "q_value": query
         }
         return render(request, "management_system/protocols.html", context)
     
