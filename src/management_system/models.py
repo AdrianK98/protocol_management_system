@@ -1,5 +1,6 @@
 from django.db import models
 from io import BytesIO
+from django.conf import settings
 import barcode
 from barcode import EAN13
 from barcode.writer import ImageWriter
@@ -34,6 +35,10 @@ class Protocol(models.Model):
     modified=models.DateField('Data modyfikacji',auto_now=True,blank=True,null=True)
     description=models.CharField('Opis',max_length=200,blank=True,null=True)
     is_return=models.BooleanField('Zwrot',blank=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,blank=True,null=True
+    )
     employee=models.ForeignKey("users.Employee", on_delete=models.CASCADE,null=True,verbose_name="Pracownik")
 
     def save(self, *args, **kwargs):

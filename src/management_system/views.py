@@ -19,15 +19,11 @@ from .models import Item,Protocol, ProtocolItem
 
 
 
-class HomeView(View):
-    template = 'management_system/home.html'
-    def get(self, request):
-        request.GET.get('test')
-        return render(request, self.template, {})
 
 @login_required
 def mainView(request):
-    
+    print(request.user.first_name)
+    print(request.user.last_name)
     return render(request, "management_system/home.html", {})
 
 @login_required
@@ -255,7 +251,7 @@ def singleProtocolView(request,pk):
 
     context={
         "protocol":Protocol.objects.get(id=pk),
-        "items":ProtocolItem.objects.filter(protocol_id=pk)
+        "items":ProtocolItem.objects.filter(protocol_id=pk),
     }
     return render(request, "management_system/single_protocol.html", context)
 
