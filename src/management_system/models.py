@@ -9,16 +9,21 @@ from django.core.files import File
 # Create your models here.
 
 
+DATE_INPUT_FORMATS = ['%d-%m-%Y']
+
 class Item(models.Model):
-    item_name = models.CharField('Nazwa Przedmiotu',max_length=200)
-    item_it = models.CharField('Numer IT',max_length=200,blank=True,null=True)
+    category = models.ForeignKey("ItemCategory", on_delete=models.PROTECT,null=True,blank=False,verbose_name="Kategoria")
+    item_producent = models.CharField('Producent',max_length=200,blank=True,null=True)
+    item_model = models.CharField('Model',max_length=200,blank=True,null=True)
     item_sn = models.CharField('Numer S/N',max_length=200,blank=True,null=True)
+    item_it = models.CharField('Numer IT',max_length=200,blank=True,null=True)
     item_kk = models.CharField("Numer KK",max_length=200,blank=True,null=True)
     item_user = models.ForeignKey("users.Employee", on_delete=models.PROTECT,null=True,blank=True,verbose_name="Pracownik")
 
 
+
     def __str__(self):
-        return str(self.id) + " "+self.item_name
+        return self.item_it + " " + self.item_producent + " " + self.item_model
 
 
 
@@ -56,4 +61,11 @@ class ProtocolItem(models.Model):
 
     def __str__(self):
         return str(self.protocol_id) + " | " + str(self.item_id)
+    
+
+class ItemCategory(models.Model):
+    category_name = models.CharField("Typ", null=False,max_length=200)
+
+    def __str__(self):
+        return self.category_name
     

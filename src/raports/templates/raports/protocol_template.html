@@ -1,0 +1,120 @@
+
+<html>
+
+
+<head>
+    <style>
+        p{
+            font-size:10px;
+        }
+    </style>
+
+</head>
+<body>
+<p style="font-size: 15x; text-align: right;">{{protocol.created|date:"d/m/Y"}}</p>
+<p style="text-align: center; font-size:20px;"><strong>Protok&oacute;ł {{protocol.is_return|yesno:"Zwrotu ,Przekazania "}}sprzętu komputerowego</strong></p>
+<p style="text-align: center;">rejestracja stacji roboczej</p>
+<p style="text-align: left;"><strong>I. Parametry techniczne sprzętu</strong></p>
+<table style="border-collapse: collapse; width: 100%; height: 72px;" border="1">
+    <tbody>
+    <tr style="height: 18px;">
+    <td style="width: 100%; text-align: center; height: 18px;" colspan="6"><strong>Lista Przekazanego sprzętu</strong></td>
+    </tr>
+    <tr style="height: 18px;">
+    <td style="width: 5.44511%; height: 18px;">LP.</td>
+    <td style="width: 15.8144%; height: 18px;">Typ.</td>
+    <td style="width: 18.7974%; height: 18px;">Producent.</td>
+    <td style="width: 19.2235%; height: 18px;">Model.</td>
+    <td style="width: 24.0531%; height: 18px;">Nr Seryjny</td>
+    <td style="width: 16.6667%; height: 18px;">Nr Inwentarzowy</td>
+    </tr>
+    {%for item in protocolItems %}
+    <tr style="height: 18px;">
+    <td style="width: 5.44511%; height: 18px;"></td>
+    <td style="width: 15.8144%; height: 18px;">{{item.item_id.category}}</td>
+    <td style="width: 18.7974%; height: 18px;">{{item.item_id.item_producent}}</td>
+    <td style="width: 19.2235%; height: 18px;">{{item.item_id.item_model}}</td>
+    <td style="width: 24.0531%; height: 18px;">{{item.item_id.item_sn}}</td>
+    <td style="width: 16.6667%; height: 18px;">{{item.item_id.item_it}}</td>
+    </tr>
+    {%endfor%}
+    </tbody>
+    </table>
+
+<p><strong>III. Potwierdzenie przekazania sprzętu&nbsp;</strong></p>
+<p>a. Data i podpis informatyka oddziałowego w regionie przekazującego sprzęt</p>
+<p><strong>Stwierdzam, że sprzęt został zainstalowany na stanowisku pracy</strong></p>
+<table style="border-collapse: collapse; width: 100%;" border="1">
+<tbody>
+<tr>
+<td style="width: 20%;">Region(nazwa)</td>
+<td style="width: 20%;">Data</td>
+<td style="width: 20%;">Imię</td>
+<td style="width: 20%;">Nazwisko</td>
+<td style="width: 20%;">Czytelny podpis</td>
+</tr>
+<tr>
+<td style="width: 20%;">&nbsp;</td>
+<td style="width: 20%;">{{protocol.created|date:"d.m.Y"}}</td>
+<td style="width: 20%;">&nbsp;</td>
+<td style="width: 20%;">&nbsp;</td>
+<td style="width: 20%;">&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p>b. Data i podpis użytkownika odbierającego sprzęt komputerowy/osoby odpowiedzialnej za powierzony sprzęt</p>
+<p>i. W zakresie zasad korzystania z służbowego sprzętu komputerowego Pracownika Firmy/Użytkownika obowiązuje stosowanie się do dokument&oacute;w pn. Polityka Bezpieczeństwa danych osobowych, Instrukcja Zarządzania Systemem informatycznym oraz procedura zarządzania majątkiem</p>
+<p>ii.W przypadku komputer&oacute;w przenośnych pracownik przejmuje odpowiedzialność finansową za utratę lub zniszczenie sprzętu.</p>
+<p>iii.Pracownik zobowiązany jest do oddania sprzętu stanowiącego własność firm w chwili ustania stosunku pracy.</p>
+<table style="border-collapse: collapse; width: 100%;" border="1">
+<tbody>
+<tr>
+<td style="width: 16.6667%;">Data</td>
+<td style="width: 16.6667%;">Imię</td>
+<td style="width: 16.6667%;">Nazwisko</td>
+<td style="width: 12.7366%;">Dział</td>
+<td style="width: 20.5968%;">Oddział/Lokalizacja</td>
+<td style="width: 16.6667%;">Czytelny podpis</td>
+</tr>
+<tr>
+<td style="width: 16.6667%;">{{protocol.created|date:"d.m.Y"}}</td>
+<td style="width: 16.6667%;">{{protocol.employee.user_name}}</td>
+<td style="width: 16.6667%;">{{protocol.employee.user_surname}}</td>
+<td style="width: 12.7366%;">{{protocol.employee.user_department}}</td>
+<td style="width: 20.5968%;">{{protocol.employee.user_location}}</td>
+<td style="width: 16.6667%;">&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p><strong>IV. Modyfikacje dokonane w sprzęcie i oprogramowaniu ww. komputera</strong></p>
+<table style="border-collapse: collapse; width: 100%;" border="1">
+<tbody>
+<tr>
+<td style="width: 6.67758%;">Lp.</td>
+<td style="width: 18.3224%;">Data</td>
+<td style="width: 12.5%;">Opis</td>
+<td style="width: 12.5%;">Nr seryjny</td>
+<td style="width: 12.5%;">Typ/producent</td>
+<td style="width: 12.5%;">Nr IT</td>
+<td style="width: 12.5%;">Podpis informatyka</td>
+<td style="width: 12.5%;">Podpis użytkownika</td>
+</tr>
+<tr>
+<td style="width: 6.67758%;">1.</td>
+<td style="width: 18.3224%;">&nbsp;</td>
+<td style="width: 12.5%;">&nbsp;</td>
+<td style="width: 12.5%;">&nbsp;</td>
+<td style="width: 12.5%;">&nbsp;</td>
+<td style="width: 12.5%;">&nbsp;</td>
+<td style="width: 12.5%;">&nbsp;</td>
+<td style="width: 12.5%;">&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p><strong>V. Zdanie sprzętu komputerowego</strong></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+</body>
+</html>

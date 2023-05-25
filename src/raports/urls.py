@@ -14,14 +14,10 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
 from django.urls import path, include
-from django.conf import settings
-from django.conf.urls.static import static
+from rest_framework.urlpatterns import format_suffix_patterns
+from . import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path("", include("management_system.urls")),
-    path("accounts/", include("users.urls")),
-    path("raports/", include("raports.urls")),
-]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('', views.RaportManager.as_view(), name="protocolRaportToPrint"),
+]

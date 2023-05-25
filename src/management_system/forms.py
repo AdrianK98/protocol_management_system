@@ -17,7 +17,10 @@ class EmployeeForm(forms.ModelForm):
 
 
 class ProtocolFormAdd(forms.ModelForm):
-
+    item = forms.ModelChoiceField(
+        queryset=Item.objects.filter(item_user__isnull=True),
+        required=True,  
+    )
     class Meta:
         model = Protocol
         fields = ['employee','item']
@@ -29,10 +32,7 @@ class ProtocolFormAdd(forms.ModelForm):
         self.fields['item'].widget.attrs.update({'id':'search-items'})
         self.fields['employee'].widget.attrs.update({'id':'search-employee'})
 
-    item = forms.ModelChoiceField(
-        queryset=Item.objects.filter(item_user__isnull=True),
-        required=True,  
-    )
+
     
 
 

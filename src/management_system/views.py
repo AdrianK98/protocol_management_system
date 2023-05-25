@@ -226,7 +226,7 @@ class ProtocolsView(View):
     def get_query(self,q):  # new
         query = q
         object_list = Protocol.objects.filter(
-            Q(employee__user_name__icontains=query)|Q(employee__user_surname__icontains=query)
+            Q(employee__user_name__icontains=query)|Q(employee__user_surname__icontains=query)|Q(created__icontains=query)
         )
         return object_list
 
