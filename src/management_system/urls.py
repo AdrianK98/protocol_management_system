@@ -21,7 +21,7 @@ from . import views
 
 urlpatterns = [
     path("",views.mainView, name="home" ),
-    path("employees/",views.showEmployees, name="employees" ),
+    path("employees/",views.EmployeesView.as_view(), name="employees" ),
     path("employees/<int:pk>/items",views.singleEmployeeItemsView, name="singleEmployee" ),
     path("employees/<int:pk>/protocols",views.singleEmployeeProtocolsView, name="singleEmployeeProtocols" ),
     path("new_protocol/add",views.NewProtocolAdd.as_view(), name="newprotocol" ),

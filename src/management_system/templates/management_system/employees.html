@@ -3,7 +3,73 @@
 
 {% block content %}
 
-    
+<form action="{% url 'employees' %}" method="get">
+    <input name="qname" type="text" placeholder="Imię..." value='{{qname_value}}'>
+    <input name="qsurname" type="text" placeholder="Nazwisko..." value='{{qsurname_value}}'>
+    <input type='submit' value='Szukaj'>
+
+  </form>
+
+<table class="table mb-0">
+    <thead>
+      <tr>
+        <th scope="col">Imię i nazwisko</th>
+        <th scope="col">Dział</th>
+        <th scope="col">Lokalizacja</th>
+        <th scope="col">Akcje</th>
+      </tr>
+    </thead>
+    <tbody>
+
+    {% for employee in employeeList%}
+
+      <tr class="fw-normal">
+        <th>
+          <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+            class="shadow-1-strong rounded-circle" alt="avatar 1"
+            style="width: 55px; height: auto;">
+          <span class="ms-2">{{employee}}</span>
+        </th>
+        <td class="align-middle">
+          <span>{{employee.user_department|default_if_none:""}}</span>
+        </td>
+        <td class="align-middle">
+          <h6 class="mb-0"><span class="badge bg-danger">{{employee.user_location|default_if_none:""}}</span></h6>
+        </td>
+        <td class="align-middle">
+            <a class="btn btn-success mb-1" href="{% url 'singleEmployee' employee.id %}" role="button">Wyświetl</a>
+          {% comment %} <a href="#!" data-mdb-toggle="tooltip" title="Remove"><i
+              class="fas fa-trash-alt text-danger"></i></a> {% endcomment %}
+        </td>
+      </tr>
+
+      {%endfor%} 
+
+    </tbody>
+  </table>
+  <div class="card-footer text-end p-3">
+    <a class="btn btn-primary mb-1" href="{% url 'newemployee' %}" role="button">Nowy pracownik</a>
+  </div>
+  <div class="container p-4">
+    <div class="pagination justify-content-center">
+        <span class="step-links">
+          {% if employeeList.has_previous %}
+              <a href="?page=1&q={{q_value}}">&laquo; first</a>
+              <a href="?page={{ employeeList.previous_page_number }}&q={{q_value}}">previous</a>
+          {% endif %}
+
+            <span class="current">
+                Page {{ employeeList.number }} of {{ employeeList.paginator.num_pages }}
+            </span>
+
+          {% if employeeList.has_next %}
+              <a href="?page={{ employeeList.next_page_number }}&q={{q_value}}">next</a>
+              <a href="?page={{ employeeList.paginator.num_pages }}&q={{q_value}}">last &raquo;</a>
+          {% endif %}
+        </span>
+        </div>
+    </div>
+  </div>    
 
         
         
@@ -13,19 +79,19 @@
 
      
 
-    <div class="container text-center">
+    {% comment %} <div class="container text-center">
         <div class="row">
-          <div class="col"><b>Imię: </b></div>
-          <div class="col"><b>Nazwisko: </b></div>
-          <div class="col"><b>Dział: </b></div>
-          <div class="col"><b>Lokalizacja: </b></div>
+          <div class="col"><b>Imię i nazwisko </b></div>
+          <div class="col"><b>Dział</b></div>
+          <div class="col"><b>Lokalizacja</b></div>
+          <div class="col"><b>Akcje</b></div>
           <div class="col"></div>
           <div class="col-5"></div>
 
         {% for employee in employeeList%}
         <hr>
             <div class="row mt-2">
-                <div class="col">{{employee.user_name}}</div>
+                <div class="col">{{employee}}</div>
                 <div class="col">{{employee.user_surname}}</div>
                 <div class="col">{{employee.user_department|default_if_none:""}}</div>
                 <div class="col">{{employee.user_location|default_if_none:""}}</div>
@@ -36,7 +102,7 @@
             
         {%endfor%}  
         <hr>
-    </div>
+    </div> {% endcomment %}
 
 
 

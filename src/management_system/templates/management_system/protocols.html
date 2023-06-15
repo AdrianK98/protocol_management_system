@@ -7,7 +7,11 @@
 
   <h2>Protokoły </h2>
   <form action="{% url 'protocollist' %}" method="get">
-    <input name="q" type="text" placeholder="Search..." value='{{q_value}}'>
+    <input name="qname" type="text" placeholder="Imię..." value='{{qname_value}}'>
+    <input name="qsurname" type="text" placeholder="Nazwisko..." value='{{qsurname_value}}'>
+    <input name="qdate" type="text" placeholder="Data: dd.mm.yyyy" value='{{qdate_value}}'>
+    <input type='submit' value='Szukaj'>
+
   </form>
 
 

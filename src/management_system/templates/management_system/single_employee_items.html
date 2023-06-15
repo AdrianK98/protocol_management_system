@@ -2,8 +2,57 @@
 
 
 {% block content %}
-<h2>Sprzęt na stanie {{employee}}</h2>
-<a class="btn btn-dark float-end me-5" href="{% url 'singleEmployeeProtocols' employee.id %}" role="button">Protokoły</a>
+
+<nav class="navbar navbar-expand-lg bg-dark">
+    <div class="container-fluid">
+      <h3 class="text-white">{{employee}}</h3>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse " id="navbarSupportedContent">
+        <ul class="navbar-nav ms-center mx-5 mb-lg-0">
+                      <li class="nav-item">
+            <a class="btn btn-outline-light me-2" href="{% url 'singleEmployeeProtocols' employee.id %}" role="button">Protokoły</a>
+          </li>
+          <li class="nav-item">
+            <a class="btn btn-outline-success me-2" href="{% url 'newprotocol'  %}?eid={{employee.id}}" role="button">Dodaj sprzęt</a>
+          </li>
+
+
+          <li class="nav-item">
+            <form id="returnItemForm" action="{% url 'employeeReturns' employee.id %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="idList" id="idListInput">
+                <button type="submit" class="btn btn-danger me-2">Zdaj sprzęt</button>
+              </form>
+          </li>
+        </ul>
+        <form class="d-flex ms-auto" role="search">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-info" type="submit">Search</button>
+        </form>
+      </div>
+    </div>
+  </nav>
+
+
+
+
+
+<div class="container text-center mt-5">
+    <div class="row">
+        
+      <div class="col">
+        
+      </div>
+      <div class="col">
+        
+      </div>
+      <div class="col-9"></div>
+    </div>
+    </div>
+
+
 
 
 
@@ -34,12 +83,7 @@
         {%endfor%}  
         <hr>
 
-        <form id="returnItemForm" action="{% url 'employeeReturns' employee.id %}" method="post">
-            {% csrf_token %}
-            <input type="hidden" name="idList" id="idListInput">
-            <button type="submit" class="btn btn-danger">Zdaj sprzęt</button>
-          </form>
-          <a class="btn btn-primary" href="{% url 'newprotocol'  %}?eid={{employee.id}}" role="button">Dodaj sprzęt</a>
+          
 
     </div>
     <script>

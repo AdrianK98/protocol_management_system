@@ -44,22 +44,32 @@
 <p><strong>III. Potwierdzenie przekazania sprzętu&nbsp;</strong></p>
 <p>a. Data i podpis informatyka oddziałowego w regionie przekazującego sprzęt</p>
 <p><strong>Stwierdzam, że sprzęt został zainstalowany na stanowisku pracy</strong></p>
+</tbody>
+</table>
+
 <table style="border-collapse: collapse; width: 100%;" border="1">
 <tbody>
+    <tr>
+        <td style="width: 16.6667%; text-align: center;" colspan="6"><strong>Osoba przekazująca sprzęt</strong></td>
+        </tr>
 <tr>
-<td style="width: 20%;">Region(nazwa)</td>
-<td style="width: 20%;">Data</td>
-<td style="width: 20%;">Imię</td>
-<td style="width: 20%;">Nazwisko</td>
-<td style="width: 20%;">Czytelny podpis</td>
+<td style="width: 16.6667%;">Data</td>
+<td style="width: 16.6667%;">Imię</td>
+<td style="width: 16.6667%;">Nazwisko</td>
+<td style="width: 12.7366%;">Dział</td>
+<td style="width: 20.5968%;">Oddział/Lokalizacja</td>
+<td style="width: 16.6667%;">Czytelny podpis</td>
 </tr>
 <tr>
-<td style="width: 20%;">&nbsp;</td>
-<td style="width: 20%;">{{protocol.created|date:"d.m.Y"}}</td>
-<td style="width: 20%;">&nbsp;</td>
-<td style="width: 20%;">&nbsp;</td>
-<td style="width: 20%;">&nbsp;</td>
+<td style="width: 16.6667%;">{{protocol.created|date:"d.m.Y"}}</td>
+<td style="width: 16.6667%;">{{protocol.created_by.first_name}}</td>
+<td style="width: 16.6667%;">{{protocol.created_by.last_name}}</td>
+<td style="width: 12.7366%;">IO</td>
+<td style="width: 20.5968%;">Kraków</td>
+<td style="width: 16.6667%;">&nbsp;</td>
 </tr>
+</tbody>
+</table>
 </tbody>
 </table>
 <p>b. Data i podpis użytkownika odbierającego sprzęt komputerowy/osoby odpowiedzialnej za powierzony sprzęt</p>
@@ -68,6 +78,9 @@
 <p>iii.Pracownik zobowiązany jest do oddania sprzętu stanowiącego własność firm w chwili ustania stosunku pracy.</p>
 <table style="border-collapse: collapse; width: 100%;" border="1">
 <tbody>
+    <tr>
+        <td style="width: 16.6667%; text-align: center;" colspan="6"><strong>Osoba odbierająca sprzęt</strong></td>
+        </tr>
 <tr>
 <td style="width: 16.6667%;">Data</td>
 <td style="width: 16.6667%;">Imię</td>
@@ -86,35 +99,14 @@
 </tr>
 </tbody>
 </table>
-<p><strong>IV. Modyfikacje dokonane w sprzęcie i oprogramowaniu ww. komputera</strong></p>
-<table style="border-collapse: collapse; width: 100%;" border="1">
-<tbody>
-<tr>
-<td style="width: 6.67758%;">Lp.</td>
-<td style="width: 18.3224%;">Data</td>
-<td style="width: 12.5%;">Opis</td>
-<td style="width: 12.5%;">Nr seryjny</td>
-<td style="width: 12.5%;">Typ/producent</td>
-<td style="width: 12.5%;">Nr IT</td>
-<td style="width: 12.5%;">Podpis informatyka</td>
-<td style="width: 12.5%;">Podpis użytkownika</td>
-</tr>
-<tr>
-<td style="width: 6.67758%;">1.</td>
-<td style="width: 18.3224%;">&nbsp;</td>
-<td style="width: 12.5%;">&nbsp;</td>
-<td style="width: 12.5%;">&nbsp;</td>
-<td style="width: 12.5%;">&nbsp;</td>
-<td style="width: 12.5%;">&nbsp;</td>
-<td style="width: 12.5%;">&nbsp;</td>
-<td style="width: 12.5%;">&nbsp;</td>
-</tr>
-</tbody>
-</table>
-<p><strong>V. Zdanie sprzętu komputerowego</strong></p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
+
+
+<script>
+    function printPage() {
+      window.print();
+    }
+    
+    window.onload = printPage;
+  </script>
 </body>
 </html>

@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseNotFound
 from django.contrib.auth.decorators import login_required
 from rest_framework import generics
 import json
+from datetime import datetime
 from django.utils.decorators import method_decorator
 from .serializers import ItemSerializer,EmployeeSerializer,ProtocolSerializer
 from .forms import EmployeeForm, ProtocolFormAdd, ItemForm, ProtocolFormReturn, ProtocolItemForm,ProtocolFormReturnNext
@@ -52,15 +53,6 @@ def newProtocolReturnConfirm(request):
 
     context={}
     return render(request, "management_system/confirm_add_protocol.html", context)
-
-@login_required
-def showEmployees(request):
-    employeeList = Employee.objects.all()
-
-    context={
-        "employeeList":employeeList
-    }
-    return render(request, "management_system/employees.html", context)
 
 
 @login_required
@@ -119,6 +111,7 @@ def newProtocolReturn(request):
 
                 newProtocol = protocolForm.save(commit=False)
                 newProtocol.is_return = True
+                newProtocol.created_by = request.user
                 newProtocol.save()
 
                 ProtocolItem(protocol_id=newProtocol,item_id=protocolFormData['item']).save()
@@ -193,14 +186,58 @@ class AddNextItem(View):
                     return redirect("addNextItem",status='return',pk=pk)
             except:
                 return HttpResponse('ERROR')
-       
 
+
+@method_decorator(login_required, name="dispatch")
+class EmployeesView(View):
+    def get(self,request):
+        queryName = str(request.GET.get('qname',''))
+        querySurname = str(request.GET.get('qsurname',''))
+        employeeQuery = self.get_query(queryName,querySurname)
+        
+
+        page = request.GET.get('page',1)
+        protocols_paginator = Paginator(employeeQuery,20)
+
+        try:
+            employeeQuery = protocols_paginator.page(page)
+        except PageNotAnInteger:
+            employeeQuery = protocols_paginator.page(1)
+        except EmptyPage:
+            employeeQuery = protocols_paginator.page(1)
+
+        context={
+            "employeeList":employeeQuery,
+            "qname_value": queryName,
+            "qsurname_value": querySurname,
+        }
+        return render(request, "management_system/employees.html", context)
+
+
+    def get_query(self,qname,qsurname):  # new
+        query = Q()
+        if qname:
+            query = query & (
+                Q(user_name__icontains=qname)
+            )
+
+        if qsurname:
+            query = query & (
+                Q(user_surname__icontains=qsurname)
+            )   
+                     
+        object_list = Employee.objects.filter(query)
+
+        return object_list
+    
 @method_decorator(login_required, name="dispatch")
 class ProtocolsView(View):
 
     def get(self,request):
-        query = str(request.GET.get('q',''))
-        protocolQuery = sorted(self.get_query(query), key=attrgetter('created'),reverse=True)
+        queryName = str(request.GET.get('qname',''))
+        querySurname = str(request.GET.get('qsurname',''))
+        queryDate = str(request.GET.get('qdate',''))
+        protocolQuery = sorted(self.get_query(queryName,querySurname,queryDate), key=attrgetter('created'),reverse=True)
         
 
         page = request.GET.get('page',1)
@@ -215,15 +252,30 @@ class ProtocolsView(View):
 
         context={
             "protocolList":protocolQuery,
-            "q_value": query
+            "qname_value": queryName,
+            "qsurname_value": querySurname,
+            "qdate_value": queryDate
         }
         return render(request, "management_system/protocols.html", context)
     
-    def get_query(self,q):  # new
-        query = q
-        object_list = Protocol.objects.filter(
-            Q(employee__user_name__icontains=query)|Q(employee__user_surname__icontains=query)|Q(created__icontains=query)
-        )
+    def get_query(self,qname,qsurname,qdate):  # new
+        query = Q()
+        if qname:
+            query = query & (
+                Q(employee__user_name__icontains=qname)
+            )
+
+        if qsurname:
+            query = query & (
+                Q(employee__user_surname__icontains=qsurname)
+            )   
+
+        if qdate:
+            date = datetime.strptime(qdate, '%d.%m.%Y').date()
+            query = query & (
+                Q(created__icontains=date)
+            )                       
+        object_list = Protocol.objects.filter(query)
         return object_list
 
 @login_required
@@ -296,7 +348,7 @@ def employeeItemsReturn(request, employee_id):
     if request.method == "POST":
         if 'confirmButton' in request.POST:
             currentEmployee = Employee.objects.get(id=employee_id)
-            newProtocol = Protocol(employee=currentEmployee,is_return=True)
+            newProtocol = Protocol(employee=currentEmployee,is_return=True,created_by=request.user)
             newProtocol.save()
             listOfItemId = request.session['itemsId']
             del request.session['itemsId']
@@ -348,6 +400,8 @@ class NewProtocolAdd(View):
 
                 newProtocol = protocolForm.save(commit=False)
                 newProtocol.is_return = False
+                newProtocol.created_by = request.user
+                print(request.user)
                 newProtocol.save()
                 ProtocolItem(protocol_id=newProtocol,item_id=protocolFormData['item']).save()
                 if 'saveAndEnd' in request.POST:
