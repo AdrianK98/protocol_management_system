@@ -193,7 +193,7 @@ class EmployeesView(View):
     def get(self,request):
         queryName = str(request.GET.get('qname',''))
         querySurname = str(request.GET.get('qsurname',''))
-        employeeQuery = self.get_query(queryName,querySurname)
+        employeeQuery = sorted(self.get_query(queryName,querySurname), key=attrgetter('id'),reverse=True)
         
 
         page = request.GET.get('page',1)
@@ -237,7 +237,7 @@ class ProtocolsView(View):
         queryName = str(request.GET.get('qname',''))
         querySurname = str(request.GET.get('qsurname',''))
         queryDate = str(request.GET.get('qdate',''))
-        protocolQuery = sorted(self.get_query(queryName,querySurname,queryDate), key=attrgetter('created'),reverse=True)
+        protocolQuery = sorted(self.get_query(queryName,querySurname,queryDate), key=attrgetter('id'),reverse=True)
         
 
         page = request.GET.get('page',1)
@@ -306,8 +306,8 @@ class ItemsView(View):
         queryIt = str(request.GET.get('qit',''))
         querySn = str(request.GET.get('qsn',''))
         queryKk = str(request.GET.get('qkk',''))
-
-        itemQuery = self.get_query(queryType,queryModel,queryIt,querySn,queryKk)
+        queryQused = request.GET.get('qused','')
+        itemQuery = sorted(self.get_query(queryType,queryModel,queryIt,querySn,queryKk,queryQused), key=attrgetter('id'),reverse=True)
         
         page = request.GET.get('page',1)
         protocols_paginator = Paginator(itemQuery,20)
@@ -326,11 +326,12 @@ class ItemsView(View):
             "qit_value": queryIt,
             "qsn_value": querySn,
             "qkk_value": queryKk,
+            "qused": queryQused,
 
         }
         return render(request, "management_system/items.html", context)
     
-    def get_query(self,qtype,qmodel,qit,qsn,qkk):  # new
+    def get_query(self,qtype,qmodel,qit,qsn,qkk,qused):  # new
         query = Q()
         if qtype:
             query = query & (
@@ -353,6 +354,10 @@ class ItemsView(View):
         if qkk:
             query = query & (
                 Q(item_kk__icontains=qkk)
+            )
+        if qused:
+            query = query & (
+                Q(item_user__isnull=False)
             )    
         object_list = Item.objects.filter(query)
         return object_list  

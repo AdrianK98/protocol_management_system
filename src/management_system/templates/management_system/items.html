@@ -9,6 +9,7 @@
     <input name="qit" type="text" placeholder="IT..." value='{{qit_value}}'>
     <input name="qsn" type="text" placeholder="S/N..." value='{{qsn_value}}'>
     <input name="qkk" type="text" placeholder="KK..." value='{{qkk_value}}'>
+    <input name="qused" type="checkbox" id="myCheckbox" value="true" {% if qused %}checked{% endif %}> Używany
     <input type='submit' value='Szukaj'>
 
 </form>
@@ -61,36 +62,30 @@
   <div class="card-footer text-end p-3">
     <a class="btn btn-primary mb-1" href="{% url 'itemsAddNew' %}" role="button">Nowy przedmiot</a>
   </div>
+
+  <div class="container p-4">
+    <div class="pagination justify-content-center">
+        <span class="step-links">
+          {% if itemList.has_previous %}
+              <a href="?page=1&q={{q_value}}">&laquo; first</a>
+              <a href="?page={{ itemList.previous_page_number }}&q={{q_value}}">previous</a>
+          {% endif %}
+
+            <span class="current">
+                Page {{ itemList.number }} of {{ itemList.paginator.num_pages }}
+            </span>
+
+          {% if itemList.has_next %}
+              <a href="?page={{ itemList.next_page_number }}&q={{q_value}}">next</a>
+              <a href="?page={{ itemList.paginator.num_pages }}&q={{q_value}}">last &raquo;</a>
+          {% endif %}
+        </span>
+        </div>
+    </div>
+  </div>   
   </div>    
 
 
+ 
 
-{% comment %} 
-        <div class="container text-center mt-5">
-                <div class="row">
-                  <div class="col"><b>Typ</b></div>
-                  <div class="col"><b>Model</b></div>
-                  <div class="col"><b>IT: </b></div>
-                  <div class="col-2"><b>SN: </b></div>
-                  <div class="col"><b>KK: </b></div>
-                  <div class="col-2"><b>Aktualny Właściciel</b></div>
-                  <div class="col-5"></div>
-        
-                {% for item in itemList %}
-                <hr>
-                    <div class="row mt-2">
-                        <div class="col">{{item.category}}</div>
-                        <div class="col">{{item.item_model}}</div>
-                        <div class="col">{{item.item_it}}</div>
-                        <div class="col-2">{{item.item_sn|default_if_none:""}}</div>
-                        <div class="col">{{item.item_kk|default_if_none:""}}</div>
-                        <div class="col-2">{{item.item_user|default_if_none:""}}</div>
-                        <div class="col-5"><a class="btn btn-primary" href="{% url 'singleItem' item.id %}" role="button">Wyświetl</a></div>
-                        
-                    </div>
-                    
-                {%endfor%}  
-                <hr>
-        
-            </div> {% endcomment %}
 {% endblock content %}
