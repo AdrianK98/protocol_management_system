@@ -3,6 +3,15 @@
 
 {% block content %}
 <h2>Sprzęt</h2>
+<form action="{% url 'itemsView' %}" method="get">
+    <input name="qtype" type="text" placeholder="Typ..." value='{{qtype_value}}'>
+    <input name="qmodel" type="text" placeholder="Model..." value='{{qmodel_value}}'>
+    <input name="qit" type="text" placeholder="IT..." value='{{qit_value}}'>
+    <input name="qsn" type="text" placeholder="S/N..." value='{{qsn_value}}'>
+    <input name="qkk" type="text" placeholder="KK..." value='{{qkk_value}}'>
+    <input type='submit' value='Szukaj'>
+
+</form>
 
 <table class="table mb-0">
     <thead>

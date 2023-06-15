@@ -31,7 +31,7 @@ urlpatterns = [
     path("protocols/",views.ProtocolsView.as_view(), name="protocollist" ),
     path("protocols/<int:pk>",views.singleProtocolView, name="singleProtocol" ),
     path("add_employee/",views.addEmployeeView, name="newemployee" ),
-    path("items/",views.itemsView, name="itemsView" ),
+    path("items/",views.ItemsView.as_view(), name="itemsView" ),
     path("items/add_new",views.itemsAddNew, name="itemsAddNew" ),
     path("items/<int:pk>",views.singleItemView, name="singleItem" ),
     path("api/items",views.ItemList.as_view()),
