@@ -7,7 +7,9 @@
 
   <h2>{{protocol.is_return|yesno:"Zwrot,Przekazanie"}} dla {{protocol.employee}} z {{protocol.created|date:"d.m.Y"}}</h2>
   <b>Sporządzony przez:  </b>{{protocol.created_by.first_name}} {{protocol.created_by.last_name}}<br><br>
-  
+  <form action="{% url 'protocolRaportToPrint' %}" method="get">
+    <button class="btn btn-dark  me-5" role="button" type="submit" name='protocol' value='{{protocol.id}}'>Drukuj</button>
+  </form>
   {% for item in items%}
   <b>Typ:  </b>{{item.item_id.category}} <br>
   <b>Producent:  </b>{{item.item_id.item_producent}} <br>
@@ -17,7 +19,38 @@
 
   <br>
   {% endfor %}
-  <form action="{% url 'protocolRaportToPrint' %}" method="get">
-  <button class="btn btn-dark  me-5" role="button" type="submit" name='protocol' value='{{protocol.id}}'>Drukuj</button>
-</form>
+
+  <ul id="myTab" role="tablist" class="nav nav-tabs nav-pills flex-column flex-sm-row text-center bg-light border-0 rounded-nav">
+    <li class="nav-item flex-sm-fill">
+      <a id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true" class="nav-link border-0 text-uppercase font-weight-bold active">Sprzęt</a>
+    </li>
+    <li class="nav-item flex-sm-fill">
+      <a id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false" class="nav-link border-0 text-uppercase font-weight-bold">Informacje</a>
+    </li>
+
+  </ul>
+  <div id="myTabContent" class="tab-content">
+    <div id="home" role="tabpanel" aria-labelledby="home-tab" class="tab-pane fade px-4 py-5 show active">
+      TU BEDZIE SPRZET
+    </div>
+    <div id="profile" role="tabpanel" aria-labelledby="profile-tab" class="tab-pane fade px-4 py-5">
+      INFOMACJE
+    </div>
+
+  </div>
+
+
+
+  <script>
+    $(document).ready(function() {
+      // Activate the first tab
+      $('#myTab a:first').tab('show');
+      
+      // Handle tab click event
+      $('#myTab a').on('click', function(event) {
+        event.preventDefault();
+        $(this).tab('show');
+      });
+    });
+  </script>
 {% endblock content %}

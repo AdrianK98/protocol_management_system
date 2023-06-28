@@ -3,19 +3,19 @@
 
 {% block content %}
 
-<nav class="navbar navbar-expand-lg bg-dark">
+<nav class="navbar navbar-expand-lg" style="background-color:#DBD5D3;">
     <div class="container-fluid">
-      <h3 class="text-white">{{employee}}</h3>
+      <h3 class="text-black">{{employee}}</h3>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse " id="navbarSupportedContent">
         <ul class="navbar-nav ms-center mx-5 mb-lg-0">
                       <li class="nav-item">
-            <a class="btn btn-outline-light me-2" href="{% url 'singleEmployeeProtocols' employee.id %}" role="button">Protokoły</a>
+            <a class="btn btn-light me-2" href="{% url 'singleEmployeeProtocols' employee.id %}" role="button">Protokoły</a>
           </li>
           <li class="nav-item">
-            <a class="btn btn-outline-success me-2" href="{% url 'newprotocol'  %}?eid={{employee.id}}" role="button">Dodaj sprzęt</a>
+            <a class="btn btn-success me-2" href="{% url 'newprotocol'  %}?eid={{employee.id}}" role="button">Dodaj sprzęt</a>
           </li>
 
 
@@ -39,53 +39,96 @@
 
 
 
-<div class="container text-center mt-5">
-    <div class="row">
-        
-      <div class="col">
-        
-      </div>
-      <div class="col">
-        
-      </div>
-      <div class="col-9"></div>
-    </div>
-    </div>
 
 
 
 
+{% comment %} 
 
-
-    <div class="container text-center mt-5">
         <div class="row">
-          <div class="col"><b>Nazwa sprzętu: </b></div>
-          <div class="col"><b>IT: </b></div>
-          <div class="col-2"><b>SN: </b></div>
-          <div class="col"><b>KK: </b></div>
-          <div class="col"></div>
-          <div class="col"></div>
-          <div class="col-6"></div>
+          <div class="col-2 text-center"><b>Typ </b></div>
+          <div class="col text-center"><b>Model</b></div>
+          <div class="col-2 text-center bg-primary"><b>IT</b></div>
+          <div class="col text-center"><b>SN</b></div>
+          <div class="col text-center"><b>KK</b></div>
+          <div class="col text-center"></div>
+          <div class="col-2 text-center"></div>
 
         {% for item in items%}
         <hr>
             <div class="row mt-2">
-                <div class="col">{{item.item_name}}</div>
-                <div class="col">{{item.item_it}}</div>
-                <div class="col-2">{{item.item_sn|default_if_none:""}}</div>
-                <div class="col">{{item.item_kk|default_if_none:""}}</div>
-                <div class="col"><a class="btn btn-primary" href="{% url 'singleItem' item.id %}" role="button">Wyświetl</a></div>
-                <div class="col"><a class="btn btn-danger zdajBtn"  role="button" data-item-id="{{item.id}}">-</a></div>
-                <div class="col-6"></div>
+                <div class="col-2 text-center">{{item.category}}</div>
+                <div class="col text-center">{{item.item_model}}</div>
+                <div class="col-2 text-center bg-primary">{{item.item_it|default_if_none:""}}</div>
+                <div class="col text-center">{{item.item_sm|default_if_none:""}}</div>
+                <div class="col text-center">{{item.item_kk|default_if_none:""}}</div>
+
+                <div class="col-2"></div>
+                <div class="col text-center mb-2"><a class="btn btn-primary" href="{% url 'singleItem' item.id %}" role="button">Wyświetl</a></div>
+                <div class="col "><a class="btn btn-danger zdajBtn"  role="button" data-item-id="{{item.id}}">Zdaj</a></div>
                 
             </div>
             
         {%endfor%}  
-        <hr>
+        <hr> {% endcomment %}
 
+
+
+
+
+
+
+
+    <table class="table mb-0">
+      <thead>
+        <tr>
+          <th scope="col">Typ</th>
+          <th scope="col">Model</th>
+          <th scope="col">IT</th>
+          <th scope="col">S/N</th>
+          <th scope="col">KK</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+  
+          {% for item in items %}
+        <tr class="fw-normal">
+          <td>
+            <span>{{item.category}}</span>
+          </td>
+          <td class="align-middle">
+            <span>{{item.item_model}}</span>
+          </td>
+          <td class="align-middle">
+              <span>{{item.item_it}}</span>
+            </td>
+            <td class="align-middle">
+              <span>{{item.item_sn|default_if_none:""}}</span>
+            </td>
+            <td class="align-middle">
+              <span>{{item.item_kk|default_if_none:""}}</span>
+            </td>
+            
+          <td>
+            <a class="btn btn-primary" href="{% url 'singleItem' item.id %}" role="button">Wyświetl</a>
+
+            <a class="btn btn-danger zdajBtn"  role="button" data-item-id="{{item.id}}">Zdaj</a>
+
+          </td>
           
+        </tr>
+  
+        {%endfor%} 
+  
+      </tbody>
+    </table>  
 
-    </div>
+
+
+
+
+
     <script>
         // Define an empty array to store the IDs
         var idList = [];

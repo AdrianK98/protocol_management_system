@@ -423,7 +423,7 @@ def employeeItemsReturn(request, employee_id):
 
                 newProtocolItem = ProtocolItem(protocol_id=newProtocol,item_id=itemObj)
                 newProtocolItem.save()
-            return redirect('singleEmployee',pk=employee_id)
+            return redirect("singleProtocol",pk=newProtocol.id)
         
         listOfItemId = json.loads(request.POST.get("idList"))
         # Process the idList and employee_id as needed
