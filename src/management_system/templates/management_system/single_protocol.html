@@ -10,15 +10,6 @@
   <form action="{% url 'protocolRaportToPrint' %}" method="get">
     <button class="btn btn-dark  me-5" role="button" type="submit" name='protocol' value='{{protocol.id}}'>Drukuj</button>
   </form>
-  {% for item in items%}
-  <b>Typ:  </b>{{item.item_id.category}} <br>
-  <b>Producent:  </b>{{item.item_id.item_producent}} <br>
-  <b>Model:  </b>{{item.item_id.item_model}} <br>
-  <b>S/N:  </b>{{item.item_id.item_sn|default_if_none:""}}<br>
-  <b>IT:  </b>{{item.item_id.item_it|default_if_none:""}}<br>
-
-  <br>
-  {% endfor %}
 
   <ul id="myTab" role="tablist" class="nav nav-tabs nav-pills flex-column flex-sm-row text-center bg-light border-0 rounded-nav">
     <li class="nav-item flex-sm-fill">
@@ -31,7 +22,53 @@
   </ul>
   <div id="myTabContent" class="tab-content">
     <div id="home" role="tabpanel" aria-labelledby="home-tab" class="tab-pane fade px-4 py-5 show active">
-      TU BEDZIE SPRZET
+      
+      <table class="table mb-0">
+        <thead>
+          <tr>
+            <th scope="col">Typ</th>
+            <th scope="col">Model</th>
+            <th scope="col">IT</th>
+            <th scope="col">S/N</th>
+            <th scope="col">KK</th>
+            <th scope="col"></th>
+            
+          </tr>
+        </thead>
+        <tbody>
+    
+            {% for item in items %}
+          <tr class="fw-normal">
+            <td>
+              <span>{{item.item_id.category}}</span>
+            </td>
+            <td class="align-middle">
+              <span>{{item.item_id.item_model}}</span>
+            </td>
+            <td class="align-middle">
+                <span>{{item.item_id.item_it}}</span>
+              </td>
+              <td class="align-middle">
+                <span>{{item.item_id.item_sn|default_if_none:""}}</span>
+              </td>
+              <td class="align-middle">
+                <span>{{item.item_id.item_kk|default_if_none:""}}</span>
+              </td>
+              
+            <td class="align-middle">
+                <a class="btn btn-success mb-1" href="{% url 'singleItem' item.item_id.id %}" role="button">Wyświetl</a>
+              {% comment %} <a href="#!" data-mdb-toggle="tooltip" title="Remove"><i
+                  class="fas fa-trash-alt text-danger"></i></a> {% endcomment %}
+            </td>
+          </tr>
+    
+          {%endfor%} 
+    
+        </tbody>
+      </table>
+
+
+
     </div>
     <div id="profile" role="tabpanel" aria-labelledby="profile-tab" class="tab-pane fade px-4 py-5">
       INFOMACJE
