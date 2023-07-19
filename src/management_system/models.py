@@ -2,7 +2,6 @@ from django.db import models
 from io import BytesIO
 from django.conf import settings
 import barcode
-from barcode import EAN13
 from barcode.writer import ImageWriter
 from datetime import datetime
 
