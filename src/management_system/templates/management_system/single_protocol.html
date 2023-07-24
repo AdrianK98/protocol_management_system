@@ -10,7 +10,7 @@
   <form action="{% url 'protocolRaportToPrint' %}" method="get">
     <button class="btn btn-dark  me-5" role="button" type="submit" name='protocol' value='{{protocol.id}}'>Drukuj</button>
   </form>
-
+  <button id="downloadButton">Download PDF</button>
   <ul id="myTab" role="tablist" class="nav nav-tabs nav-pills flex-column flex-sm-row text-center bg-light border-0 rounded-nav">
     <li class="nav-item flex-sm-fill">
       <a id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true" class="nav-link border-0 text-uppercase font-weight-bold active">Sprzęt</a>
@@ -100,6 +100,30 @@
         event.preventDefault();
         $(this).tab('show');
       });
+
+      document.getElementById('downloadButton').addEventListener('click', function() {
+        // Replace "path/to/your/file.pdf" with the actual path to your PDF file on the server.
+        var pdfFilePath = '/mnt/skany/test.pdf';
+        
+        // Create an anchor element dynamically
+        var downloadLink = document.createElement('a');
+        
+        // Set the anchor's href to the PDF file path
+        downloadLink.href = pdfFilePath;
+        
+        // Set the anchor's "download" attribute to force the download instead of navigation
+        downloadLink.setAttribute('download', 'your_file_name.pdf');
+        
+        // Append the anchor to the document body
+        document.body.appendChild(downloadLink);
+        
+        // Click the anchor to start the download
+        downloadLink.click();
+        
+        // Remove the anchor from the document body (optional, but clean)
+        document.body.removeChild(downloadLink);
+      });
+
     });
   </script>
 {% endblock content %}
