@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-ptrqxu-484uvh5+8k%!t$2^vozu+o_y5=t95so+kvum-t04dr4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -82,7 +82,7 @@ WSGI_APPLICATION = 'src.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'devdb',
+        'NAME': 'testdb',
         'USER': 'testt',
         'PASSWORD': 'testt',
         'HOST': 'localhost',
@@ -125,14 +125,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 MEDIA_URL ='/media/'
+
+MEDIA_ROOT = BASE_DIR/'media'
+
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
-MEDIA_ROOT = BASE_DIR/'media'
-
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
