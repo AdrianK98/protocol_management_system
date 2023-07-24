@@ -10,7 +10,11 @@
   <b>Sporządzony przez:  </b>{{protocol.created_by.first_name}} {{protocol.created_by.last_name}}<br><br>
   <form action="{% url 'protocolRaportToPrint' %}" method="get">
     <button class="btn btn-dark  me-5" role="button" type="submit" name='protocol' value='{{protocol.id}}'>Drukuj</button>
-    <a class="btn btn-success mb-1" href="{% static 'protocols/test.pdf' %}" role="button">PDF</a>
+    {% if not protocol.is_scanned %}
+    <a class="btn btn-secondary mb-1 disabled"  role="button" >PDF</a>
+    {% else %}
+    <a class="btn btn-success mb-1" href="{% static 'protocols/test.pdf' %}" role="button" >PDF</a>
+    {% endif %}
   </form>
   <ul id="myTab" role="tablist" class="nav nav-tabs nav-pills flex-column flex-sm-row text-center bg-light border-0 rounded-nav">
     <li class="nav-item flex-sm-fill">

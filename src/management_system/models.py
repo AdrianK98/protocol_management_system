@@ -48,7 +48,7 @@ class Protocol(models.Model):
         currentMinute = str(datetime.now().minute)
         currentHour = str(datetime.now().hour) 
         EAN = barcode.get_barcode_class('ean13')
-        ean = EAN(f'{currentYear.zfill(4)}{currentMonth.zfill(2)}{currentDay.zfill(2)}{currentMinute.zfill(2)}{currentSecond.zfill(2)}{self.employee.id}', writer=ImageWriter())
+        ean = f'{currentYear.zfill(4)}{currentMonth.zfill(2)}{currentDay.zfill(2)}{currentMinute.zfill(2)}{currentSecond.zfill(2)}{self.employee.id}'
         self.barcode = ean
         # buffer = BytesIO()
         # ean.write(buffer)
