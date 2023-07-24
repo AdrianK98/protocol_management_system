@@ -33,6 +33,7 @@ class Protocol(models.Model):
     modified=models.DateField('Data modyfikacji',auto_now=True,blank=True,null=True)
     description=models.CharField('Opis',max_length=200,blank=True,null=True)
     is_return=models.BooleanField('Zwrot',blank=True)
+    is_scanned=models.BooleanField('Skan',default=False, null=False, blank=False)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,blank=True,null=True
