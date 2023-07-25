@@ -13,9 +13,9 @@ DATE_INPUT_FORMATS = ['%d-%m-%Y']
 
 class Item(models.Model):
     category = models.ForeignKey("ItemCategory", on_delete=models.PROTECT,null=True,blank=False,verbose_name="Kategoria")
-    item_producent = models.CharField('Producent',max_length=200,blank=True,null=True)
-    item_model = models.CharField('Model',max_length=200,blank=True,null=True)
-    item_sn = models.CharField('Numer S/N',max_length=200,blank=True,null=True)
+    item_producent = models.CharField('Producent',max_length=200)
+    item_model = models.CharField('Model',max_length=200)
+    item_sn = models.CharField('Numer S/N',max_length=200)
     item_it = models.CharField('Numer IT',max_length=200,blank=True,null=True)
     item_kk = models.CharField("Numer KK",max_length=200,blank=True,null=True)
     item_user = models.ForeignKey("users.Employee", on_delete=models.PROTECT,null=True,blank=True,verbose_name="Pracownik")
