@@ -47,7 +47,9 @@
             <span>{{item.item_kk|default_if_none:""}}</span>
           </td>
           <td class="align-middle"> 
+            {% if item.item_user %}
             <a  class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="{%url 'singleEmployee' item.item_user.id%}"role="button"><span>{{item.item_user|default_if_none:""}}</span></a>
+            {% endif %}
           </td>
           
         <td class="align-middle">
