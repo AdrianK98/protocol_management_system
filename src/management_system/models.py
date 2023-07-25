@@ -29,7 +29,7 @@ class Item(models.Model):
 
 class Protocol(models.Model):
     created=models.DateField('Data utworzenia',auto_now_add=True)
-    barcode=models.CharField(max_length=13,blank=True, unique=True)
+    barcode=models.CharField(max_length=20,blank=True, unique=True)
     modified=models.DateField('Data modyfikacji',auto_now=True,blank=True,null=True)
     description=models.CharField('Opis',max_length=200,blank=True,null=True)
     is_return=models.BooleanField('Zwrot',blank=True)
@@ -47,7 +47,6 @@ class Protocol(models.Model):
         currentSecond= str(datetime.now().second)
         currentMinute = str(datetime.now().minute)
         currentHour = str(datetime.now().hour) 
-        EAN = barcode.get_barcode_class('ean13')
         ean = f'{currentYear.zfill(4)}{currentMonth.zfill(2)}{currentDay.zfill(2)}{currentMinute.zfill(2)}{currentSecond.zfill(2)}{self.employee.id}'
         self.barcode = ean
         # buffer = BytesIO()

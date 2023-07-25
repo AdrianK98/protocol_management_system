@@ -451,6 +451,7 @@ class NewProtocolAdd(View):
         if protocolForm.is_valid():
             try:
                 protocolFormData = protocolForm.cleaned_data
+                
                 #IF ITS NOT RETURN AND USER ITEM IS NOT EMPLOYEE AND ITEM USER IS NOT EMPTY
                 if protocolFormData['item'].item_user != protocolFormData['employee'] and protocolFormData['item'].item_user:
                     return HttpResponse('CANT DO IT')
@@ -460,12 +461,13 @@ class NewProtocolAdd(View):
                 else:
                     protocolFormData['item'].item_user = protocolFormData['employee']
                     protocolFormData['item'].save()
+                    
                 
 
                 newProtocol = protocolForm.save(commit=False)
                 newProtocol.is_return = False
                 newProtocol.created_by = request.user
-                print(request.user)
+                
                 newProtocol.save()
                 ProtocolItem(protocol_id=newProtocol,item_id=protocolFormData['item']).save()
                 if 'saveAndEnd' in request.POST:
@@ -474,7 +476,7 @@ class NewProtocolAdd(View):
                     return redirect("addNextItem",status='add',pk=newProtocol.id)
                 
             except:
-                    print("An exception occurred")
+                    return HttpResponse('ERROR')
 
     def get(self,request):
         protocolFormClass = ProtocolFormAdd
