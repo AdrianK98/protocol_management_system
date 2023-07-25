@@ -12,4 +12,4 @@ class Employee(models.Model):
     user_location=models.CharField('Lokalizacja',max_length=200, blank=True)
 
     def __str__(self):
-        return str(self.id) +" "+self.user_name +" "+ self.user_surname
+        return self.user_name +" "+ self.user_surname
