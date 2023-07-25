@@ -80,12 +80,12 @@
       <ul class="list-group list-group-flush">
         <li class="list-group-item"><b>Barcode:</b> {{protocol.barcode}}</li>
         <li class="list-group-item"><b>Osoba odbierająca:</b> {{protocol.employee}}</li>
-        <li class="list-group-item"><b>Osoba przekazująca:</b> {{protocol.created_by.first_name}} {{protocol.created_by.last_name}}</li>
+        <li class="list-group-item"><b>Informatyk:</b> {{protocol.created_by.first_name}} {{protocol.created_by.last_name}}</li>
         <li class="list-group-item"><b>Data przekazania:</b> {{protocol.created|date:"d.m.Y"}}</li>
         <li class="list-group-item"><b>Typ:</b> {{protocol.is_return|yesno:"Zwrot,Przekazanie"}}</li>
         <li class="list-group-item"><b>Lokalizacja:</b> {{protocol.employee.user_location}}</li>
         <li class="list-group-item"><b>Dział:</b> {{protocol.employee.user_department}}</li>
-        <li class="list-group-item"><b>Wydrukowany:</b> TAK/NIE......TBA</li>
+        <li class="list-group-item"><b>Skan:</b> {{protocol.is_scanned|yesno:"TAK,NIE"}}</li>
       </ul>
 
 

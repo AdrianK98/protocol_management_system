@@ -33,7 +33,7 @@
               <li class="list-group-item"><b>Numer S/N:</b> {{item.item_sn}}</li>
               <li class="list-group-item"><b>Numer IT:</b> {{item.item_it}}</li>
               {%if item.item_user.id%}
-              <li class="list-group-item"><b>Posiadacz:</b> <a  href="{%url 'singleEmployee' item.item_user.id%}"role="button">{{item.item_user}} </a> </li>
+              <li class="list-group-item "><b>Posiadacz:</b> <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="{%url 'singleEmployee' item.item_user.id%}"role="button">{{item.item_user}} </a> </li>
               {%endif%}
             </ul>
       
