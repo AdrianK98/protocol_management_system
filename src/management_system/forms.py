@@ -23,7 +23,7 @@ class ProtocolFormAdd(forms.ModelForm):
     )
     class Meta:
         model = Protocol
-        fields = ['employee','item']
+        fields = ['employee','item','description']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args,**kwargs)

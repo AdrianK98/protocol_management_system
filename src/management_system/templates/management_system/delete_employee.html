@@ -17,7 +17,8 @@
     <!-- Security token -->
     {% csrf_token %}
  
-    <button type="submit" class="btn btn-primary mt-3">Potwierdź</button>
+    <button type="submit" class="btn btn-danger mt-3">Potwierdź</button> 
+    <a class="btn btn-success mt-3" href="{% url 'employees'  %}" role="button">Anuluj</a>
 </form>
 
 {% endblock content %}

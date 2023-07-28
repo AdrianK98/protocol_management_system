@@ -182,8 +182,8 @@ class AddNextItem(View):
     
     def get(self,request,status,pk):
         if status == 'add':
-            return render(request, "management_system/new_protocol_next_item.html", {'itemForm':ProtocolItemForm})
-        return render(request, "management_system/new_protocol_next_item.html", {'itemForm':ProtocolFormReturnNext})
+            return render(request, "management_system/new_protocol_next_item.html", {'itemForm':ProtocolItemForm,"pk":pk})
+        return render(request, "management_system/new_protocol_next_item.html", {'itemForm':ProtocolFormReturnNext,"pk":pk})
 
     def addItem(self,request,status,pk):
         itemForm = ProtocolItemForm(request.POST)
