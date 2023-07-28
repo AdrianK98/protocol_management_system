@@ -29,5 +29,23 @@
                 $('#show-employee-btn').hide();
             });
         }); {% endcomment %}
+        $(document).ready(function () {
+          $('#search-employee').select2({
+            ajax: {
+              url: '/get_filtered_employees/',
+              dataType: 'json',
+              delay: 250,
+              data: function (params) {
+                print('xd')
+              },
+              processResults: function (data) {
+                print('xd')
+              },
+              cache: true,
+            },
+            minimumInputLength: 1,
+          });
+        });
+        
 </script>
 {% endblock content %}

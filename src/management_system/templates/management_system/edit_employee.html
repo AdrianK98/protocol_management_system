@@ -4,7 +4,7 @@
 {% block content %}
 
 
-<h1>Dodawanie nowego pracownika</h1>
+<h1>Edycja Pracownika</h1>
 <form method="POST" enctype="multipart/form-data">
  
     <!-- Security token -->
@@ -13,7 +13,7 @@
     <!-- Using the formset -->
     {{ form|crispy }}
      
-    <button type="submit" class="btn btn-primary mt-3">Stwórz</button>
+    <button type="submit" class="btn btn-primary mt-3">Zapisz</button>
 </form>
 
 {% endblock content %}

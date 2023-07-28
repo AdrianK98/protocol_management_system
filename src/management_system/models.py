@@ -47,7 +47,8 @@ class Protocol(models.Model):
         currentSecond= str(datetime.now().second)
         currentMinute = str(datetime.now().minute)
         currentHour = str(datetime.now().hour) 
-        ean = f'{currentYear.zfill(4)}{currentMonth.zfill(2)}{currentDay.zfill(2)}{currentMinute.zfill(2)}{currentSecond.zfill(2)}{self.employee.id}'
+        employeeId= str(self.employee.id)
+        ean = f'{currentYear.zfill(4)}{currentMonth.zfill(2)}{currentDay.zfill(2)}{currentMinute.zfill(2)}{currentSecond.zfill(2)}{employeeId.zfill(2)}'
         self.barcode = ean
         # buffer = BytesIO()
         # ean.write(buffer)

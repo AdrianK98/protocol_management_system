@@ -36,8 +36,10 @@
         <td class="align-middle">
           <h6 class="mb-0"><span class="badge bg-danger">{{employee.user_location|default_if_none:""}}</span></h6>
         </td>
-        <td class="align-middle">
+        <td >
             <a class="btn btn-success mb-1" href="{% url 'singleEmployee' employee.id %}" role="button">Wyświetl</a>
+            <a class="btn btn-info mb-1" href="{% url 'editEmployee' %}?id={{employee.id}}" role="button">Edycja</a>
+            <a class="btn btn-danger mb-1" href="{% url 'deleteEmployee' employee.id %}" role="button">Usuń</a>
           {% comment %} <a href="#!" data-mdb-toggle="tooltip" title="Remove"><i
               class="fas fa-trash-alt text-danger"></i></a> {% endcomment %}
         </td>

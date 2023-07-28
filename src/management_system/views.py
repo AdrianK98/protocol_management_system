@@ -1,5 +1,5 @@
-from django.shortcuts import render,redirect
-from django.http import HttpResponse, HttpResponseNotFound
+from django.shortcuts import render,redirect,get_object_or_404
+from django.http import HttpResponse, HttpResponseNotFound, JsonResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from rest_framework import generics
 import json
@@ -19,7 +19,44 @@ from users.models import Employee
 from .models import Item,Protocol, ProtocolItem
 
 
+@login_required
+def deleteEmployeeView(request,pk):
+    
+    # fetch the object related to passed id
+    obj = get_object_or_404(Employee, id = pk)
+    context ={
+        'employee':obj,
+    }
+    if request.method =="POST":
+        try:
+            obj.delete()
+            return redirect("employees")
+        except Exception as e:
+            messages.error(request, f"{e}.")
+            return redirect("deleteEmployee",pk=pk)
 
+    return render(request, "management_system/delete_employee.html", context)
+
+@method_decorator(login_required, name="dispatch")
+class editEmployeeView(View):
+    def post(self, request):
+        obj = get_object_or_404(Employee, id = request.GET.get('id',''))
+        form = EmployeeForm(request.POST or None,instance = obj)
+        if form.is_valid():
+            form.save()
+            return redirect("employees")
+        context={
+            "form":form
+        }
+        return render(request, "management_system/edit_employee.html", context)
+
+    def get(self, request):
+        obj = get_object_or_404(Employee, id = request.GET.get('id',''))
+        form = EmployeeForm(instance = obj)
+        context={
+                "form":form
+            }
+        return render(request, "management_system/edit_employee.html", context)
 
 @login_required
 def mainView(request):
@@ -479,13 +516,15 @@ class NewProtocolAdd(View):
                     return HttpResponse('ERROR')
 
     def get(self,request):
-        protocolFormClass = ProtocolFormAdd
         if request.GET.get('eid'):
+            protocolFormClass = ProtocolFormAdd
             protocolForm = protocolFormClass(initial={
                 'employee': Employee.objects.get(id=request.GET.get('eid'))
             })
             return render(request, self.template,{'protocolForm':protocolForm})
-        return render(request, self.template,{'protocolForm':protocolFormClass})
+        else:
+            protocolFormClass = ProtocolFormAdd
+            return render(request, self.template,{'protocolForm':protocolFormClass})
 
 
 
