@@ -35,6 +35,7 @@ urlpatterns = [
     path("add_employee/delete/<int:pk>",views.deleteEmployeeView, name="deleteEmployee" ),
     path("items/",views.ItemsView.as_view(), name="itemsView" ),
     path("items/add_new",views.itemsAddNew, name="itemsAddNew" ),
+    path("items/edit/<int:pk>",views.itemsEdit, name="itemsEdit" ),
     path("items/<int:pk>",views.singleItemView, name="singleItem" ),
     path("api/items",views.ItemList.as_view()),
     path("api/items/<int:pk>",views.ItemDetail.as_view()),

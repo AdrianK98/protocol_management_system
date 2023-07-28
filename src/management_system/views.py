@@ -19,6 +19,8 @@ from users.models import Employee
 from .models import Item,Protocol, ProtocolItem
 
 
+
+
 @login_required
 def deleteEmployeeView(request,pk):
     
@@ -36,6 +38,28 @@ def deleteEmployeeView(request,pk):
             return redirect("deleteEmployee",pk=pk)
 
     return render(request, "management_system/delete_employee.html", context)
+
+@login_required
+def itemsEdit(request,pk):
+
+    context ={}
+ 
+    # fetch the object related to passed id
+    obj = get_object_or_404(Item, id = pk)
+ 
+    # pass the object as instance in form
+    form = ItemForm(request.POST or None, instance = obj)
+ 
+    # save the data from the form and
+    # redirect to detail_view
+    if form.is_valid():
+        try:
+            form.save()
+            return redirect("itemsView")
+        except Exception as e:
+            return HttpResponse(f"{e}")
+    context["itemForm"] = form
+    return render(request, "management_system/items_edit.html", context)
 
 @method_decorator(login_required, name="dispatch")
 class editEmployeeView(View):
