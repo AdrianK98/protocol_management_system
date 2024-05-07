@@ -39,6 +39,8 @@ class Protocol(models.Model):
         on_delete=models.CASCADE,blank=True,null=True
     )
     employee=models.ForeignKey("users.Employee", on_delete=models.CASCADE,null=True,verbose_name="Pracownik")
+    protocol_scan = models.BinaryField('SkanProtokolu',blank=True,null=True, editable=True)
+
 
     def save(self, *args, **kwargs):
         currentDay = str(datetime.now().day)
