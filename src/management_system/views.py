@@ -12,14 +12,18 @@ from django.views import View
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from operator import attrgetter
+import base64
 
 
 # Create your views here.
 from users.models import Employee
 from .models import Item,Protocol, ProtocolItem
 
-
-
+@login_required
+def singleProtocolViewScan(request,pk):
+    obj = Protocol.objects.get(id=pk)
+    blob = base64.b64decode(obj.protocol_scan)
+    return HttpResponse(blob, content_type='application/pdf')
 
 @login_required
 def deleteEmployeeView(request,pk):

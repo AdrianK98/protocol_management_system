@@ -13,7 +13,8 @@
     {% if not protocol.is_scanned %}
     <a class="btn btn-secondary mb-1 disabled"  role="button" >PDF</a>
     {% else %}
-    <a class="btn btn-success mb-1" href="{% static 'protocols/'|add:protocol.barcode|add:'.pdf' %}" role="button" >PDF</a>
+   <!--  <a class="btn btn-success mb-1" href="{% static 'protocols/'|add:protocol.barcode|add:'.pdf' %}" role="button" >PDF</a> -->
+    <a class="btn btn-success mb-1" href="{% url 'singleProtocolScan' protocol.id %}" role="button" >PDF</a>
     {% endif %}
   </form>
   <ul id="myTab" role="tablist" class="nav nav-tabs nav-pills flex-column flex-sm-row text-center bg-light border-0 rounded-nav">
