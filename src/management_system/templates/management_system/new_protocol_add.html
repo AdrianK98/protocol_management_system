@@ -118,6 +118,17 @@
     $('#search-items').select2();
     $('#search-items' + id).select2();
 
+    var x = document.createElement('button');
+    x.classList.add('btn');
+    x.classList.add('btn-danger');
+    x.classList.add('py-0');
+    x.classList.add('px-2');
+    x.innerHTML = "X";
+    x.addEventListener('click', () => {
+      div_id_item.removeChild(field);
+    });
+    field.appendChild(x);
+
     // Meke next id unique
     id++;
   }
