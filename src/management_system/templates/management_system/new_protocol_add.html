@@ -48,6 +48,7 @@
     // Validate items
     var seen = [];
     for(var item of items){
+      if(!item.value) continue;
       if(seen.includes(item.value)){
         // Alert user with name (got from span)
         alert("Zduplikowany przedmiot " + item.parentElement.children[1].innerText);
