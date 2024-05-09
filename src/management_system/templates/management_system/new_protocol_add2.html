@@ -1,0 +1,75 @@
+{% extends 'main.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+
+
+  <h1>Nowe przekazanie</h1>
+  <form method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="endMyLife" />
+ 
+    <!-- Security token -->
+    {% csrf_token %}
+ 
+    <!-- Using the formset -->
+    {{ protocolForm|crispy }}
+    <hr>
+    {% if messages %}
+    <div class="alert alert-danger">
+        {% for message in messages %}
+        
+          <strong>Uwaga!</strong> {{message}}.
+   
+        {% endfor %}
+    </div>
+{% endif %}
+     
+    <button type="button" onclick="send()" class="btn btn-success mt-3" name="saveAndEnd">Zapisz</button>
+    <button type="button" onclick="addItem()" class="btn btn-secondary mt-3" name="saveAndContinue">Dodaj Kolejny</button>
+</form>
+<script type="text/javascript">
+  $(document).ready(function() {
+      $('.select2field').select2();
+  });
+  async function send(){
+    const token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+    const employee = document.getElementById('search-employee').value;
+    const items = document.getElementsByName('item');
+   
+    var id = undefined;
+    for(var item of items){
+      var data = new FormData();
+      data.append('csrfmiddlewaretoken', token);
+      data.append('employee', employee);
+      data.append('item', item.value);
+      if(id != undefined)
+        data.append('pk', id);
+      console.log(id);
+      var res = await fetch('/new_protocol/add', { 
+        method: "POST",
+        body: new URLSearchParams(data),
+      });
+      d = await res.json();
+      id = d.pk;
+    }
+    window.location.href = "{% url 'protocollist' %}" + id;
+  }
+
+  var id = 0;
+  function addItem(){
+    var div_id_item = document.getElementById('div_id_item');
+    var field = div_id_item.getElementsByTagName('div')[0].cloneNode(true);
+    field.getElementsByTagName('select')[0].id += id;
+    field.removeChild(field.children[1]);
+    div_id_item.appendChild(field);
+    $('#search-items' + id).select2();
+    $('#search-items').select2();
+    $('#search-items' + id).select2();
+    id++;
+  }
+</script>
+
+
+
+{% endblock content %}
