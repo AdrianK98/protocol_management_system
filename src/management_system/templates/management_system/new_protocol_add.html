@@ -7,6 +7,7 @@
 
   <h1>Nowe przekazanie</h1>
   <form method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="endMyLife" />
  
     <!-- Security token -->
     {% csrf_token %}
@@ -24,13 +25,74 @@
     </div>
 {% endif %}
      
-    <button type="submit" class="btn btn-success mt-3" name="saveAndEnd">Zapisz</button>
-    <button type="submit" class="btn btn-secondary mt-3" name="saveAndContinue">Dodaj Kolejny</button>
+    <button type="button" onclick="send()" class="btn btn-success mt-3" name="saveAndEnd">Zapisz</button>
+    <button type="button" onclick="addItem()" class="btn btn-secondary mt-3" name="saveAndContinue">Dodaj Kolejny</button>
 </form>
 <script type="text/javascript">
   $(document).ready(function() {
       $('.select2field').select2();
   });
+
+  async function send(){
+    // Get data from form, including token
+    const token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+    const employee = document.getElementById('search-employee').value;
+    const items = document.getElementsByName('item'); // Gets all fields with name=item
+   
+    // Variable with pk
+    var id = undefined;
+
+    // Send each item to server
+    for(var item of items){
+      // Create form-loke data
+      var data = new FormData();
+      data.append('csrfmiddlewaretoken', token);
+      data.append('employee', employee);
+      data.append('item', item.value);
+
+      // If we have pk send it too
+      if(id != undefined)
+        data.append('pk', id);
+      console.log(id);
+
+      // Send data and wait for response
+      var res = await fetch('/new_protocol/add', { 
+        method: "POST",
+        body: new URLSearchParams(data),
+      });
+
+      // Response is in JSON format
+      d = await res.json();
+
+      // Get pk
+      id = d.pk;
+    }
+
+    // Redirect to the protocol
+    window.location.href = "{% url 'protocollist' %}" + id;
+  }
+
+  // This variable holds search-item id
+  var id = 0;
+  function addItem(){
+    // Get div where we're willing to add new field
+    var div_id_item = document.getElementById('div_id_item');
+
+    // Clone first field, change its id, remove span (will be added by jQuery), then append to div
+    var field = div_id_item.getElementsByTagName('div')[0].cloneNode(true);
+    field.getElementsByTagName('select')[0].id += id;
+    field.removeChild(field.children[1]);
+    div_id_item.appendChild(field);
+
+    // A 'lil trick here, for some reason we must update both new and the very first field in that order
+    // Otherwise it breaks everything
+    $('#search-items' + id).select2();
+    $('#search-items').select2();
+    $('#search-items' + id).select2();
+
+    // Meke next id unique
+    id++;
+  }
 </script>
 
 

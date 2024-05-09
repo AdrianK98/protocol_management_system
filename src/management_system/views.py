@@ -14,6 +14,8 @@ from django.db.models import Q
 from operator import attrgetter
 import base64
 
+# TODO: for debug only, delete in release
+from pprint import pprint
 
 # Create your views here.
 from users.models import Employee
@@ -528,20 +530,34 @@ class NewProtocolAdd(View):
                     protocolFormData['item'].save()
                     
                 
+                pprint(request.POST)
 
-                newProtocol = protocolForm.save(commit=False)
-                newProtocol.is_return = False
-                newProtocol.created_by = request.user
-                
-                newProtocol.save()
+                # If pk was send to us, we use it otherwise we create new protocol
+                if 'pk' in request.POST:
+                    newProtocol = Protocol.objects.get(id=request.POST['pk'])
+                else:
+                    newProtocol = protocolForm.save(commit=False)
+                    newProtocol.is_return = False
+                    newProtocol.created_by = request.user
+                    newProtocol.save()
+
                 ProtocolItem(protocol_id=newProtocol,item_id=protocolFormData['item']).save()
+
+                # This if is not used by me, but i decided not to delete it just in case
                 if 'saveAndEnd' in request.POST:
                     return redirect("singleProtocol",pk=newProtocol.id)
                 elif 'saveAndContinue' in request.POST:
                     return redirect("addNextItem",status='add',pk=newProtocol.id)
                 
-            except:
-                    return HttpResponse('ERROR')
+                # Send pk to client in JSON format
+                return HttpResponse('{\"pk\": \"' + str(newProtocol.id) + '\"}')
+                
+            except Exception as e:
+                print(e)
+                return HttpResponse('ERROR')
+        else:
+            print("Form is invalid")
+        return HttpResponse('ERROR')
 
     def get(self,request):
         if request.GET.get('eid'):

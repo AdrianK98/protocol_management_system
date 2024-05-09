@@ -41,18 +41,29 @@
           </div>
           <div id="profile" role="tabpanel" aria-labelledby="profile-tab" class="tab-pane fade px-4 py-5">
             
-            <div class="card w-100" >
-              <ul class="list-group list-group-flush">
+            <div class="col py-3" >
+              <table class="table mb-0">
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Pracownik</th>
+                  <th scope="col">Data</th>
+                  <th scope="col">Typ</th>
+                  <th scope="col"></th>
+                </tr>
           
                 {% for protocol in protocolList %}
-                  <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 " href="{% url 'singleProtocol' protocol.protocol_id.id%}">
-                  <li class="list-group-item">{{protocol.protocol_id.barcode}} | {{protocol.protocol_id.employee}} | {{protocol.protocol_id.created|date:"d/m/Y"}} | {{protocol.protocol_id.is_return|yesno:"Zwrot,Przekazanie"}}</li>
-                  </a>
+                  <tr class="fw-normal">
+                    <td>{{protocol.protocol_id.barcode}}</td>
+                    <td>{{protocol.protocol_id.employee}}</td>
+                    <td>{{protocol.protocol_id.created|date:"d/m/Y"}}</td>
+                    <td>{{protocol.protocol_id.is_return|yesno:"Zwrot,Przekazanie"}}</td>
+                    <td><a class="btn btn-success mb-1" role="button" href="{% url 'singleProtocol' protocol.protocol_id.id %}">Wyswietl</a></td>
+                  </tr>
                 
                 
                 {%endfor%}  
           
-              </ul>
+              </table>
             </div>
 
       

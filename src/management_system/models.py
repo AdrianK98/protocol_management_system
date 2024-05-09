@@ -23,7 +23,12 @@ class Item(models.Model):
 
 
     def __str__(self):
-        return self.item_it + " " + self.item_producent + " " + self.item_model
+        mid = " " + self.item_producent + " " + self.item_model
+        if self.item_it:
+            mid = self.item_it + mid
+        else:
+            mid = "NOIT" + mid
+        return mid
 
 
 
