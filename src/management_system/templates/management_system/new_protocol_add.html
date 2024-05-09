@@ -38,12 +38,35 @@
     const token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
     const employee = document.getElementById('search-employee').value;
     const items = document.getElementsByName('item'); // Gets all fields with name=item
+
+    // Validate employee
+    if(!employee){
+      alert('Pope pracownik jest wymagane.');
+      return;
+    }
    
+    // Validate items
+    var seen = [];
+    for(var item of items){
+      if(seen.includes(item.value)){
+        // Alert user with name (got from span)
+        alert("Zduplikowany przedmiot " + item.parentElement.children[1].innerText);
+        return;
+      }
+      seen.push(item.value);
+    }
+
     // Variable with pk
     var id = undefined;
 
     // Send each item to server
     for(var item of items){
+      // Skipp if empty
+      if(!item.value){
+        console.log('skipped');
+        continue;
+      }
+
       // Create form-loke data
       var data = new FormData();
       data.append('csrfmiddlewaretoken', token);
@@ -66,6 +89,11 @@
 
       // Get pk
       id = d.pk;
+    }
+
+    if(id == undefined){
+      alert('Podaj przynajmniej jeden przedmiot.');
+      return;
     }
 
     // Redirect to the protocol
