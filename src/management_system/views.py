@@ -14,6 +14,8 @@ from django.db.models import Q
 from operator import attrgetter
 import base64
 
+# TODO: for debug only, delete in release
+from pprint import pprint
 
 # Create your views here.
 from users.models import Employee
@@ -510,8 +512,11 @@ def employeeItemsReturn(request, employee_id):
 
 @method_decorator(login_required, name="dispatch")
 class NewProtocolAdd(View):
-    template = "management_system/new_protocol_add.html"
+    # template = "management_system/new_protocol_add.html"
+    template = "management_system/new_protocol_add2.html"
     def post(self,request):
+        if 'endMyLife' in request.POST:
+            return redirect("singleProtocol",pk=newProtocol.id)
         protocolForm = ProtocolFormAdd(request.POST)
         if protocolForm.is_valid():
             try:
@@ -528,20 +533,29 @@ class NewProtocolAdd(View):
                     protocolFormData['item'].save()
                     
                 
+                pprint(request.POST)
+                if 'pk' in request.POST:
+                    newProtocol = Protocol.objects.get(id=request.POST['pk'])
+                else:
+                    newProtocol = protocolForm.save(commit=False)
+                    newProtocol.is_return = False
+                    newProtocol.created_by = request.user
+                    newProtocol.save()
 
-                newProtocol = protocolForm.save(commit=False)
-                newProtocol.is_return = False
-                newProtocol.created_by = request.user
-                
-                newProtocol.save()
                 ProtocolItem(protocol_id=newProtocol,item_id=protocolFormData['item']).save()
                 if 'saveAndEnd' in request.POST:
                     return redirect("singleProtocol",pk=newProtocol.id)
                 elif 'saveAndContinue' in request.POST:
                     return redirect("addNextItem",status='add',pk=newProtocol.id)
+                print('ok')
+                return HttpResponse('{\"pk\": \"' + str(newProtocol.id) + '\"}')
                 
-            except:
-                    return HttpResponse('ERROR')
+            except Exception as e:
+                print(e)
+                return HttpResponse('ERROR')
+        else:
+            print("Form is invalid")
+        return HttpResponse('ERROR')
 
     def get(self,request):
         if request.GET.get('eid'):
