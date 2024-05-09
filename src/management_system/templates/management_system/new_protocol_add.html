@@ -38,12 +38,36 @@
     const token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
     const employee = document.getElementById('search-employee').value;
     const items = document.getElementsByName('item'); // Gets all fields with name=item
+
+    // Validate employee
+    if(!employee){
+      alert('Pope pracownik jest wymagane.');
+      return;
+    }
    
+    // Validate items
+    var seen = [];
+    for(var item of items){
+      if(!item.value) continue;
+      if(seen.includes(item.value)){
+        // Alert user with name (got from span)
+        alert("Zduplikowany przedmiot " + item.parentElement.children[1].innerText);
+        return;
+      }
+      seen.push(item.value);
+    }
+
     // Variable with pk
     var id = undefined;
 
     // Send each item to server
     for(var item of items){
+      // Skipp if empty
+      if(!item.value){
+        console.log('skipped');
+        continue;
+      }
+
       // Create form-loke data
       var data = new FormData();
       data.append('csrfmiddlewaretoken', token);
@@ -68,6 +92,11 @@
       id = d.pk;
     }
 
+    if(id == undefined){
+      alert('Podaj przynajmniej jeden przedmiot.');
+      return;
+    }
+
     // Redirect to the protocol
     window.location.href = "{% url 'protocollist' %}" + id;
   }
@@ -89,6 +118,17 @@
     $('#search-items' + id).select2();
     $('#search-items').select2();
     $('#search-items' + id).select2();
+
+    var x = document.createElement('button');
+    x.classList.add('btn');
+    x.classList.add('btn-danger');
+    x.classList.add('py-0');
+    x.classList.add('px-2');
+    x.innerHTML = "X";
+    x.addEventListener('click', () => {
+      div_id_item.removeChild(field);
+    });
+    field.appendChild(x);
 
     // Meke next id unique
     id++;
