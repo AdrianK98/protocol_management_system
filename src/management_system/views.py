@@ -512,11 +512,8 @@ def employeeItemsReturn(request, employee_id):
 
 @method_decorator(login_required, name="dispatch")
 class NewProtocolAdd(View):
-    # template = "management_system/new_protocol_add.html"
-    template = "management_system/new_protocol_add2.html"
+    template = "management_system/new_protocol_add.html"
     def post(self,request):
-        if 'endMyLife' in request.POST:
-            return redirect("singleProtocol",pk=newProtocol.id)
         protocolForm = ProtocolFormAdd(request.POST)
         if protocolForm.is_valid():
             try:
@@ -534,6 +531,8 @@ class NewProtocolAdd(View):
                     
                 
                 pprint(request.POST)
+
+                # If pk was send to us, we use it otherwise we create new protocol
                 if 'pk' in request.POST:
                     newProtocol = Protocol.objects.get(id=request.POST['pk'])
                 else:
@@ -543,11 +542,14 @@ class NewProtocolAdd(View):
                     newProtocol.save()
 
                 ProtocolItem(protocol_id=newProtocol,item_id=protocolFormData['item']).save()
+
+                # This if is not used by me, but i decided not to delete it just in case
                 if 'saveAndEnd' in request.POST:
                     return redirect("singleProtocol",pk=newProtocol.id)
                 elif 'saveAndContinue' in request.POST:
                     return redirect("addNextItem",status='add',pk=newProtocol.id)
-                print('ok')
+                
+                # Send pk to client in JSON format
                 return HttpResponse('{\"pk\": \"' + str(newProtocol.id) + '\"}')
                 
             except Exception as e:
