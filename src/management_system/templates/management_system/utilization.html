@@ -19,10 +19,10 @@
       <tr>
         <th scope="col" style="width: 1em;"></th>
         <th scope="col">id</th>
+        <th scope="col">Stworzony przez</th>
         <th scope="col">Data Stworzenia</th>
-        <th scope="col">xx</th>
-        <th scope="col">xx</th>
-        <th scope="col">xx</th>
+        <th scope="col">Data Zakończenia</th>
+        <th scope="col"></th>
       </tr>
 
       {% for utilization in utilizationList %}
@@ -45,7 +45,15 @@
           <td>{{utilization.id}}</td>
           <td>{{utilization.created_by}}</td>
           <td>{{utilization.created|date:"d/m/Y"}}</td>
-          <td>xx</td>
+          <td>
+        {% if utilization.company_transfer_date %}
+        {{utilization.company_transfer_date|date:"d/m/Y"}}
+          {% else %}
+            W toku
+          {% endif %}    
+            
+        
+        </td>
           <td><a class="btn btn-success mb-1" role="button" href="{% url 'singleUtilization' utilization.id %}">Wyswietl</a></td>
         </tr>
       

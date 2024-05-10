@@ -6,9 +6,9 @@
 
 
 
-
+{% if not utilization.company_transfer_date%}
 <a class="btn btn-danger me-2" href="{% url 'utilizationAddItem' %}?pk={{utilization.id}}" role="button">Dodaj sprzęt do utylizacji</a>
-
+{% endif%}
 
 
     <table class="table mb-0">

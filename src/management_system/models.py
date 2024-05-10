@@ -92,7 +92,7 @@ class Utilization(models.Model):
     utilization_company = models.CharField('Firma utylizujaca',blank=True,max_length=200)
     inform_dzm = models.BooleanField('Ponfirmowano DZM',blank=False, default=False)
     utilization_protocol_scan = models.BinaryField('Skan protokolu utylizacji',blank=True,null=True, editable=True, default=None)
-    company_transfer_date=models.DateField('Data przekazania firmie zewnetrznej',auto_now=True,blank=True,null=True)
+    company_transfer_date=models.DateField('Data przekazania firmie zewnetrznej',auto_now=False,blank=True,null=True)
 
     def __str__(self):
         return 'id ' + str(self.id) + '  date '+str(self.created)
