@@ -28,10 +28,23 @@ class utilizationView(View):
     def get(self, request):
         # form = EmployeeForm(instance = obj)
         # obj = get_object_or_404(Employee, id = request.GET.get('id',''))
+        utilizationList = Utilization.objects.all()
         context={
-                "form":"xx"
-            }
+        "utilizationList":utilizationList,
+        }
         return render(request, "management_system/utilization.html", context)
+    
+@method_decorator(login_required, name="dispatch")
+class singleUtilizationView(View):
+    def get(self, request, pk):
+        utilizationObj = get_object_or_404(Utilization, id = pk)
+
+        context={
+        "utilizationObj":utilizationObj,
+        "items":Item.objects.filter(utilization_id=utilizationObj)
+        }
+        return render(request, "management_system/single_utilization.html", context)
+
 
 @method_decorator(login_required, name="dispatch")
 class utilizationAddView(View):
