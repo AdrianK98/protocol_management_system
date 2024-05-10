@@ -6,7 +6,7 @@ import json
 from datetime import datetime
 from django.utils.decorators import method_decorator
 from .serializers import ItemSerializer,EmployeeSerializer,ProtocolSerializer
-from .forms import EmployeeForm, ProtocolFormAdd, ItemForm, ProtocolFormReturn,ProtocolFormReturnNext,UtylizationItemForm
+from .forms import EmployeeForm, ProtocolFormAdd, ItemForm, ProtocolFormReturn,ProtocolFormReturnNext,UtilizationItemForm
 from django.contrib import messages
 from django.views import View
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -19,7 +19,9 @@ from pprint import pprint
 
 # Create your views here.
 from users.models import Employee
-from .models import Item,Protocol, ProtocolItem
+from .models import Item,Protocol, ProtocolItem, Utilization
+
+# TODO: Test if item is utilizated while adding new protocol, or in utilization
 
 @method_decorator(login_required, name="dispatch")
 class utilizationView(View):
@@ -35,15 +37,45 @@ class utilizationView(View):
 class utilizationAddView(View):
     template = "management_system/utilization_add_item.html"
 
+    def post(self,request):
+        utilizationForm = UtilizationItemForm(request.POST)
+        if utilizationForm.is_valid():
+            try:
+                utilizationFormData = utilizationForm.cleaned_data
+
+                pprint(request.POST)
+
+                # If pk was send to us, we use it otherwise we create new protocol
+                if 'pk' in request.POST:
+                    newUtilization = Utilization.objects.get(id=request.POST['pk'])
+                else:
+                    newUtilization = Utilization()
+                    newUtilization.created_by = request.user
+                    newUtilization.save()
+                
+                #IF ITS NOT RETURN AND USER ITEM IS NOT EMPLOYEE AND ITEM USER IS NOT EMPTY
+                if utilizationFormData['item'].item_user:
+                    return HttpResponse('CANT DO IT')
+                    #TODO ADD RETURNING PROTOCOL FROM ACTUAL ITEM USER AND ADD CONFIRM 
+                else:
+                    utilizationFormData['item'].utilization_id = newUtilization
+                    utilizationFormData['item'].save()
+                    
+                
+                # Send pk to client in JSON format
+                return HttpResponse('{\"pk\": \"' + str(newUtilization.id) + '\"}')
+                
+            except Exception as e:
+                print(e)
+                return HttpResponse('ERROR')
+        else:
+            print("Form is invalid")
+        return HttpResponse('ERROR')
+
 
     def get(self, request):
-        # form = EmployeeForm(instance = obj)
-        # obj = get_object_or_404(Employee, id = request.GET.get('id',''))
-        # context={
-        #         "form":"xx"
-        #     }
-        protocolFormClass = UtylizationItemForm
-        return render(request, self.template,{'protocolForm':protocolFormClass})
+        utilizationFormClass = UtilizationItemForm
+        return render(request, self.template,{'utilizationForm':utilizationFormClass})
 
 
 
@@ -220,65 +252,6 @@ def newProtocolReturn(request):
             "protocolForm":protocolForm,
         }
     return render(request, "management_system/new_protocol_return.html", context)
-
-
-# @method_decorator(login_required, name="dispatch")
-# class AddNextItem(View):
-
-#     def post(self,request,status,pk):
-#         if status == 'add':
-#             self.addItem(request,status,pk)
-#             if 'saveAndEnd' in request.POST:
-#                 return redirect("singleProtocol",pk=pk)
-#             elif 'saveAndContinue' in request.POST:
-#                 return redirect("addNextItem",status='add',pk=pk)
-#         elif status == 'return':
-#             return self.returnItem(request,status,pk)
-
-    
-#     def get(self,request,status,pk):
-#         if status == 'add':
-#             return render(request, "management_system/new_protocol_next_item.html", {'itemForm':ProtocolItemForm,"pk":pk})
-#         return render(request, "management_system/new_protocol_next_item.html", {'itemForm':ProtocolFormReturnNext,"pk":pk})
-
-#     def addItem(self,request,status,pk):
-#         itemForm = ProtocolItemForm(request.POST)
-#         if itemForm.is_valid(): 
-#             newProtocol = Protocol.objects.get(id=pk)
-#             try:
-#                 itemFormData= itemForm.cleaned_data
-#                 newItem = itemFormData['item']
-#                 itemFormData['item'].item_user = newProtocol.employee
-#                 itemFormData['item'].save()
-#                 ProtocolItem(protocol_id=newProtocol,item_id=newItem).save()
-#                 print('valid')
-#             except:
-#                 return HttpResponse('ERROR')
-    
-#     def returnItem(self,request,status,pk):
-#         itemForm = ProtocolFormReturnNext(request.POST)
-#         if itemForm.is_valid(): 
-#             newProtocol = Protocol.objects.get(id=pk)
-#             employee = newProtocol.employee
-#             try:
-#                 itemFormData= itemForm.cleaned_data
-#                 newItem = itemFormData['item']
-
-#                 if newItem.item_user != employee and newItem.item_user :
-#                     messages.error(request, 'Nie można zwrócic, przedmiot jest używany przez innego użytkownika')
-#                     print('NOT THIS USER')
-#                     return redirect("addNextItem",status='return',pk=pk)
-
-
-#                 itemFormData['item'].item_user = None
-#                 itemFormData['item'].save()
-#                 ProtocolItem(protocol_id=newProtocol,item_id=newItem).save()
-#                 if 'saveAndEnd' in request.POST:
-#                     return redirect("singleProtocol",pk=pk)
-#                 elif 'saveAndContinue' in request.POST:
-#                     return redirect("addNextItem",status='return',pk=pk)
-#             except:
-#                 return HttpResponse('ERROR')
 
 
 @method_decorator(login_required, name="dispatch")
