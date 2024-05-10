@@ -27,7 +27,7 @@ urlpatterns = [
     path("new_protocol/add",views.NewProtocolAdd.as_view(), name="newprotocol" ),
     path("new_protocol/return",views.newProtocolReturn, name="newprotocolReturn" ),
     path("new_protocol/confirm/",views.newProtocolReturnConfirm, name="newprotocolconfirm" ),
-    path("new_protocol/next/<str:status>/<int:pk>",views.AddNextItem.as_view(), name="addNextItem" ),
+    # path("new_protocol/next/<str:status>/<int:pk>",views.AddNextItem.as_view(), name="addNextItem" ),
     path("protocols/",views.ProtocolsView.as_view(), name="protocollist" ),
     path("protocols/<int:pk>",views.singleProtocolView, name="singleProtocol" ),
     path("add_employee/",views.addEmployeeView, name="newemployee" ),
@@ -45,6 +45,8 @@ urlpatterns = [
     path("api/protocols/<int:pk>",views.ProtocolDetail.as_view()),
     path("employees/<int:employee_id>/returns", views.employeeItemsReturn, name="employeeReturns"),
     path("protocols/view/<int:pk>",views.singleProtocolViewScan, name="singleProtocolScan" ),
+    path("utilization/",views.utilizationView.as_view(), name="utilization" ),
+    path("utilization/add_item",views.utilizationAddView.as_view(), name="utilizationAddItem" ),
 
 
 ]

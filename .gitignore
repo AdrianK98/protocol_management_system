@@ -1,2 +1,3 @@
-/src/media/barcodes
-/src/src/settings.py
+**/src/media/barcodes
+**/src/src/settings.py
+**/__pycache__

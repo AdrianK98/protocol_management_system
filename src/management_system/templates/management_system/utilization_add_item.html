@@ -1,0 +1,140 @@
+{% extends 'main.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+
+
+  <h1>Dodaj sprzęt do utylizacji</h1>
+  <form method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="endMyLife" />
+ 
+    <!-- Security token -->
+    {% csrf_token %}
+ 
+    <!-- Using the formset -->
+    {{ protocolForm|crispy }}
+    <hr>
+    {% if messages %}
+    <div class="alert alert-danger">
+        {% for message in messages %}
+        
+          <strong>Uwaga!</strong> {{message}}.
+   
+        {% endfor %}
+    </div>
+{% endif %}
+     
+    <button type="button" onclick="send()" class="btn btn-success mt-3" name="saveAndEnd">Zapisz</button>
+    <button type="button" onclick="addItem()" class="btn btn-secondary mt-3" name="saveAndContinue">Dodaj Kolejny</button>
+</form>
+<script type="text/javascript">
+  $(document).ready(function() {
+      $('.select2field').select2();
+  });
+
+  async function send(){
+    // Get data from form, including token
+    const token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+    const employee = document.getElementById('search-employee').value;
+    const items = document.getElementsByName('item'); // Gets all fields with name=item
+
+    // Validate employee
+    if(!employee){
+      alert('Pope pracownik jest wymagane.');
+      return;
+    }
+   
+    // Validate items
+    var seen = [];
+    for(var item of items){
+      if(!item.value) continue;
+      if(seen.includes(item.value)){
+        // Alert user with name (got from span)
+        alert("Zduplikowany przedmiot " + item.parentElement.children[1].innerText);
+        return;
+      }
+      seen.push(item.value);
+    }
+
+    // Variable with pk
+    var id = undefined;
+
+    // Send each item to server
+    for(var item of items){
+      // Skipp if empty
+      if(!item.value){
+        console.log('skipped');
+        continue;
+      }
+
+      // Create form-loke data
+      var data = new FormData();
+      data.append('csrfmiddlewaretoken', token);
+      data.append('employee', employee);
+      data.append('item', item.value);
+
+      // If we have pk send it too
+      if(id != undefined)
+        data.append('pk', id);
+      console.log(id);
+
+      // Send data and wait for response
+      var res = await fetch('/new_protocol/add', { 
+        method: "POST",
+        body: new URLSearchParams(data),
+      });
+
+      // Response is in JSON format
+      d = await res.json();
+
+      // Get pk
+      id = d.pk;
+    }
+
+    if(id == undefined){
+      alert('Podaj przynajmniej jeden przedmiot.');
+      return;
+    }
+
+    // Redirect to the protocol
+    window.location.href = "{% url 'protocollist' %}" + id;
+  }
+
+  // This variable holds search-item id
+  var id = 0;
+  function addItem(){
+    // Get div where we're willing to add new field
+    var div_id_item = document.getElementById('div_id_item');
+
+    // Clone first field, change its id, remove span (will be added by jQuery), then append to div
+    var field = div_id_item.getElementsByTagName('div')[0].cloneNode(true);
+    field.getElementsByTagName('select')[0].id += id;
+    field.removeChild(field.children[1]);
+    div_id_item.appendChild(field);
+
+    // A 'lil trick here, for some reason we must update both new and the very first field in that order
+    // Otherwise it breaks everything
+    $('#search-items' + id).select2();
+    $('#search-items').select2();
+    $('#search-items' + id).select2();
+
+    var x = document.createElement('button');
+    x.classList.add('btn');
+    x.classList.add('btn-danger');
+    x.classList.add('py-0');
+    x.classList.add('px-2');
+    x.innerHTML = "X";
+    x.addEventListener('click', () => {
+      div_id_item.removeChild(field);
+    });
+    field.appendChild(x);
+
+    // Meke next id unique
+    id++;
+  }
+</script>
+
+
+
+{% endblock content %}
