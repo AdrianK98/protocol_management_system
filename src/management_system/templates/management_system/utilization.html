@@ -3,11 +3,13 @@
 
 {% block content %}
 
+    <!-- Security token -->
+    {% csrf_token %}
 
 
   <h2>Utylizacja</h2>
   <hr />
-  <a class="btn btn-success me-2" href="{% url 'utilizationAddItem'  %}" role="button">Stwórz utylizacje</a>
+  <button class="btn btn-success me-2" onclick="add()" href="{% url 'utilizationAddItem'  %}" role="button">Stwórz utylizacje</button>
 
 
 
@@ -51,6 +53,20 @@
 
     </table>
   </div>
+
+  <script>
+    async function add(){
+      const token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+      var data = new FormData();
+      data.append('csrfmiddlewaretoken', token);
+      var res = await fetch('/utilization/add_item', {
+        method: 'POST',
+        body: new URLSearchParams(data)
+      });
+      var d = await res.json();
+      window.location.href = "{% url 'utilization' %}" + d.pk;
+    }
+  </script>
 
   
   <!--end of Pagination-->

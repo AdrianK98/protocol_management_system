@@ -7,7 +7,7 @@
 
 
 
-<a class="btn btn-danger me-2" href="{% url 'utilizationAddItem'  %}" role="button">Dodaj sprzęt do utylizacji</a>
+<a class="btn btn-danger me-2" href="{% url 'utilizationAddItem' %}?pk={{utilization.id}}" role="button">Dodaj sprzęt do utylizacji</a>
 
 
 
@@ -33,22 +33,21 @@
           <td>
             <span>{{item.item_producent}}</span>
           </td>
-          <td class="align-middle">
+          <td>
             <span>{{item.item_model}}</span>
           </td>
-          <td class="align-middle">
+          <td>
               <span>{{item.item_it}}</span>
             </td>
-            <td class="align-middle">
+            <td>
               <span>{{item.item_sn|default_if_none:""}}</span>
             </td>
-            <td class="align-middle">
+            <td>
               <span>{{item.item_kk|default_if_none:""}}</span>
             </td>
             
           <td>
             <a class="btn btn-primary" href="{% url 'singleItem' item.id %}" role="button">Wyświetl</a>
-
           </td>
           
         </tr>

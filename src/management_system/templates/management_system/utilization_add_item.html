@@ -39,6 +39,8 @@
 
   });
 
+  var debug = {{pk}};
+
   async function send(){
     // Get data from form, including token
     const token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
@@ -57,7 +59,7 @@
     }
 
     // Variable with pk
-    var id = undefined;
+    var id = {{pk}};
 
     // Send each item to server
     for(var item of items){
