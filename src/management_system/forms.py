@@ -75,21 +75,9 @@ class ItemForm(forms.ModelForm):
             self.fields[field].widget.attrs.update({'class':'w-25 m-2'})
         self.fields['item_user'].widget.attrs.update({'id':'search-items','style':'display: none;'})
 
-# class ProtocolItemForm(forms.Form):
-#     item = forms.ModelChoiceField(
-#         queryset=Item.objects.filter(item_user__isnull=True),
-#         required=True,  
-#     )
-
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args,**kwargs)
-#         for field in self.fields: 
-#             self.fields[field].widget.attrs.update({'class':'w-25 m-2'})
-#         self.fields['item'].widget.attrs.update({'id':'search-items'})
-
-class UtylizationItemForm(forms.ModelForm):
+class UtilizationItemForm(forms.ModelForm):
     item = forms.ModelChoiceField(
-        queryset=Item.objects.filter(item_user__isnull=True),
+        queryset=Item.objects.filter(item_user__isnull=True, utilization_id__isnull=True),
         required=True,  
     )
     class Meta:
