@@ -40,7 +40,7 @@ class singleUtilizationView(View):
         utilizationObj = get_object_or_404(Utilization, id = pk)
 
         context={
-        "utilizationObj":utilizationObj,
+        "utilization":utilizationObj,
         "items":Item.objects.filter(utilization_id=utilizationObj)
         }
         return render(request, "management_system/single_utilization.html", context)
@@ -51,6 +51,16 @@ class utilizationAddView(View):
     template = "management_system/utilization_add_item.html"
 
     def post(self,request):
+        # If pk was send to us, we use it otherwise we create new protocol
+        if 'pk' in request.POST:
+            newUtilization = Utilization.objects.get(id=request.POST['pk'])
+        else:
+            newUtilization = Utilization()
+            newUtilization.created_by = request.user
+            newUtilization.save()
+            # Send pk to client in JSON format
+            return HttpResponse('{\"pk\": \"' + str(newUtilization.id) + '\"}')
+
         utilizationForm = UtilizationItemForm(request.POST)
         if utilizationForm.is_valid():
             try:
@@ -58,14 +68,7 @@ class utilizationAddView(View):
 
                 pprint(request.POST)
 
-                # If pk was send to us, we use it otherwise we create new protocol
-                if 'pk' in request.POST:
-                    newUtilization = Utilization.objects.get(id=request.POST['pk'])
-                else:
-                    newUtilization = Utilization()
-                    newUtilization.created_by = request.user
-                    newUtilization.save()
-                
+                                
                 #IF ITS NOT RETURN AND USER ITEM IS NOT EMPLOYEE AND ITEM USER IS NOT EMPTY
                 if utilizationFormData['item'].item_user:
                     return HttpResponse('CANT DO IT')
@@ -87,8 +90,11 @@ class utilizationAddView(View):
 
 
     def get(self, request):
+        pk = 'undefined'
+        if 'pk' in request.GET:
+            pk = request.GET['pk']
         utilizationFormClass = UtilizationItemForm
-        return render(request, self.template,{'utilizationForm':utilizationFormClass})
+        return render(request, self.template,{'utilizationForm':utilizationFormClass, 'pk': pk})
 
 
 
