@@ -3,6 +3,7 @@
 
 {% block content %}
 <h2>Sprzęt</h2>
+<hr />
 <form action="{% url 'itemsView' %}" method="get">
     <input name="qtype" type="text" placeholder="Typ..." value='{{qtype_value}}'>
     <input name="qmodel" type="text" placeholder="Model..." value='{{qmodel_value}}'>
