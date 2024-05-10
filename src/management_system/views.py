@@ -6,7 +6,7 @@ import json
 from datetime import datetime
 from django.utils.decorators import method_decorator
 from .serializers import ItemSerializer,EmployeeSerializer,ProtocolSerializer
-from .forms import EmployeeForm, ProtocolFormAdd, ItemForm, ProtocolFormReturn, ProtocolItemForm,ProtocolFormReturnNext
+from .forms import EmployeeForm, ProtocolFormAdd, ItemForm, ProtocolFormReturn,ProtocolFormReturnNext,UtylizationItemForm
 from django.contrib import messages
 from django.views import View
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -20,6 +20,32 @@ from pprint import pprint
 # Create your views here.
 from users.models import Employee
 from .models import Item,Protocol, ProtocolItem
+
+@method_decorator(login_required, name="dispatch")
+class utilizationView(View):
+    def get(self, request):
+        # form = EmployeeForm(instance = obj)
+        # obj = get_object_or_404(Employee, id = request.GET.get('id',''))
+        context={
+                "form":"xx"
+            }
+        return render(request, "management_system/utilization.html", context)
+
+@method_decorator(login_required, name="dispatch")
+class utilizationAddView(View):
+    template = "management_system/utilization_add_item.html"
+
+
+    def get(self, request):
+        # form = EmployeeForm(instance = obj)
+        # obj = get_object_or_404(Employee, id = request.GET.get('id',''))
+        # context={
+        #         "form":"xx"
+        #     }
+        protocolFormClass = UtylizationItemForm
+        return render(request, self.template,{'protocolForm':protocolFormClass})
+
+
 
 @login_required
 def singleProtocolViewScan(request,pk):
@@ -196,63 +222,63 @@ def newProtocolReturn(request):
     return render(request, "management_system/new_protocol_return.html", context)
 
 
-@method_decorator(login_required, name="dispatch")
-class AddNextItem(View):
+# @method_decorator(login_required, name="dispatch")
+# class AddNextItem(View):
 
-    def post(self,request,status,pk):
-        if status == 'add':
-            self.addItem(request,status,pk)
-            if 'saveAndEnd' in request.POST:
-                return redirect("singleProtocol",pk=pk)
-            elif 'saveAndContinue' in request.POST:
-                return redirect("addNextItem",status='add',pk=pk)
-        elif status == 'return':
-            return self.returnItem(request,status,pk)
+#     def post(self,request,status,pk):
+#         if status == 'add':
+#             self.addItem(request,status,pk)
+#             if 'saveAndEnd' in request.POST:
+#                 return redirect("singleProtocol",pk=pk)
+#             elif 'saveAndContinue' in request.POST:
+#                 return redirect("addNextItem",status='add',pk=pk)
+#         elif status == 'return':
+#             return self.returnItem(request,status,pk)
 
     
-    def get(self,request,status,pk):
-        if status == 'add':
-            return render(request, "management_system/new_protocol_next_item.html", {'itemForm':ProtocolItemForm,"pk":pk})
-        return render(request, "management_system/new_protocol_next_item.html", {'itemForm':ProtocolFormReturnNext,"pk":pk})
+#     def get(self,request,status,pk):
+#         if status == 'add':
+#             return render(request, "management_system/new_protocol_next_item.html", {'itemForm':ProtocolItemForm,"pk":pk})
+#         return render(request, "management_system/new_protocol_next_item.html", {'itemForm':ProtocolFormReturnNext,"pk":pk})
 
-    def addItem(self,request,status,pk):
-        itemForm = ProtocolItemForm(request.POST)
-        if itemForm.is_valid(): 
-            newProtocol = Protocol.objects.get(id=pk)
-            try:
-                itemFormData= itemForm.cleaned_data
-                newItem = itemFormData['item']
-                itemFormData['item'].item_user = newProtocol.employee
-                itemFormData['item'].save()
-                ProtocolItem(protocol_id=newProtocol,item_id=newItem).save()
-                print('valid')
-            except:
-                return HttpResponse('ERROR')
+#     def addItem(self,request,status,pk):
+#         itemForm = ProtocolItemForm(request.POST)
+#         if itemForm.is_valid(): 
+#             newProtocol = Protocol.objects.get(id=pk)
+#             try:
+#                 itemFormData= itemForm.cleaned_data
+#                 newItem = itemFormData['item']
+#                 itemFormData['item'].item_user = newProtocol.employee
+#                 itemFormData['item'].save()
+#                 ProtocolItem(protocol_id=newProtocol,item_id=newItem).save()
+#                 print('valid')
+#             except:
+#                 return HttpResponse('ERROR')
     
-    def returnItem(self,request,status,pk):
-        itemForm = ProtocolFormReturnNext(request.POST)
-        if itemForm.is_valid(): 
-            newProtocol = Protocol.objects.get(id=pk)
-            employee = newProtocol.employee
-            try:
-                itemFormData= itemForm.cleaned_data
-                newItem = itemFormData['item']
+#     def returnItem(self,request,status,pk):
+#         itemForm = ProtocolFormReturnNext(request.POST)
+#         if itemForm.is_valid(): 
+#             newProtocol = Protocol.objects.get(id=pk)
+#             employee = newProtocol.employee
+#             try:
+#                 itemFormData= itemForm.cleaned_data
+#                 newItem = itemFormData['item']
 
-                if newItem.item_user != employee and newItem.item_user :
-                    messages.error(request, 'Nie można zwrócic, przedmiot jest używany przez innego użytkownika')
-                    print('NOT THIS USER')
-                    return redirect("addNextItem",status='return',pk=pk)
+#                 if newItem.item_user != employee and newItem.item_user :
+#                     messages.error(request, 'Nie można zwrócic, przedmiot jest używany przez innego użytkownika')
+#                     print('NOT THIS USER')
+#                     return redirect("addNextItem",status='return',pk=pk)
 
 
-                itemFormData['item'].item_user = None
-                itemFormData['item'].save()
-                ProtocolItem(protocol_id=newProtocol,item_id=newItem).save()
-                if 'saveAndEnd' in request.POST:
-                    return redirect("singleProtocol",pk=pk)
-                elif 'saveAndContinue' in request.POST:
-                    return redirect("addNextItem",status='return',pk=pk)
-            except:
-                return HttpResponse('ERROR')
+#                 itemFormData['item'].item_user = None
+#                 itemFormData['item'].save()
+#                 ProtocolItem(protocol_id=newProtocol,item_id=newItem).save()
+#                 if 'saveAndEnd' in request.POST:
+#                     return redirect("singleProtocol",pk=pk)
+#                 elif 'saveAndContinue' in request.POST:
+#                     return redirect("addNextItem",status='return',pk=pk)
+#             except:
+#                 return HttpResponse('ERROR')
 
 
 @method_decorator(login_required, name="dispatch")
