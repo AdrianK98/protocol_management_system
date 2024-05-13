@@ -49,6 +49,7 @@ urlpatterns = [
     path("utilization/<int:pk>",views.singleUtilizationView.as_view(), name="singleUtilization" ),
     path("utilization/add_item",views.utilizationAddView.as_view(), name="utilizationAddItem" ),
     path("utilization/<int:pk>/finalization",views.utilizationFinalizationView.as_view(), name="utilizationFinalization" ),
+    path("utilization/view/<int:pk>",views.singleUtilizationViewScan, name="singleUtilizationScan" ),
 
 
 ]

@@ -23,6 +23,11 @@ from .models import Item,Protocol, ProtocolItem, Utilization
 
 # TODO: Test if item is utilizated while adding new protocol, or in utilization
 
+@login_required
+def singleUtilizationViewScan(request,pk):
+    obj = Utilization.objects.get(id=pk)
+    blob = base64.b64decode(obj.utilization_protocol_scan)
+    return HttpResponse(blob, content_type='application/pdf')
 
 @method_decorator(login_required, name="dispatch")
 class utilizationFinalizationView(View):
