@@ -1,6 +1,6 @@
 from django import forms
 from users.models import Employee
-from .models import Protocol, Item,ProtocolItem
+from .models import Protocol, Item,ProtocolItem, Utilization
 
 
 class EmployeeForm(forms.ModelForm):
@@ -89,3 +89,18 @@ class UtilizationItemForm(forms.ModelForm):
         for field in self.fields: 
             self.fields[field].widget.attrs.update({'class':'w-25 m-2'})
         self.fields['item'].widget.attrs.update({'id':'search-items'})
+
+
+class UtilizationFinalizationForm(forms.ModelForm):
+    class Meta:
+        model = Utilization
+        fields = ['utilization_company','inform_dzm','company_transfer_date']
+        widgets = {
+            'company_transfer_date': forms.DateInput(attrs={'type': 'date'})
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args,**kwargs)
+        for field in self.fields: 
+            self.fields[field].widget.attrs.update({'class':'w-25 m-2'})
+        self.fields['inform_dzm'].widget.attrs.update({'class':'w-5 m-2'})

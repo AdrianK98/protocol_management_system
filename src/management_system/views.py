@@ -6,7 +6,7 @@ import json
 from datetime import datetime
 from django.utils.decorators import method_decorator
 from .serializers import ItemSerializer,EmployeeSerializer,ProtocolSerializer
-from .forms import EmployeeForm, ProtocolFormAdd, ItemForm, ProtocolFormReturn,ProtocolFormReturnNext,UtilizationItemForm
+from .forms import EmployeeForm, ProtocolFormAdd, ItemForm, ProtocolFormReturn,ProtocolFormReturnNext,UtilizationItemForm, UtilizationFinalizationForm
 from django.contrib import messages
 from django.views import View
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -22,6 +22,38 @@ from users.models import Employee
 from .models import Item,Protocol, ProtocolItem, Utilization
 
 # TODO: Test if item is utilizated while adding new protocol, or in utilization
+
+
+@method_decorator(login_required, name="dispatch")
+class utilizationFinalizationView(View):
+    def post(self, request, pk):
+        obj = get_object_or_404(Utilization, id = pk )
+        form = UtilizationFinalizationForm(request.POST, instance = obj)
+        if request.FILES:
+            scan_binary_blob = base64.b64encode(request.FILES.get('scan').read())
+        if form.is_valid():
+            try:
+                form.save()
+                obj.utilization_protocol_scan = scan_binary_blob
+                obj.save()
+                return redirect('home')
+            except Exception as e:
+                print(e)
+                return redirect('home')
+        print('WRONG FORM!')    
+        return redirect('home')
+
+    def get(self, request, pk):
+        # form = EmployeeForm(instance = obj)
+        obj = get_object_or_404(Utilization, id = pk)
+        utilizationForm = UtilizationFinalizationForm(instance = obj)
+        context={
+        "utilizationForm":utilizationForm,
+        "pk":pk,
+        }
+        return render(request, "management_system/utilization_finalization.html", context)
+    
+
 
 @method_decorator(login_required, name="dispatch")
 class utilizationView(View):
