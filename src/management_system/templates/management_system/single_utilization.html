@@ -81,6 +81,7 @@
             <ul class="list-group list-group-flush">
               <li class="list-group-item"><b>Data utworzenia:</b> {{utilization.created}}</li>
               <li class="list-group-item"><b>DZM:</b> {{utilization.inform_dzm|yesno:"Tak,Nie"}}</li>
+              <li class="list-group-item"><b>Liczba sprzetu:</b> {{items.count}}</li>
               {% if utilization.company_transfer_date %}
                 <li class="list-group-item"><b>Firma utylizacyjna:</b> {{utilization.utilization_company}}</li>
                 <li class="list-group-item"><b>Data oddania do utylizacji:</b> {{utilization.company_transfer_date}}</li>
