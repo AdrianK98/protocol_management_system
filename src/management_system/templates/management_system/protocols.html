@@ -10,7 +10,7 @@
   <form action="{% url 'protocollist' %}" method="get">
     <input name="qname" type="text" placeholder="Imię..." value='{{qname_value}}'>
     <input name="qsurname" type="text" placeholder="Nazwisko..." value='{{qsurname_value}}'>
-    <input name="qdate" type="text" placeholder="Data: dd.mm.yyyy" pattern="((3[0-1])|([1-2][0-9])|(0[1-9]))\.((0[1-9])|(1[0-2]))\.[1-9][0-9]{3}" value='{{qdate_value}}'>
+    <input name="qdate" type="date" placeholder="Data przekazania..." pattern="((3[0-1])|([1-2][0-9])|(0[1-9]))\.((0[1-9])|(1[0-2]))\.[1-9][0-9]{3}" value='{{qdate_value}}'>
     <input type='submit' value='Szukaj'>
 
   </form>

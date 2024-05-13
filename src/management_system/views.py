@@ -64,13 +64,54 @@ class utilizationFinalizationView(View):
 @method_decorator(login_required, name="dispatch")
 class utilizationView(View):
     def get(self, request):
-        # form = EmployeeForm(instance = obj)
-        # obj = get_object_or_404(Employee, id = request.GET.get('id',''))
-        utilizationList = Utilization.objects.all()
+
+        queryCreator = str(request.GET.get('qcreator',''))
+        queryCreatedDate = str(request.GET.get('qcreateddate',''))
+        queryEndDate = str(request.GET.get('qenddate',''))
+        utilizationQuery = sorted(self.get_query(queryCreator,queryCreatedDate,queryEndDate), key=attrgetter('id'),reverse=True)
+        
+
+        page = request.GET.get('page',1)
+        protocols_paginator = Paginator(utilizationQuery,20)
+
+        try:
+            utilizationQuery = protocols_paginator.page(page)
+        except PageNotAnInteger:
+            utilizationQuery = protocols_paginator.page(1)
+        except EmptyPage:
+            utilizationQuery = protocols_paginator.page(1)
+
         context={
-        "utilizationList":utilizationList,
+        "utilizationList":utilizationQuery,
+        "qcreator_value": queryCreator,
+        "qcreateddate_value": queryCreatedDate,
+        "qenddate_value": queryEndDate,
+        
         }
         return render(request, "management_system/utilization.html", context)
+    
+    def get_query(self,qcreator,qcreated,qend):  # new
+        query = Q()
+        if qcreator:
+            query = query & (
+                Q(created_by__username__icontains=qcreator)
+            )
+
+        if qcreated:
+            date1 = datetime.strptime(qcreated, '%Y-%m-%d').date()
+            query = query & (
+                Q(created__icontains=date1)
+            )
+
+        if qend:
+            date2 = datetime.strptime(qend, '%Y-%m-%d').date()
+            query = query & (
+                Q(company_transfer_date__icontains=date2)
+            )      
+                     
+        object_list = Utilization.objects.filter(query)
+
+        return object_list
     
 @method_decorator(login_required, name="dispatch")
 class singleUtilizationView(View):
@@ -394,7 +435,7 @@ class ProtocolsView(View):
             )   
 
         if qdate:
-            date = datetime.strptime(qdate, '%d.%m.%Y').date()
+            date = datetime.strptime(qdate, '%Y-%m-%d').date()
             query = query & (
                 Q(created__icontains=date)
             )                       

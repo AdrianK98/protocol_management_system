@@ -11,7 +11,13 @@
   <hr />
   <button class="btn btn-success me-2" onclick="add()" href="{% url 'utilizationAddItem'  %}" role="button">Stwórz utylizacje</button>
 
+  <form action="{% url 'utilization' %}" method="get">
+    <input name="qcreator" type="text" placeholder="Twórca..." value='{{qcreator}}'>
+    <input name="qcreateddate" type="date" placeholder="Data stworzenia..." value='{{qcreateddate_value}}'>
+    <input name="qenddate" type="date" placeholder="Data zakończenia..." value='{{qenddate_value}}'>
+    <input type='submit' value='Szukaj'>
 
+</form>
 
 
   <div class="col py-3" >
@@ -72,7 +78,29 @@
     }
   </script>
 
-  
+    
+  <div class="card-footer text-end p-3">
+  </div>
+  <div class="container p-4">
+    <div class="pagination justify-content-center">
+        <span class="step-links">
+          {% if utilizationList.has_previous %}
+              <a href="?page=1&q={{q_value}}">&laquo; first</a>
+              <a href="?page={{ utilizationList.previous_page_number }}&q={{q_value}}">previous</a>
+          {% endif %}
+
+            <span class="current">
+                Page {{ utilizationList.number }} of {{ utilizationList.paginator.num_pages }}
+            </span>
+
+          {% if utilizationList.has_next %}
+              <a href="?page={{ utilizationList.next_page_number }}&q={{q_value}}">next</a>
+              <a href="?page={{ utilizationList.paginator.num_pages }}&q={{q_value}}">last &raquo;</a>
+          {% endif %}
+        </span>
+        </div>
+    </div>
+  </div>  
   <!--end of Pagination-->
   
 
