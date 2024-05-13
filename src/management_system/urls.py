@@ -46,7 +46,9 @@ urlpatterns = [
     path("employees/<int:employee_id>/returns", views.employeeItemsReturn, name="employeeReturns"),
     path("protocols/view/<int:pk>",views.singleProtocolViewScan, name="singleProtocolScan" ),
     path("utilization/",views.utilizationView.as_view(), name="utilization" ),
+    path("utilization/<int:pk>",views.singleUtilizationView.as_view(), name="singleUtilization" ),
     path("utilization/add_item",views.utilizationAddView.as_view(), name="utilizationAddItem" ),
+    path("utilization/<int:pk>/finalization",views.utilizationFinalizationView.as_view(), name="utilizationFinalization" ),
 
 
 ]

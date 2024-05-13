@@ -7,8 +7,6 @@
 
   <h1>Nowe przekazanie</h1>
   <form method="POST" enctype="multipart/form-data">
-    <input type="hidden" name="endMyLife" />
- 
     <!-- Security token -->
     {% csrf_token %}
  
@@ -30,7 +28,16 @@
 </form>
 <script type="text/javascript">
   $(document).ready(function() {
-      $('.select2field').select2();
+    // Initialize select2
+    $('.select2field').select2();
+
+    // Add event listener to search-items 
+    $('#search-items').on('select2:select', () => {
+      // Add new search-item and get its id
+      var ix = addItem();
+      // Open newly created select
+      $('#search-items' + ix).select2('open');
+    });
   });
 
   async function send(){
@@ -119,6 +126,14 @@
     $('#search-items').select2();
     $('#search-items' + id).select2();
 
+    // Add event listener to search-items 
+    $('#search-items' + id).on('select2:select', () => {
+      // Add new search-item and get its id
+      var ix = addItem();
+      // Open newly created select
+      $('#search-items' + ix).select2('open');
+    });
+
     var x = document.createElement('button');
     x.classList.add('btn');
     x.classList.add('btn-danger');
@@ -131,7 +146,7 @@
     field.appendChild(x);
 
     // Meke next id unique
-    id++;
+    return id++;
   }
 </script>
 

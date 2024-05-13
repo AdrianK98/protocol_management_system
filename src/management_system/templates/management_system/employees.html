@@ -3,6 +3,9 @@
 
 {% block content %}
 
+<h2>Pracownicy</h2>
+<hr />
+
 <form action="{% url 'employees' %}" method="get">
     <input name="qname" type="text" placeholder="Imię..." value='{{qname_value}}'>
     <input name="qsurname" type="text" placeholder="Nazwisko..." value='{{qsurname_value}}'>

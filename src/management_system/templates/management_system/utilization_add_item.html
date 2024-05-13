@@ -7,13 +7,11 @@
 
   <h1>Dodaj sprzęt do utylizacji</h1>
   <form method="POST" enctype="multipart/form-data">
-    <input type="hidden" name="endMyLife" />
- 
     <!-- Security token -->
     {% csrf_token %}
  
     <!-- Using the formset -->
-    {{ protocolForm|crispy }}
+    {{ utilizationForm|crispy }}
     <hr>
     {% if messages %}
     <div class="alert alert-danger">
@@ -30,21 +28,24 @@
 </form>
 <script type="text/javascript">
   $(document).ready(function() {
-      $('.select2field').select2();
+    $('.select2field').select2();
+    // Add event listener to search-items 
+    $('#search-items').on('select2:select', () => {
+      // Add new search-item and get its id
+      var ix = addItem();
+      // Open newly created select
+      $('#search-items' + ix).select2('open');
+    });
+
   });
+
+  var debug = {{pk}};
 
   async function send(){
     // Get data from form, including token
     const token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
-    const employee = document.getElementById('search-employee').value;
     const items = document.getElementsByName('item'); // Gets all fields with name=item
 
-    // Validate employee
-    if(!employee){
-      alert('Pope pracownik jest wymagane.');
-      return;
-    }
-   
     // Validate items
     var seen = [];
     for(var item of items){
@@ -58,7 +59,7 @@
     }
 
     // Variable with pk
-    var id = undefined;
+    var id = {{pk}};
 
     // Send each item to server
     for(var item of items){
@@ -71,7 +72,6 @@
       // Create form-loke data
       var data = new FormData();
       data.append('csrfmiddlewaretoken', token);
-      data.append('employee', employee);
       data.append('item', item.value);
 
       // If we have pk send it too
@@ -80,13 +80,13 @@
       console.log(id);
 
       // Send data and wait for response
-      var res = await fetch('/new_protocol/add', { 
+      var res = await fetch('/utilization/add_item', { 
         method: "POST",
         body: new URLSearchParams(data),
       });
 
       // Response is in JSON format
-      d = await res.json();
+      var d = await res.json();
 
       // Get pk
       id = d.pk;
@@ -98,7 +98,8 @@
     }
 
     // Redirect to the protocol
-    window.location.href = "{% url 'protocollist' %}" + id;
+    // TODO: add URL /utilization/<id>
+    window.location.href = "{% url 'utilization' %}"// + id;
   }
 
   // This variable holds search-item id
@@ -119,6 +120,14 @@
     $('#search-items').select2();
     $('#search-items' + id).select2();
 
+    // Add event listener to search-items 
+    $('#search-items' + id).on('select2:select', () => {
+      // Add new search-item and get its id
+      var ix = addItem();
+      // Open newly created select
+      $('#search-items' + ix).select2('open');
+    });
+
     var x = document.createElement('button');
     x.classList.add('btn');
     x.classList.add('btn-danger');
@@ -131,7 +140,7 @@
     field.appendChild(x);
 
     // Meke next id unique
-    id++;
+    return id++;
   }
 </script>
 

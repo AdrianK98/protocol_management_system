@@ -3,6 +3,7 @@
 
 {% block content %}
 <h2>Sprzęt</h2>
+<hr />
 <form action="{% url 'itemsView' %}" method="get">
     <input name="qtype" type="text" placeholder="Typ..." value='{{qtype_value}}'>
     <input name="qmodel" type="text" placeholder="Model..." value='{{qmodel_value}}'>
@@ -38,25 +39,25 @@
         <td>
           <span>{{item.item_producent}}</span>
         </td>
-        <td class="align-middle">
+        <td>
           <span>{{item.item_model}}</span>
         </td>
-        <td class="align-middle">
+        <td>
             <span>{{item.item_it}}</span>
           </td>
-          <td class="align-middle">
+          <td>
             <span>{{item.item_sn|default_if_none:""}}</span>
           </td>
-          <td class="align-middle">
+          <td>
             <span>{{item.item_kk|default_if_none:""}}</span>
           </td>
-          <td class="align-middle"> 
+          <td> 
             {% if item.item_user %}
             <a  class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="{%url 'singleEmployee' item.item_user.id%}"role="button"><span>{{item.item_user|default_if_none:""}}</span></a>
             {% endif %}
           </td>
           
-        <td class="align-middle">
+        <td>
             <a class="btn btn-success mb-1" href="{% url 'singleItem' item.id %}" role="button">Wyświetl</a>
             <a class="btn btn-info mb-1" href="{% url 'itemsEdit' item.id%}" role="button">Edycja</a>
           {% comment %} <a href="#!" data-mdb-toggle="tooltip" title="Remove"><i
