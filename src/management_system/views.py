@@ -49,6 +49,7 @@ class utilizationFinalizationView(View):
         utilizationForm = UtilizationFinalizationForm(instance = obj)
         context={
         "utilizationForm":utilizationForm,
+            "utilization": obj,
         "pk":pk,
         }
         return render(request, "management_system/utilization_finalization.html", context)
