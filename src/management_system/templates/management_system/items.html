@@ -58,8 +58,16 @@
           </td>
           
         <td>
-            <a class="btn btn-success mb-1" href="{% url 'singleItem' item.id %}" role="button">Wyświetl</a>
-            <a class="btn btn-info mb-1" href="{% url 'itemsEdit' item.id%}" role="button">Edycja</a>
+          <div class="btn-group">
+            <a class="btn btn-secondary" href="{% url 'singleItem' item.id %}" role="button">Wyświetl</a>
+            <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+              <span class="visually-hidden">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{% url 'itemsEdit' item.id%}">Edycja</a></li>
+            </ul>
+          </div>
+
           {% comment %} <a href="#!" data-mdb-toggle="tooltip" title="Remove"><i
               class="fas fa-trash-alt text-danger"></i></a> {% endcomment %}
         </td>
@@ -70,7 +78,6 @@
     </tbody>
   </table>
   <div class="card-footer text-end p-3">
-    <a class="btn btn-primary mb-1" href="{% url 'itemsAddNew' %}" role="button">Nowy przedmiot</a>
   </div>
 
   <div class="container p-4">

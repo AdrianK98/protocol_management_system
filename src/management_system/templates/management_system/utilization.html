@@ -13,8 +13,8 @@
 
   <form action="{% url 'utilization' %}" method="get">
     <input name="qcreator" type="text" placeholder="Twórca..." value='{{qcreator}}'>
-    <input name="qcreateddate" type="date" placeholder="Data stworzenia..." value='{{qcreateddate_value}}'>
-    <input name="qenddate" type="date" placeholder="Data zakończenia..." value='{{qenddate_value}}'>
+    <input name="qcreateddate" type="text" placeholder="Data stworzenia..." value='{{qcreateddate_value}}' onfocus="(this.type='date')">
+    <input name="qenddate" type="text" placeholder="Data zakończenia..." value='{{qenddate_value}}' onfocus="(this.type='date')">
     <input type='submit' value='Szukaj'>
 
 </form>
@@ -65,6 +65,7 @@
   </div>
 
   <script>
+
     async function add(){
       const token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
       var data = new FormData();
