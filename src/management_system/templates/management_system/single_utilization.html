@@ -4,8 +4,20 @@
 {% block content %}
 
 
+        <h1>Informacje o utylizacji </h1>
 
+        <ul id="myTab" role="tablist" class="nav nav-tabs nav-pills flex-column flex-sm-row text-center bg-light border-0 rounded-nav">
+          <li class="nav-item flex-sm-fill">
+            <a id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true" class="nav-link border-0 text-uppercase font-weight-bold active">Sprzet</a>
+          </li>
+          <li class="nav-item flex-sm-fill">
+            <a id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false" class="nav-link border-0 text-uppercase font-weight-bold">Informacje</a>
+          </li>
+      
+        </ul>
 
+        <div id="myTabContent" class="tab-content">
+          <div id="home" role="tabpanel" aria-labelledby="home-tab" class="tab-pane fade px-4 py-5 show active">
 {% if not utilization.company_transfer_date%}
 <a class="btn btn-danger me-2" href="{% url 'utilizationAddItem' %}?pk={{utilization.id}}" role="button">Dodaj sprzęt do utylizacji</a>
 {% endif%}
@@ -58,8 +70,18 @@
     </table>  
 
 
-
-
+          </div>
+          <div id="profile" role="tabpanel" aria-labelledby="profile-tab" class="tab-pane fade px-4 py-5">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item"><b>Data utworzenia:</b> {{utilization.created}}</li>
+              <li class="list-group-item"><b>DZM:</b> {{utilization.inform_dzm|yesno:"Tak,Nie"}}</li>
+              {% if utilization.company_transfer_date %}
+                <li class="list-group-item"><b>Firma utylizacyjna:</b> {{utilization.utilization_company}}</li>
+                <li class="list-group-item"><b>Data oddania do utylizacji:</b> {{utilization.company_transfer_date}}</li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
 
 
     <script>
@@ -107,6 +129,18 @@
         });
     </script>
 
+    <script>
+          $(document).ready(function() {
+            // Activate the first tab
+            $('#myTab a:first').tab('show');
+            
+            // Handle tab click event
+            $('#myTab a').on('click', function(event) {
+              event.preventDefault();
+              $(this).tab('show');
+            });
+          });
+        </script>
 
 
 
