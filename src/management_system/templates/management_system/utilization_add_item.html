@@ -30,7 +30,7 @@
   $(document).ready(function() {
     $('.select2field').select2();
     // Add event listener to search-items 
-    $('#search-items' + id).on('select2:select', () => {
+    $('#search-items').on('select2:select', () => {
       // Add new search-item and get its id
       var ix = addItem();
       // Open newly created select
@@ -140,7 +140,7 @@
     field.appendChild(x);
 
     // Meke next id unique
-    id++;
+    return id++;
   }
 </script>
 
