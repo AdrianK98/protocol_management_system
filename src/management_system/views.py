@@ -12,7 +12,9 @@ from django.views import View
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from operator import attrgetter
+from django.views.decorators.cache import cache_page
 import base64
+
 
 # TODO: for debug only, delete in release
 from pprint import pprint
@@ -277,7 +279,7 @@ def newProtocolReturnConfirm(request):
     context={}
     return render(request, "management_system/confirm_add_protocol.html", context)
 
-
+@cache_page(60*15)
 @login_required
 def itemsAddNew(request):
     itemForm = ItemForm(request.POST or None)
