@@ -710,7 +710,12 @@ class NewProtocolAdd(View):
 
 @login_required
 def API2EmployeesView(request):
-    employees = list(Employee.objects.all())
+    if request.GET and request.GET['q']:
+        employees = list(Employee.objects.raw("select * from users_employee where concat(user_name, \' \', user_surname) like %s;", ['%' + request.GET['q'] + '%']))
+    else:
+        employees = list(Employee.objects.all())
+    if len(employees) < 1:
+        return HttpResponse("[]", content_type='application/json')
     last = employees.pop(-1)
     json = "["
     for e in employees:
