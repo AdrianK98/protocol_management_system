@@ -54,7 +54,6 @@ poetry==1.8.3 ; python_version >= "3.9" and python_version < "4.0"
 prometheus-client==0.16.0 ; python_version >= "3.9" and python_version < "4.0"
 prompt-toolkit==3.0.38 ; python_version >= "3.9" and python_version < "4.0"
 psycopg2-binary==2.9.6 ; python_version >= "3.9" and python_version < "4.0"
-psycopg2==2.9.6 ; python_version >= "3.9" and python_version < "4.0"
 ptyprocess==0.7.0 ; python_version >= "3.9" and python_version < "4.0"
 pycparser==2.22 ; python_version >= "3.9" and python_version < "4.0" and (sys_platform == "darwin" or sys_platform == "linux") and (sys_platform == "darwin" or platform_python_implementation != "PyPy")
 pygments==2.15.1 ; python_version >= "3.9" and python_version < "4.0"
