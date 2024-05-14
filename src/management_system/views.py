@@ -13,6 +13,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from operator import attrgetter
 from django.views.decorators.cache import cache_page
+from django.core.cache import cache
 import base64
 
 
@@ -285,6 +286,8 @@ class editEmployeeView(View):
 
 @login_required
 def mainView(request):
+    cache.set('additemform',ItemForm,timeout=3600)
+    print(cache.get('additemform'))
     print(request.user.first_name)
     print(request.user.last_name)
     return render(request, "management_system/home.html", {})
@@ -316,11 +319,23 @@ def newProtocolReturnConfirm(request):
     context={}
     return render(request, "management_system/confirm_add_protocol.html", context)
 
-@cache_page(60*15)
+
+#TODO CLEAN UP
 @login_required
 def itemsAddNew(request):
-    itemForm = ItemForm(request.POST or None)
+    if request.method == 'GET':
+        cached_value = cache.get('additemform')
+        if cached_value is not None:    
+            print(cached_value)
+            # itemForm = ItemForm(request.POST or None)
+            itemForm = cached_value
+            context={
+                'itemForm':itemForm
+            }
+            print('XDD')
+            return render(request, "management_system/items_add_new.html", context)
     if request.method == 'POST':
+        itemForm = ItemForm(request.POST)
         if itemForm.is_valid():
             try:
                 newItem = itemForm.save()
@@ -331,6 +346,7 @@ def itemsAddNew(request):
     context={
         'itemForm':itemForm
     }
+    print('PPPP')
     return render(request, "management_system/items_add_new.html", context)
 
 
