@@ -708,8 +708,32 @@ class NewProtocolAdd(View):
             protocolFormClass = ProtocolFormAdd
             return render(request, self.template,{'protocolForm':protocolFormClass})
 
-
-
+@login_required
+def API2EmployeesView(request):
+    employees = list(Employee.objects.all())
+    last = employees.pop(-1)
+    json = "[\n"
+    for e in employees:
+        json += "\t{\n" 
+        json += "\t\t\"id\":\""              + str(e.id)              + "\",\n"
+        json += "\t\t\"user_name\":\""       + str(e.user_name)       + "\",\n"
+        json += "\t\t\"user_surname\":\""    + str(e.user_surname)    + "\",\n"
+        json += "\t\t\"user_department\":\"" + str(e.user_department) + "\",\n"
+        json += "\t\t\"user_location\":\""   + str(e.user_location)   + "\",\n"
+        json += "\t\t\"user_email\":\""      + str(e.user_email)      + "\",\n"
+        json += "\t\t\"user_login\":\""      + str(e.user_login)      + "\"\n"
+        json += "\t},\n"
+    json += "\t{\n" 
+    json += "\t\t\"id\":\""              + str(last.id)              + "\",\n"
+    json += "\t\t\"user_name\":\""       + str(last.user_name)       + "\",\n"
+    json += "\t\t\"user_surname\":\""    + str(last.user_surname)    + "\",\n"
+    json += "\t\t\"user_department\":\"" + str(last.user_department) + "\",\n"
+    json += "\t\t\"user_location\":\""   + str(last.user_location)   + "\",\n"
+    json += "\t\t\"user_email\":\""      + str(last.user_email)      + "\",\n"
+    json += "\t\t\"user_login\":\""      + str(last.user_login)      + "\"\n"
+    json += "\t}\n"
+    json += "]"
+    return HttpResponse(json, content_type='application/json')
 
 
 class ItemList(generics.ListCreateAPIView):
