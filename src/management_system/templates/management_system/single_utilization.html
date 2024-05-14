@@ -18,7 +18,7 @@
 
         <div id="myTabContent" class="tab-content">
           <div id="home" role="tabpanel" aria-labelledby="home-tab" class="tab-pane fade px-4 py-5 show active">
-{% if not utilization.company_transfer_date%}
+{% if not utilization.company_transfer_date %}
 <a class="btn btn-danger me-2" href="{% url 'utilizationAddItem' %}?pk={{utilization.id}}" role="button">
   <!-- <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/></svg> -->
   <strong>+</strong>
@@ -66,6 +66,11 @@
             
           <td>
             <a class="btn btn-primary" href="{% url 'singleItem' item.id %}" role="button">Wyświetl</a>
+            {% if not utilization.company_transfer_date %}
+              <a class="btn btn-danger" href="{% url 'utilizationDeleteItem' utilization.id item.id %}" role="button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg>
+              </a>
+            {% endif %}
           </td>
           
         </tr>
@@ -81,9 +86,13 @@
             <ul class="list-group list-group-flush">
               <li class="list-group-item"><b>Data utworzenia:</b> {{utilization.created}}</li>
               <li class="list-group-item"><b>DZM:</b> {{utilization.inform_dzm|yesno:"Tak,Nie"}}</li>
+              <li class="list-group-item"><b>Liczba sprzetu:</b> {{items.count}}</li>
               {% if utilization.company_transfer_date %}
                 <li class="list-group-item"><b>Firma utylizacyjna:</b> {{utilization.utilization_company}}</li>
                 <li class="list-group-item"><b>Data oddania do utylizacji:</b> {{utilization.company_transfer_date}}</li>
+              {% endif %}
+              {% if utilization.utilization_protocol_scan %}
+                <a class="btn btn-success mb-1" href="{% url 'singleUtilizationScan' utilization.id %}" role="button" >PDF</a>
               {% endif %}
             </ul>
           </div>

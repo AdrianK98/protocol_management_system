@@ -12,7 +12,10 @@ from django.views import View
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from operator import attrgetter
+from django.views.decorators.cache import cache_page
+from django.core.cache import cache
 import base64
+
 
 # TODO: for debug only, delete in release
 from pprint import pprint
@@ -23,6 +26,48 @@ from .models import Item,Protocol, ProtocolItem, Utilization
 
 # TODO: Test if item is utilizated while adding new protocol, or in utilization
 
+@method_decorator(login_required, name="dispatch")
+class utilizationDelete(View):
+    def post(self, request, pk):
+        obj = get_object_or_404(Utilization, id = pk )
+        obj.delete()
+        return redirect('utilization')
+
+    def get(self, request, pk):
+        obj = get_object_or_404(Utilization, id = pk)
+        context={
+            "utilization": obj,
+            "pk":pk,
+        }
+        return render(request, "management_system/utilization_delete.html", context)
+
+
+@method_decorator(login_required, name="dispatch")
+class utilizationDeleteItem(View):
+    def post(self, request, pk, item):
+        obj = get_object_or_404(Utilization, id = pk )
+        it = get_object_or_404(Item, id = item)
+        it.utilization_id = None
+        it.save()
+        return redirect('singleUtilization', pk)
+
+    def get(self, request, pk, item):
+        obj = get_object_or_404(Utilization, id = pk)
+        it = get_object_or_404(Item, id = item)
+        context={
+            "utilization": obj,
+            "item": it,
+            "pk":pk,
+            "item_id":item
+        }
+        return render(request, "management_system/utilization_delete_item.html", context)
+
+
+@login_required
+def singleUtilizationViewScan(request,pk):
+    obj = Utilization.objects.get(id=pk)
+    blob = base64.b64decode(obj.utilization_protocol_scan)
+    return HttpResponse(blob, content_type='application/pdf')
 
 @method_decorator(login_required, name="dispatch")
 class utilizationFinalizationView(View):
@@ -49,6 +94,7 @@ class utilizationFinalizationView(View):
         utilizationForm = UtilizationFinalizationForm(instance = obj)
         context={
         "utilizationForm":utilizationForm,
+            "utilization": obj,
         "pk":pk,
         }
         return render(request, "management_system/utilization_finalization.html", context)
@@ -58,13 +104,54 @@ class utilizationFinalizationView(View):
 @method_decorator(login_required, name="dispatch")
 class utilizationView(View):
     def get(self, request):
-        # form = EmployeeForm(instance = obj)
-        # obj = get_object_or_404(Employee, id = request.GET.get('id',''))
-        utilizationList = Utilization.objects.all()
+
+        queryCreator = str(request.GET.get('qcreator',''))
+        queryCreatedDate = str(request.GET.get('qcreateddate',''))
+        queryEndDate = str(request.GET.get('qenddate',''))
+        utilizationQuery = sorted(self.get_query(queryCreator,queryCreatedDate,queryEndDate), key=attrgetter('id'),reverse=True)
+        
+
+        page = request.GET.get('page',1)
+        protocols_paginator = Paginator(utilizationQuery,20)
+
+        try:
+            utilizationQuery = protocols_paginator.page(page)
+        except PageNotAnInteger:
+            utilizationQuery = protocols_paginator.page(1)
+        except EmptyPage:
+            utilizationQuery = protocols_paginator.page(1)
+
         context={
-        "utilizationList":utilizationList,
+        "utilizationList":utilizationQuery,
+        "qcreator_value": queryCreator,
+        "qcreateddate_value": queryCreatedDate,
+        "qenddate_value": queryEndDate,
+        
         }
         return render(request, "management_system/utilization.html", context)
+    
+    def get_query(self,qcreator,qcreated,qend):  # new
+        query = Q()
+        if qcreator:
+            query = query & (
+                Q(created_by__username__icontains=qcreator)
+            )
+
+        if qcreated:
+            date1 = datetime.strptime(qcreated, '%Y-%m-%d').date()
+            query = query & (
+                Q(created__icontains=date1)
+            )
+
+        if qend:
+            date2 = datetime.strptime(qend, '%Y-%m-%d').date()
+            query = query & (
+                Q(company_transfer_date__icontains=date2)
+            )      
+                     
+        object_list = Utilization.objects.filter(query)
+
+        return object_list
     
 @method_decorator(login_required, name="dispatch")
 class singleUtilizationView(View):
@@ -231,6 +318,7 @@ def newProtocolReturnConfirm(request):
     return render(request, "management_system/confirm_add_protocol.html", context)
 
 
+#TODO CLEAN UP
 @login_required
 def itemsAddNew(request):
     itemForm = ItemForm(request.POST or None)
@@ -388,7 +476,7 @@ class ProtocolsView(View):
             )   
 
         if qdate:
-            date = datetime.strptime(qdate, '%d.%m.%Y').date()
+            date = datetime.strptime(qdate, '%Y-%m-%d').date()
             query = query & (
                 Q(created__icontains=date)
             )                       
