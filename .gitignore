@@ -2,3 +2,4 @@
 **/src/src/settings.py
 **/__pycache__/
 .env
+data/
