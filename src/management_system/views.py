@@ -25,6 +25,43 @@ from .models import Item,Protocol, ProtocolItem, Utilization
 
 # TODO: Test if item is utilizated while adding new protocol, or in utilization
 
+@method_decorator(login_required, name="dispatch")
+class utilizationDelete(View):
+    def post(self, request, pk):
+        obj = get_object_or_404(Utilization, id = pk )
+        obj.delete()
+        return redirect('utilization')
+
+    def get(self, request, pk):
+        obj = get_object_or_404(Utilization, id = pk)
+        context={
+            "utilization": obj,
+            "pk":pk,
+        }
+        return render(request, "management_system/utilization_delete.html", context)
+
+
+@method_decorator(login_required, name="dispatch")
+class utilizationDeleteItem(View):
+    def post(self, request, pk, item):
+        obj = get_object_or_404(Utilization, id = pk )
+        it = get_object_or_404(Item, id = item)
+        it.utilization_id = None
+        it.save()
+        return redirect('singleUtilization', pk)
+
+    def get(self, request, pk, item):
+        obj = get_object_or_404(Utilization, id = pk)
+        it = get_object_or_404(Item, id = item)
+        context={
+            "utilization": obj,
+            "item": it,
+            "pk":pk,
+            "item_id":item
+        }
+        return render(request, "management_system/utilization_delete_item.html", context)
+
+
 @login_required
 def singleUtilizationViewScan(request,pk):
     obj = Utilization.objects.get(id=pk)
