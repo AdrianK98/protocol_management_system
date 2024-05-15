@@ -716,7 +716,7 @@ class NewProtocolAdd(View):
 @login_required
 def API2EmployeesView(request):
     if request.GET and request.GET.get('q', False):
-        employees = Employee.objects.raw("select * from users_employee where concat(user_name, \' \', user_surname) like %s;", ['%' + request.GET['q'] + '%'])
+        employees = Employee.objects.raw("select * from users_employee where concat(user_name, \' \', user_surname) ilike %s;", ['%' + request.GET['q'] + '%'])
     else:
         employees = Employee.objects.all()
     if request.GET and request.GET.get('limit', False):
@@ -750,7 +750,7 @@ def API2EmployeesView(request):
 @login_required
 def API2ItemsView(request):
     if request.GET and request.GET.get('q', False):
-        employees = Item.objects.raw("select * from users_employee where concat(user_name, \' \', user_surname) like %s;", ['%' + request.GET['q'] + '%'])
+        employees = Item.objects.raw("select * from users_employee where concat(user_name, \' \', user_surname) ilike %s;", ['%' + request.GET['q'] + '%'])
     else:
         employees = Item.objects.all()
     if request.GET and request.GET.get('limit', False):
