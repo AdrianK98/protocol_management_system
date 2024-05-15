@@ -660,31 +660,28 @@ class NewProtocolAdd(View):
         protocolForm = ProtocolFormAdd(request.POST)
         if protocolForm.is_valid():
             try:
-                protocolFormData = protocolForm.cleaned_data
+                protocolFormData = protocolForm.save(commit=False)
+                protocolFormData.item = Item.objects.get(id=request.POST['item'])
+                protocolFormData.employee = Employee.objects.get(id=request.POST['employee'])
                 
                 #IF ITS NOT RETURN AND USER ITEM IS NOT EMPLOYEE AND ITEM USER IS NOT EMPTY
-                if protocolFormData['item'].item_user != protocolFormData['employee'] and protocolFormData['item'].item_user:
+                if protocolFormData.item.item_user != protocolFormData.employee and protocolFormData.item.item_user:
                     return HttpResponse('CANT DO IT')
                     #TODO ADD RETURNING PROTOCOL FROM ACTUAL ITEM USER AND ADD CONFIRM 
-
-                
                 else:
-                    protocolFormData['item'].item_user = protocolFormData['employee']
-                    protocolFormData['item'].save()
+                    protocolFormData.item.item_user = protocolFormData.employee
+                    protocolFormData.item.save()
                     
-                
-                pprint(request.POST)
-
                 # If pk was send to us, we use it otherwise we create new protocol
                 if 'pk' in request.POST:
                     newProtocol = Protocol.objects.get(id=request.POST['pk'])
                 else:
-                    newProtocol = protocolForm.save(commit=False)
+                    newProtocol = protocolFormData
                     newProtocol.is_return = False
                     newProtocol.created_by = request.user
                     newProtocol.save()
 
-                ProtocolItem(protocol_id=newProtocol,item_id=protocolFormData['item']).save()
+                ProtocolItem(protocol_id=newProtocol,item_id=protocolFormData.item).save()
 
                 # This if is not used by me, but i decided not to delete it just in case
                 if 'saveAndEnd' in request.POST:

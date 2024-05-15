@@ -17,20 +17,22 @@ class EmployeeForm(forms.ModelForm):
 
 
 class ProtocolFormAdd(forms.ModelForm):
-    item = forms.ModelChoiceField(
-        queryset=Item.objects.filter(item_user__isnull=True,utilization_id__isnull=True),
-        required=True,  
-    )
+    # item = forms.ModelChoiceField(
+    #     queryset=Item.objects.filter(item_user__isnull=True,utilization_id__isnull=True),
+    #     required=True,  
+    # )
     class Meta:
         model = Protocol
-        fields = ['employee','item','description']
+        fields = [
+            # 'employee','item',
+            'description']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args,**kwargs)
         for field in self.fields: 
             self.fields[field].widget.attrs.update({'class':'w-25 m-2'})
-        self.fields['item'].widget.attrs.update({'id':'search-items'})
-        self.fields['employee'].widget.attrs.update({'id':'search-employee'})
+        # self.fields['item'].widget.attrs.update({'id':'search-items'})
+        # self.fields['employee'].widget.attrs.update({'id':'search-employee'})
 
 
     

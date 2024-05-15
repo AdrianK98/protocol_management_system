@@ -10,7 +10,23 @@
     <!-- Security token -->
     {% csrf_token %}
  
-    <!-- Using the formset -->
+    <!-- Using the formset --> 
+    <div id="div_id_employee" class="form-group">
+      <label for="search-employee" class=" requiredField">Pracownik<span class="asteriskField">*</span></label> 
+      <div> 
+        <select name="employee" class="w-25 m-2 select form-control select2-hidden-accessible" id="search-employee" required="" tabindex="-1" aria-hidden="true" data-select2-id="select2-data-search-employee"> 
+          <option value="" selected="" data-select2-id="select2-data-11-591n">---------</option>
+        </select>
+      </div>
+    </div>
+    <div id="div_id_item" class="form-group">
+       <label for="search-items" class=" requiredField">Item<span class="asteriskField">*</span> </label> 
+       <div data-select2-id="select2-data-28-4whr"> 
+         <select name="item" class="w-25 m-2 select form-control select2-hidden-accessible" id="search-items" required="" tabindex="-1" aria-hidden="true" data-select2-id="select2-data-search-items"> 
+          <option value="" selected="" data-select2-id="select2-data-10-iflm">---------</option>
+         </select>
+       </div> 
+    </div>
     {{ protocolForm|crispy }}
     <hr>
     {% if messages %}
@@ -43,6 +59,7 @@
         // We get raw data, so we are formating it that select2 can work with them
         return {
           results: data.map(e => {
+            if(e.item_user != "None") return e;
             return {id: e.id, text: e.item_it + ' ' + e.item_model}
           })
         }
