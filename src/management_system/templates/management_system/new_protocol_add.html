@@ -27,9 +27,31 @@
     <button type="button" onclick="addItem()" class="btn btn-secondary mt-3" name="saveAndContinue">Dodaj Kolejny</button>
 </form>
 <script type="text/javascript">
+  const select2conf = {
+    // Use AJAX to call to API2 to get the list of employees
+    ajax: {
+      url: "{% url 'API2Employees' %}",
+      dataType: 'json',
+      data: function(params){
+        // We send only query as 'q' and limit = 10
+        return {
+          q: params.term,
+          limit: 10
+        }
+      },
+      processResults: function(data){
+        // We get raw data, so we are formating it that select2 can work with them
+        return {
+          results: data.map(e => {
+            return {id: e.id, text: e.user_name + ' ' + e.user_surname}
+          })
+        }
+      },
+    }
+  };
   $(document).ready(function() {
     // Initialize select2
-    $('.select2field').select2();
+    $('.select2field').select2(select2conf);
 
     // Add event listener to search-items 
     $('#search-items').on('select2:select', () => {
@@ -122,9 +144,9 @@
 
     // A 'lil trick here, for some reason we must update both new and the very first field in that order
     // Otherwise it breaks everything
-    $('#search-items' + id).select2();
-    $('#search-items').select2();
-    $('#search-items' + id).select2();
+    $('#search-items' + id).select2(select2conf);
+    $('#search-items').select2(select2conf);
+    $('#search-items' + id).select2(select2conf);
 
     // Add event listener to search-items 
     $('#search-items' + id).on('select2:select', () => {
