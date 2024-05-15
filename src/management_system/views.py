@@ -742,6 +742,45 @@ def API2EmployeesView(request):
     json += "}]"
     return HttpResponse(json, content_type='application/json')
 
+@login_required
+def API2ItemsView(request):
+    if request.GET and request.GET.get('q', False):
+        employees = Item.objects.raw("select * from users_employee where concat(user_name, \' \', user_surname) like %s;", ['%' + request.GET['q'] + '%'])
+    else:
+        employees = Item.objects.all()
+    if request.GET and request.GET.get('limit', False):
+        employees = employees[:int(request.GET.get('limit', 10))]
+    employees = list(employees)
+    if len(employees) < 1:
+        return HttpResponse("[]", content_type='application/json')
+    last = employees.pop(-1)
+    json = "["
+    for e in employees:
+        json += "{" 
+        json += "\"id\":\""             + str(e.id)             + "\"," 
+        json += "\"category\":\""       + str(e.category)       + "\"," 
+        json += "\"item_producent\":\"" + str(e.item_producent) + "\"," 
+        json += "\"item_model\":\""     + str(e.item_model)     + "\"," 
+        json += "\"item_sn\":\""        + str(e.item_sn)        + "\"," 
+        json += "\"item_it\":\""        + str(e.item_it)        + "\"," 
+        json += "\"item_kk\":\""        + str(e.item_kk)        + "\","  
+        json += "\"item_user\":\""      + str(e.item_user)      + "\","  
+        json += "\"utilization_id\":\"" + str(e.utilization_id) + "\""  
+        json += "},"       
+    json += "{"        
+    json += "\"id\":\""              + str(last.id)              + "\","
+    json += "\"category\":\""       + str(e.category)       + "\"," 
+    json += "\"item_producent\":\"" + str(e.item_producent) + "\"," 
+    json += "\"item_model\":\""     + str(e.item_model)     + "\"," 
+    json += "\"item_sn\":\""        + str(e.item_sn)        + "\"," 
+    json += "\"item_it\":\""        + str(e.item_it)        + "\"," 
+    json += "\"item_kk\":\""        + str(e.item_kk)        + "\","  
+    json += "\"item_user\":\""      + str(e.item_user)      + "\","  
+    json += "\"utilization_id\":\"" + str(e.utilization_id) + "\""
+    json += "}]"
+    return HttpResponse(json, content_type='application/json')
+
+
 
 class ItemList(generics.ListCreateAPIView):
     queryset = Item.objects.all()

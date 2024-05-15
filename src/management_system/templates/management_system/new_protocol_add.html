@@ -30,7 +30,7 @@
   const select2conf = {
     // Use AJAX to call to API2 to get the list of employees
     ajax: {
-      url: "{% url 'API2Employees' %}",
+      url: "{% url 'API2Items' %}",
       dataType: 'json',
       data: function(params){
         // We send only query as 'q' and limit = 10
@@ -43,15 +43,38 @@
         // We get raw data, so we are formating it that select2 can work with them
         return {
           results: data.map(e => {
-            return {id: e.id, text: e.user_name + ' ' + e.user_surname}
+            return {id: e.id, text: e.item_it + ' ' + e.item_model}
           })
         }
       },
     }
   };
   $(document).ready(function() {
-    // Initialize select2
-    $('.select2field').select2(select2conf);
+      // Initialize select2
+      //$('.select2field').select2(select2conf);
+      $('#search-employee').select2({
+      // Use AJAX to call to API2 to get the list of employees
+      ajax: {
+        url: "{% url 'API2Employees' %}",
+        dataType: 'json',
+        data: function(params){
+          // We send only query as 'q' and limit = 10
+          return {
+            q: params.term,
+            limit: 10
+          }
+        },
+        processResults: function(data){
+          // We get raw data, so we are formating it that select2 can work with them
+          return {
+            results: data.map(e => {
+              return {id: e.id, text: e.user_name + ' ' + e.user_surname}
+            })
+          }
+        },
+      }
+    });
+    $('#search-items').select2(select2conf);
 
     // Add event listener to search-items 
     $('#search-items').on('select2:select', () => {
