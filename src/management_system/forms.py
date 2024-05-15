@@ -67,7 +67,7 @@ class ProtocolFormReturnNext(forms.Form):
 class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
-        fields = ['category', 'item_producent', 'item_model', 'item_sn', 'item_it', 'item_kk']
+        fields = ['category', 'item_producent', 'item_model', 'item_sn', 'item_it', 'item_kk', 'item_user']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args,**kwargs)
