@@ -34,9 +34,9 @@ class Item(models.Model):
 
 
 class Protocol(models.Model):
-    created=models.DateField('Data utworzenia',auto_now_add=True)
+    created=models.DateTimeField('Data utworzenia',auto_now_add=True)
     barcode=models.CharField(max_length=20,blank=True, unique=True)
-    modified=models.DateField('Data modyfikacji',auto_now=True,blank=True,null=True)
+    modified=models.DateTimeField('Data modyfikacji',blank=True,null=True)
     description=models.CharField('Opis',max_length=200,blank=True,null=True)
     is_return=models.BooleanField('Zwrot',blank=True)
     printed_count=models.IntegerField('Druk',default=0,blank=True)

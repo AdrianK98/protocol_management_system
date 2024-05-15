@@ -29,12 +29,22 @@ from .models import Item,Protocol, ProtocolItem, Utilization
 @method_decorator(login_required, name="dispatch")
 class utilizationDelete(View):
     def post(self, request, pk):
-        obj = get_object_or_404(Utilization, id = pk )
-        obj.delete()
-        return redirect('utilization')
+        try:
+            obj = get_object_or_404(Utilization, id = pk )
+            print(obj)
+            obj.delete()
+            return redirect('utilization')
+        except Exception as e:
+            print('error')
+            messages.error(request, f"{e}.")
+            return render(request, "management_system/utilization_delete.html", {"utilization": obj})
 
     def get(self, request, pk):
-        obj = get_object_or_404(Utilization, id = pk)
+        try:
+            obj = get_object_or_404(Utilization, id = pk)
+        except Exception as e:
+            print(e)
+
         context={
             "utilization": obj,
             "pk":pk,
@@ -325,10 +335,17 @@ def itemsAddNew(request):
     if request.method == 'POST':
         if itemForm.is_valid():
             try:
-                newItem = itemForm.save()
+                newItem = itemForm.save(commit=False)
+                if request.POST.get('item_user'):
+                    newItem.item_user = Employee.objects.get(id=request.POST.get('item_user'))
+                
+                newItem.save()
                 return redirect('home')
             except:
-                print('ERROR OCCURED!')
+                print('ERROR OCCURED WHILE SAVING DATA TO DB!')
+        else:
+            print('Form not valid!')
+            print(itemForm.errors)
 
     context={
         'itemForm':itemForm
@@ -655,31 +672,28 @@ class NewProtocolAdd(View):
         protocolForm = ProtocolFormAdd(request.POST)
         if protocolForm.is_valid():
             try:
-                protocolFormData = protocolForm.cleaned_data
+                protocolFormData = protocolForm.save(commit=False)
+                protocolFormData.item = Item.objects.get(id=request.POST['item'])
+                protocolFormData.employee = Employee.objects.get(id=request.POST['employee'])
                 
                 #IF ITS NOT RETURN AND USER ITEM IS NOT EMPLOYEE AND ITEM USER IS NOT EMPTY
-                if protocolFormData['item'].item_user != protocolFormData['employee'] and protocolFormData['item'].item_user:
+                if protocolFormData.item.item_user != protocolFormData.employee and protocolFormData.item.item_user:
                     return HttpResponse('CANT DO IT')
                     #TODO ADD RETURNING PROTOCOL FROM ACTUAL ITEM USER AND ADD CONFIRM 
-
-                
                 else:
-                    protocolFormData['item'].item_user = protocolFormData['employee']
-                    protocolFormData['item'].save()
+                    protocolFormData.item.item_user = protocolFormData.employee
+                    protocolFormData.item.save()
                     
-                
-                pprint(request.POST)
-
                 # If pk was send to us, we use it otherwise we create new protocol
                 if 'pk' in request.POST:
                     newProtocol = Protocol.objects.get(id=request.POST['pk'])
                 else:
-                    newProtocol = protocolForm.save(commit=False)
+                    newProtocol = protocolFormData
                     newProtocol.is_return = False
                     newProtocol.created_by = request.user
                     newProtocol.save()
 
-                ProtocolItem(protocol_id=newProtocol,item_id=protocolFormData['item']).save()
+                ProtocolItem(protocol_id=newProtocol,item_id=protocolFormData.item).save()
 
                 # This if is not used by me, but i decided not to delete it just in case
                 if 'saveAndEnd' in request.POST:
@@ -699,21 +713,24 @@ class NewProtocolAdd(View):
 
     def get(self,request):
         if request.GET.get('eid'):
-            protocolFormClass = ProtocolFormAdd
-            protocolForm = protocolFormClass(initial={
-                'employee': Employee.objects.get(id=request.GET.get('eid'))
-            })
-            return render(request, self.template,{'protocolForm':protocolForm})
+            # protocolFormClass = ProtocolFormAdd
+            # protocolForm = protocolFormClass(initial={
+            #     'employee': Employee.objects.get(id=request.GET.get('eid'))
+            # })
+            return render(request, self.template,{'employee':Employee.objects.get(id=request.GET.get('eid'))})
         else:
             protocolFormClass = ProtocolFormAdd
             return render(request, self.template,{'protocolForm':protocolFormClass})
 
 @login_required
 def API2EmployeesView(request):
-    if request.GET and request.GET['q']:
-        employees = list(Employee.objects.raw("select * from users_employee where concat(user_name, \' \', user_surname) like %s;", ['%' + request.GET['q'] + '%']))
+    if request.GET and request.GET.get('q', False):
+        employees = Employee.objects.raw("select * from users_employee where concat(user_name, \' \', user_surname) ilike %s;", ['%' + request.GET['q'] + '%'])
     else:
-        employees = list(Employee.objects.all())
+        employees = Employee.objects.all()
+    if request.GET and request.GET.get('limit', False):
+        employees = employees[:int(request.GET.get('limit', 10))]
+    employees = list(employees)
     if len(employees) < 1:
         return HttpResponse("[]", content_type='application/json')
     last = employees.pop(-1)
@@ -738,6 +755,45 @@ def API2EmployeesView(request):
     json += "\"user_login\":\""      + str(last.user_login)      + "\""
     json += "}]"
     return HttpResponse(json, content_type='application/json')
+
+@login_required
+def API2ItemsView(request):
+    if request.GET and request.GET.get('q', False):
+        items = Item.objects.raw("select * from management_system_item where concat(item_it, \' \', item_model) ilike %s;", ['%' + request.GET['q'] + '%'])
+    else:
+        items = Item.objects.all()
+    if request.GET and request.GET.get('limit', False):
+        items = items[:int(request.GET.get('limit', 10))]
+    items = list(items)
+    if len(items) < 1:
+        return HttpResponse("[]", content_type='application/json')
+    last = items.pop(-1)
+    json = "["
+    for e in items:
+        json += "{" 
+        json += "\"id\":\""             + str(e.id)             + "\"," 
+        json += "\"category\":\""       + str(e.category)       + "\"," 
+        json += "\"item_producent\":\"" + str(e.item_producent) + "\"," 
+        json += "\"item_model\":\""     + str(e.item_model)     + "\"," 
+        json += "\"item_sn\":\""        + str(e.item_sn)        + "\"," 
+        json += "\"item_it\":\""        + str(e.item_it)        + "\"," 
+        json += "\"item_kk\":\""        + str(e.item_kk)        + "\","  
+        json += "\"item_user\":\""      + str(e.item_user)      + "\","  
+        json += "\"utilization_id\":\"" + str(e.utilization_id) + "\""  
+        json += "},"       
+    json += "{"        
+    json += "\"id\":\""              + str(last.id)              + "\","
+    json += "\"category\":\""       + str(last.category)       + "\"," 
+    json += "\"item_producent\":\"" + str(last.item_producent) + "\"," 
+    json += "\"item_model\":\""     + str(last.item_model)     + "\"," 
+    json += "\"item_sn\":\""        + str(last.item_sn)        + "\"," 
+    json += "\"item_it\":\""        + str(last.item_it)        + "\"," 
+    json += "\"item_kk\":\""        + str(last.item_kk)        + "\","  
+    json += "\"item_user\":\""      + str(last.item_user)      + "\","  
+    json += "\"utilization_id\":\"" + str(last.utilization_id) + "\""
+    json += "}]"
+    return HttpResponse(json, content_type='application/json')
+
 
 
 class ItemList(generics.ListCreateAPIView):

@@ -9,8 +9,28 @@
   <form method="POST" enctype="multipart/form-data">
     <!-- Security token -->
     {% csrf_token %}
- 
-    <!-- Using the formset -->
+    <!-- Using the formset --> 
+    <div id="div_id_employee" class="form-group">
+      <label for="search-employee" class=" requiredField">Pracownik<span class="asteriskField">*</span></label> 
+      <div> 
+        <select name="employee" class="w-25 m-2 select form-control select2-hidden-accessible" id="search-employee" required="" tabindex="-1" aria-hidden="true" data-select2-id="select2-data-search-employee"> 
+          <!-- If page redirected from employee page, add that employee as default -->
+          {% if employee %}
+          <option value="{{employee.id}}" selected data-select2-id="select2-data-11-591n">{{employee.user_name}}  {{employee.user_surname}}</option>
+          {% else%}
+          <option value="" selected data-select2-id="select2-data-11-591n">---------</option>
+          {% endif %}
+        </select>
+      </div>
+    </div>
+    <div id="div_id_item" class="form-group">
+       <label for="search-items" class=" requiredField">Item<span class="asteriskField">*</span> </label> 
+       <div data-select2-id="select2-data-28-4whr"> 
+         <select name="item" class="w-25 m-2 select form-control select2-hidden-accessible" id="search-items" required="" tabindex="-1" aria-hidden="true" data-select2-id="select2-data-search-items"> 
+          <option value="" selected="" data-select2-id="select2-data-10-iflm">---------</option>
+         </select>
+       </div> 
+    </div>
     {{ protocolForm|crispy }}
     <hr>
     {% if messages %}
@@ -27,9 +47,57 @@
     <button type="button" onclick="addItem()" class="btn btn-secondary mt-3" name="saveAndContinue">Dodaj Kolejny</button>
 </form>
 <script type="text/javascript">
+  const select2conf = {
+    // Use AJAX to call to API2 to get the list of employees
+    ajax: {
+      url: "{% url 'API2Items' %}",
+      dataType: 'json',
+      delay: 300,
+      data: function(params){
+        // We send only query as 'q' and limit = 10
+        return {
+          q: params.term,
+          limit: 10
+        }
+      },
+      processResults: function(data){
+        // We get raw data, so we are formating it that select2 can work with them
+        return {
+          results: data.map(e => {
+            if(e.item_user != "None") return e;
+            return {id: e.id, text: e.item_it + ' ' + e.item_model}
+          })
+        }
+      },
+    }
+  };
   $(document).ready(function() {
-    // Initialize select2
-    $('.select2field').select2();
+      // Initialize select2
+      //$('.select2field').select2(select2conf);
+      $('#search-employee').select2({
+      // Use AJAX to call to API2 to get the list of employees
+      ajax: {
+        url: "{% url 'API2Employees' %}",
+        delay: 300,
+        dataType: 'json',
+        data: function(params){
+          // We send only query as 'q' and limit = 10
+          return {
+            q: params.term,
+            limit: 10
+          }
+        },
+        processResults: function(data){
+          // We get raw data, so we are formating it that select2 can work with them
+          return {
+            results: data.map(e => {
+              return {id: e.id, text: e.user_name + ' ' + e.user_surname}
+            })
+          }
+        },
+      }
+    });
+    $('#search-items').select2(select2conf);
 
     // Add event listener to search-items 
     $('#search-items').on('select2:select', () => {
@@ -122,9 +190,9 @@
 
     // A 'lil trick here, for some reason we must update both new and the very first field in that order
     // Otherwise it breaks everything
-    $('#search-items' + id).select2();
-    $('#search-items').select2();
-    $('#search-items' + id).select2();
+    $('#search-items' + id).select2(select2conf);
+    $('#search-items').select2(select2conf);
+    $('#search-items' + id).select2(select2conf);
 
     // Add event listener to search-items 
     $('#search-items' + id).on('select2:select', () => {

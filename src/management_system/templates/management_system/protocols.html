@@ -48,7 +48,7 @@
           </td>
           <td>{{protocol.barcode}}</td>
           <td>{{protocol.employee}}</td>
-          <td>{{protocol.created|date:"d/m/Y"}}</td>
+          <td>{{protocol.created|date:"d.m.Y G:i:s"}}</td>
           <td>{{protocol.is_return|yesno:"Zwrot,Przekazanie"}}</td>
           <td><a class="btn btn-success mb-1" role="button" href="{% url 'singleProtocol' protocol.id %}">Wyswietl</a></td>
         </tr>
