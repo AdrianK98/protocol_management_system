@@ -326,7 +326,9 @@ def itemsAddNew(request):
         if itemForm.is_valid():
             try:
                 newItem = itemForm.save(commit=False)
-                newItem.item_user = Employee.objects.get(id=request.POST.get('item_user'))
+                if request.POST.get('item_user'):
+                    newItem.item_user = Employee.objects.get(id=request.POST.get('item_user'))
+                
                 newItem.save()
                 return redirect('home')
             except:
