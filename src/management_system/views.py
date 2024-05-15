@@ -708,8 +708,36 @@ class NewProtocolAdd(View):
             protocolFormClass = ProtocolFormAdd
             return render(request, self.template,{'protocolForm':protocolFormClass})
 
-
-
+@login_required
+def API2EmployeesView(request):
+    if request.GET and request.GET['q']:
+        employees = list(Employee.objects.raw("select * from users_employee where concat(user_name, \' \', user_surname) like %s;", ['%' + request.GET['q'] + '%']))
+    else:
+        employees = list(Employee.objects.all())
+    if len(employees) < 1:
+        return HttpResponse("[]", content_type='application/json')
+    last = employees.pop(-1)
+    json = "["
+    for e in employees:
+        json += "{" 
+        json += "\"id\":\""              + str(e.id)              + "\"," 
+        json += "\"user_name\":\""       + str(e.user_name)       + "\"," 
+        json += "\"user_surname\":\""    + str(e.user_surname)    + "\"," 
+        json += "\"user_department\":\"" + str(e.user_department) + "\"," 
+        json += "\"user_location\":\""   + str(e.user_location)   + "\"," 
+        json += "\"user_email\":\""      + str(e.user_email)      + "\"," 
+        json += "\"user_login\":\""      + str(e.user_login)      + "\""  
+        json += "},"       
+    json += "{"        
+    json += "\"id\":\""              + str(last.id)              + "\","
+    json += "\"user_name\":\""       + str(last.user_name)       + "\","
+    json += "\"user_surname\":\""    + str(last.user_surname)    + "\","
+    json += "\"user_department\":\"" + str(last.user_department) + "\","
+    json += "\"user_location\":\""   + str(last.user_location)   + "\","
+    json += "\"user_email\":\""      + str(last.user_email)      + "\","
+    json += "\"user_login\":\""      + str(last.user_login)      + "\""
+    json += "}]"
+    return HttpResponse(json, content_type='application/json')
 
 
 class ItemList(generics.ListCreateAPIView):

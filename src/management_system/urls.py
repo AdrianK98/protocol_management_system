@@ -52,6 +52,7 @@ urlpatterns = [
     path("utilization/view/<int:pk>",views.singleUtilizationViewScan, name="singleUtilizationScan" ),
     path("utilization/<int:pk>/delete/<int:item>",views.utilizationDeleteItem.as_view(), name="utilizationDeleteItem" ),
     path("utilization/<int:pk>/delete",views.utilizationDelete.as_view(), name="utilizationDelete" ),
+    path("api2/employees",views.API2EmployeesView, name="API2Employees" ),
 
 
 ]
