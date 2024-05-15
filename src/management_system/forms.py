@@ -57,7 +57,7 @@ class ProtocolFormReturn(forms.ModelForm):
     # )
 
 class ProtocolFormReturnNext(forms.Form):
-    item = forms.ModelChoiceField(queryset=Item.objects.filter(item_user__isnull=False), required=True,)
+    item = forms.ModelChoiceField(queryset=Item.objects.filter(item_user__isnull=False), required=True)
     def __init__(self, *args, **kwargs):
         super().__init__(*args,**kwargs)
         for field in self.fields: 
@@ -67,12 +67,14 @@ class ProtocolFormReturnNext(forms.Form):
 class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
-        fields = ['category', 'item_producent', 'item_model', 'item_sn', 'item_it', 'item_kk', 'item_user']
+        fields = ['category', 'item_producent', 'item_model', 'item_sn', 'item_it', 'item_kk',]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args,**kwargs)
         for field in self.fields: 
             self.fields[field].widget.attrs.update({'class':'w-25 m-2'})
+
+        # 
         #self.fields['item_user'].widget.attrs.update({'id':'search-items','style':'display: none;'})
 
 class UtilizationItemForm(forms.ModelForm):

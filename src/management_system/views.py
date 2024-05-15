@@ -325,10 +325,15 @@ def itemsAddNew(request):
     if request.method == 'POST':
         if itemForm.is_valid():
             try:
-                newItem = itemForm.save()
+                newItem = itemForm.save(commit=False)
+                newItem.item_user = Employee.objects.get(id=request.POST.get('item_user'))
+                newItem.save()
                 return redirect('home')
             except:
                 print('ERROR OCCURED!')
+        else:
+            print('Form not valid')
+            print(itemForm.errors)
 
     context={
         'itemForm':itemForm

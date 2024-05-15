@@ -13,14 +13,14 @@
 
   <!-- Using the formset -->
   {{ itemForm|crispy }}
-  <!-- <div id="div_id_item_user" class="form-group"> -->
-  <!--   <label for="id_item_user">Pracownik</label> -->
-  <!--   <div> -->
-  <!--     <select id="id_item_user" name="item_user" class="w-25 m-2 select form-control"> -->
-  <!--       <option value="" selected="">---------</option> -->
-  <!--     </select> -->
-  <!--   </div> -->
-  <!-- </div> -->
+  <div id="div_id_item_user" class="form-group">
+    <label for="id_item_user">Pracownik</label>
+    <div>
+      <select id="id_item_user" name="item_user" class="w-25 m-2 select form-control">
+        <option value="" selected="">---------</option>
+      </select>
+    </div>
+  </div>
   {% comment %} <button id="show-employee-btn" class="btn btn-secondary mt-3" type="button">Dodaj pracownika</button> {% endcomment %}
   <hr>
 
@@ -37,6 +37,7 @@
           $('#id_item_user').select2({
             // Use AJAX to call to API2 to get the list of employees
             ajax: {
+              delay: 300,
               url: "{% url 'API2Employees' %}",
               dataType: 'json',
               data: function(params){
