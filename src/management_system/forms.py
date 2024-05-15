@@ -67,13 +67,13 @@ class ProtocolFormReturnNext(forms.Form):
 class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
-        fields = "__all__"
+        fields = ['category', 'item_producent', 'item_model', 'item_sn', 'item_it', 'item_kk']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args,**kwargs)
         for field in self.fields: 
             self.fields[field].widget.attrs.update({'class':'w-25 m-2'})
-        self.fields['item_user'].widget.attrs.update({'id':'search-items','style':'display: none;'})
+        #self.fields['item_user'].widget.attrs.update({'id':'search-items','style':'display: none;'})
 
 class UtilizationItemForm(forms.ModelForm):
     item = forms.ModelChoiceField(

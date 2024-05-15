@@ -13,6 +13,14 @@
 
   <!-- Using the formset -->
   {{ itemForm|crispy }}
+  <div id="div_id_item_user" class="form-group">
+    <label for="id_item_user">Pracownik</label>
+    <div>
+      <select id="id_item_user" name="item_user" class="w-25 m-2 select form-control">
+        <option value="" selected="">---------</option>
+      </select>
+    </div>
+  </div>
   {% comment %} <button id="show-employee-btn" class="btn btn-secondary mt-3" type="button">Dodaj pracownika</button> {% endcomment %}
   <hr>
 
@@ -23,27 +31,30 @@
 
 
 <script>
-        {% comment %} $(document).ready(function() {
-            $('#show-employee-btn').click(function() {
-                $('#search-items').toggle();
-                $('#show-employee-btn').hide();
-            });
-        }); {% endcomment %}
+        // When page is ready
         $(document).ready(function () {
-          $('#search-employee').select2({
+          // Init select2 for #id_item_user
+          $('#id_item_user').select2({
+            // Use AJAX to call to API2 to get the list of employees
             ajax: {
-              url: '/get_filtered_employees/',
+              url: "{% url 'API2Employees' %}",
               dataType: 'json',
-              delay: 250,
-              data: function (params) {
-                print('xd')
+              data: function(params){
+                // We send only query as 'q' and limit = 10
+                return {
+                  q: params.term,
+                  limit: 10
+                }
               },
-              processResults: function (data) {
-                print('xd')
+              processResults: function(data){
+                // We get raw data, so we are formating it that select2 can work with them
+                return {
+                  results: data.map(e => {
+                    return {id: e.id, text: e.user_name + ' ' + e.user_surname}
+                  })
+                }
               },
-              cache: true,
-            },
-            minimumInputLength: 1,
+            }
           });
         });
         
