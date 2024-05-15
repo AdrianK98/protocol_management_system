@@ -29,12 +29,22 @@ from .models import Item,Protocol, ProtocolItem, Utilization
 @method_decorator(login_required, name="dispatch")
 class utilizationDelete(View):
     def post(self, request, pk):
-        obj = get_object_or_404(Utilization, id = pk )
-        obj.delete()
-        return redirect('utilization')
+        try:
+            obj = get_object_or_404(Utilization, id = pk )
+            print(obj)
+            obj.delete()
+            return redirect('utilization')
+        except Exception as e:
+            print('error')
+            messages.error(request, f"{e}.")
+            return render(request, "management_system/utilization_delete.html", {"utilization": obj})
 
     def get(self, request, pk):
-        obj = get_object_or_404(Utilization, id = pk)
+        try:
+            obj = get_object_or_404(Utilization, id = pk)
+        except Exception as e:
+            print(e)
+
         context={
             "utilization": obj,
             "pk":pk,

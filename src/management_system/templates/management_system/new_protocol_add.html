@@ -52,6 +52,7 @@
     ajax: {
       url: "{% url 'API2Items' %}",
       dataType: 'json',
+      delay: 300,
       data: function(params){
         // We send only query as 'q' and limit = 10
         return {
@@ -77,6 +78,7 @@
       // Use AJAX to call to API2 to get the list of employees
       ajax: {
         url: "{% url 'API2Employees' %}",
+        delay: 300,
         dataType: 'json',
         data: function(params){
           // We send only query as 'q' and limit = 10
