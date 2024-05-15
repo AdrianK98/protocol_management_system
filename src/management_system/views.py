@@ -332,9 +332,9 @@ def itemsAddNew(request):
                 newItem.save()
                 return redirect('home')
             except:
-                print('ERROR OCCURED!')
+                print('ERROR OCCURED WHILE SAVING DATA TO DB!')
         else:
-            print('Form not valid')
+            print('Form not valid!')
             print(itemForm.errors)
 
     context={
@@ -703,11 +703,11 @@ class NewProtocolAdd(View):
 
     def get(self,request):
         if request.GET.get('eid'):
-            protocolFormClass = ProtocolFormAdd
-            protocolForm = protocolFormClass(initial={
-                'employee': Employee.objects.get(id=request.GET.get('eid'))
-            })
-            return render(request, self.template,{'protocolForm':protocolForm})
+            # protocolFormClass = ProtocolFormAdd
+            # protocolForm = protocolFormClass(initial={
+            #     'employee': Employee.objects.get(id=request.GET.get('eid'))
+            # })
+            return render(request, self.template,{'employee':Employee.objects.get(id=request.GET.get('eid'))})
         else:
             protocolFormClass = ProtocolFormAdd
             return render(request, self.template,{'protocolForm':protocolFormClass})

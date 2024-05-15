@@ -9,13 +9,17 @@
   <form method="POST" enctype="multipart/form-data">
     <!-- Security token -->
     {% csrf_token %}
- 
     <!-- Using the formset --> 
     <div id="div_id_employee" class="form-group">
       <label for="search-employee" class=" requiredField">Pracownik<span class="asteriskField">*</span></label> 
       <div> 
         <select name="employee" class="w-25 m-2 select form-control select2-hidden-accessible" id="search-employee" required="" tabindex="-1" aria-hidden="true" data-select2-id="select2-data-search-employee"> 
-          <option value="" selected="" data-select2-id="select2-data-11-591n">---------</option>
+          <!-- If page redirected from employee page, add that employee as default -->
+          {% if employee %}
+          <option value="{{employee.id}}" selected data-select2-id="select2-data-11-591n">{{employee.user_name}}  {{employee.user_surname}}</option>
+          {% else%}
+          <option value="" selected data-select2-id="select2-data-11-591n">---------</option>
+          {% endif %}
         </select>
       </div>
     </div>
