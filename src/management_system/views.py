@@ -747,17 +747,17 @@ def API2EmployeesView(request):
 @login_required
 def API2ItemsView(request):
     if request.GET and request.GET.get('q', False):
-        employees = Item.objects.raw("select * from users_employee where concat(user_name, \' \', user_surname) ilike %s;", ['%' + request.GET['q'] + '%'])
+        items = Item.objects.raw("select * from management_system_item where concat(item_it, \' \', item_model) ilike %s;", ['%' + request.GET['q'] + '%'])
     else:
-        employees = Item.objects.all()
+        items = Item.objects.all()
     if request.GET and request.GET.get('limit', False):
-        employees = employees[:int(request.GET.get('limit', 10))]
-    employees = list(employees)
-    if len(employees) < 1:
+        items = items[:int(request.GET.get('limit', 10))]
+    items = list(items)
+    if len(items) < 1:
         return HttpResponse("[]", content_type='application/json')
-    last = employees.pop(-1)
+    last = items.pop(-1)
     json = "["
-    for e in employees:
+    for e in items:
         json += "{" 
         json += "\"id\":\""             + str(e.id)             + "\"," 
         json += "\"category\":\""       + str(e.category)       + "\"," 
@@ -771,14 +771,14 @@ def API2ItemsView(request):
         json += "},"       
     json += "{"        
     json += "\"id\":\""              + str(last.id)              + "\","
-    json += "\"category\":\""       + str(e.category)       + "\"," 
-    json += "\"item_producent\":\"" + str(e.item_producent) + "\"," 
-    json += "\"item_model\":\""     + str(e.item_model)     + "\"," 
-    json += "\"item_sn\":\""        + str(e.item_sn)        + "\"," 
-    json += "\"item_it\":\""        + str(e.item_it)        + "\"," 
-    json += "\"item_kk\":\""        + str(e.item_kk)        + "\","  
-    json += "\"item_user\":\""      + str(e.item_user)      + "\","  
-    json += "\"utilization_id\":\"" + str(e.utilization_id) + "\""
+    json += "\"category\":\""       + str(last.category)       + "\"," 
+    json += "\"item_producent\":\"" + str(last.item_producent) + "\"," 
+    json += "\"item_model\":\""     + str(last.item_model)     + "\"," 
+    json += "\"item_sn\":\""        + str(last.item_sn)        + "\"," 
+    json += "\"item_it\":\""        + str(last.item_it)        + "\"," 
+    json += "\"item_kk\":\""        + str(last.item_kk)        + "\","  
+    json += "\"item_user\":\""      + str(last.item_user)      + "\","  
+    json += "\"utilization_id\":\"" + str(last.utilization_id) + "\""
     json += "}]"
     return HttpResponse(json, content_type='application/json')
 
