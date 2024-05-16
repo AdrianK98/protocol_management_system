@@ -43,9 +43,38 @@
     </div>
 {% endif %}
      
-    <button type="button" onclick="send()" class="btn btn-success mt-3" name="saveAndEnd">Zapisz</button>
+    <button type="button" onclick="step()" class="btn btn-success mt-3" name="saveAndEnd">Zapisz</button>
     <button type="button" onclick="addItem()" class="btn btn-secondary mt-3" name="saveAndContinue">Dodaj Kolejny</button>
 </form>
+<span class="popup" id="popup1" onclick="closePopup('popup1')">
+  <span class="popup-cnt">
+    <h3>Czy na pewno chcesz utworzyc nowe przekazanie?</h3>
+    <button type="button" onclick="send()" class="btn btn-success mx-3">Tak</button>
+    <button type="button" onclick="closePopup('popup1')" class="btn btn-danger mx-3">Nie</button>
+  </span>
+</span>
+<span class="popup" id="popup2" onclick="closePopup('popup2')">
+  <span class="popup-cnt">
+    <h3>Pole pracownik jest wymagane.</h3>
+    <button type="button" onclick="closePopup('popup2')" class="btn btn-success mx-3">OK</button>
+  </span>
+</span>
+<span class="popup" id="popup3" onclick="closePopup('popup3')">
+  <span class="popup-cnt">
+    <h3>Pole przedmiot jest wymagane.</h3>
+    <button type="button" onclick="closePopup('popup3')" class="btn btn-success mx-3">OK</button>
+  </span>
+</span>
+<span class="popup" id="popup4" onclick="closePopup('popup4')">
+  <span class="popup-cnt">
+    <section style="display: block; text-align: center;">
+      <h3>Zduplikowany przedmiot.</h3>
+      <p id="popup4msg"></p>
+      <button type="button" onclick="closePopup('popup4')" class="btn btn-success mx-3">OK</button>
+    </section>
+  </span>
+</span>
+
 <script type="text/javascript">
   const select2conf = {
     // Use AJAX to call to API2 to get the list of employees
@@ -107,6 +136,39 @@
       $('#search-items' + ix).select2('open');
     });
   });
+
+  function step(){
+    const employee = document.getElementById('search-employee').value;
+    const items = document.getElementsByName('item'); // Gets all fields with name=item
+    // Validate employee
+    if(!employee){
+      // alert('Pope pracownik jest wymagane.');
+      showPopup('popup2');
+      return;
+    }
+   
+    // Validate items
+    var seen = [];
+    for(var item of items){
+      if(!item.value) continue;
+      if(seen.includes(item.value)){
+        // Alert user with name (got from span)
+        // alert("Zduplikowany przedmiot " + item.parentElement.children[1].innerText);
+        document.getElementById('popup4msg').innerHTML = item.parentElement.children[1].innerText;
+        showPopup('popup4');
+        return;
+      }
+      seen.push(item.value);
+    }
+
+    if(seen.length <= 0){
+      // alert('Podaj przynajmniej jeden przedmiot.');
+      showPopup('popup3');
+      return;
+    }
+
+    showPopup('popup1');
+  }
 
   async function send(){
     // Get data from form, including token
