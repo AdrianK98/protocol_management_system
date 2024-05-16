@@ -11,3 +11,11 @@ nav a{
 	text-decoration: none;
 	font-weight: bold;
 }
+
+.title-float{
+	float: left;
+}
+
+.btn-title{
+	float: right;
+}
