@@ -54,6 +54,7 @@ urlpatterns = [
     path("utilization/<int:pk>/delete",views.utilizationDelete.as_view(), name="utilizationDelete" ),
     path("api2/employees",views.API2EmployeesView, name="API2Employees" ),
     path("api2/items",views.API2ItemsView, name="API2Items" ),
+    path("css/main.css",views.MainCSSView, name="MainCSS" ),
 
 
 ]

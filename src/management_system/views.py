@@ -822,3 +822,6 @@ class ProtocolList(generics.ListCreateAPIView):
 class ProtocolDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Protocol.objects.all()
     serializer_class = ProtocolSerializer
+
+def MainCSSView(request):
+    return render(request, "management_system/main.css", content_type="text/css")
