@@ -758,13 +758,16 @@ def API2EmployeesView(request):
 
 @login_required
 def API2ItemsView(request):
-    if request.GET and request.GET.get('q', False):
-        items = Item.objects.raw("select * from management_system_item where concat(item_it, \' \', item_sn, \' \', item_kk, \' \', item_model) ilike %s;", ['%' + request.GET['q'] + '%'])
+    if request.GET and request.GET.get('id', False):
+        items = [ Item.objects.get(id=request.GET.get('id', 0)) ]
     else:
-        items = Item.objects.all()
-    if request.GET and request.GET.get('limit', False):
-        items = items[:int(request.GET.get('limit', 10))]
-    items = list(sorted(items, key=attrgetter('id')))
+        if request.GET and request.GET.get('q', False):
+            items = Item.objects.raw("select * from management_system_item where concat(item_it, \' \', item_sn, \' \', item_kk, \' \', item_model) ilike %s;", ['%' + request.GET['q'] + '%'])
+        else:
+            items = Item.objects.all()
+        if request.GET and request.GET.get('limit', False):
+            items = items[:int(request.GET.get('limit', 10))]
+        items = list(sorted(items, key=attrgetter('id')))
     if len(items) < 1:
         return HttpResponse("[]", content_type='application/json')
     last = items.pop(-1)

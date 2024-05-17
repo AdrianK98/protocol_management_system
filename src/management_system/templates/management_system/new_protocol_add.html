@@ -46,44 +46,54 @@
     <button type="button" onclick="step()" class="btn btn-success mt-3" name="saveAndEnd">Zapisz</button>
     <button type="button" onclick="addItem()" class="btn btn-secondary mt-3" name="saveAndContinue">Dodaj Kolejny</button>
 </form>
-<span class="popup" id="popup1" onclick="closePopup('popup1')">
+<!-- <span class="popup" id="popup1" onclick="closePopup('popup1')"> -->
+<span class="popup" id="popup1">
   <span class="popup-cnt">
-    <h3>Czy na pewno chcesz utworzyc nowe przekazanie?</h3>
-    <button type="button" onclick="send()" class="btn btn-success mx-3">Tak</button>
-    <button type="button" onclick="closePopup('popup1')" class="btn btn-danger mx-3">Nie</button>
+    <section class="popup-row fill">
+      <section class="popup-column w-100">
+        <h3>Czy na pewno chcesz utworzyc nowe przekazanie?</h3>
+        <section id="popup1table" style="overflow: scroll;" class="w-100 h-50 my-1">
+          <table class="table w-100"></table>
+        </section>
+        <section>
+          <button type="button" onclick="send()" class="btn btn-success mx-3">Tak</button>
+          <button type="button" onclick="closePopup('popup1')" class="btn btn-danger mx-3">Nie</button>
+        </section>
+      </section>
+    </section>
   </span>
 </span>
 <!-- <span class="popup" id="popup2" onclick="closePopup('popup2')"> -->
 <span class="popup" id="popup2">
   <span class="popup-cnt">
     <section class="popup-row fill">
-    <section class="popup-column w-100">
-      <h3>Pole pracownik jest wymagane.</h3>
-      <button type="button" onclick="closePopup('popup2')" class="btn btn-success mx-3">OK</button>
-    </section>
+      <section class="popup-column w-100">
+        <h3>Pole pracownik jest wymagane.</h3>
+        <button type="button" onclick="closePopup('popup2')" class="btn btn-success mx-3">OK</button>
+      </section>
     </section>
   </span>
-</span>
+</span> 
 <!-- <span class="popup" id="popup3" onclick="closePopup('popup3')"> -->
 <span class="popup" id="popup3">
   <span class="popup-cnt">
     <section class="popup-row fill">
-    <section class="popup-column w-100">
-      <h3>Pole przedmiot jest wymagane.</h3>
-      <button type="button" onclick="closePopup('popup3')" class="btn btn-success mx-3">OK</button>
-    </section>
+      <section class="popup-column w-100">
+        <h3>Pole przedmiot jest wymagane.</h3>
+        <button type="button" onclick="closePopup('popup3')" class="btn btn-success mx-3">OK</button>
+      </section>
     </section>
   </span>
-</span>
+</span> 
 <!-- <span class="popup" id="popup4" onclick="closePopup('popup4')"> -->
 <span class="popup" id="popup4">
   <span class="popup-cnt">
     <section class="popup-row fill">
-    <section class="popup-column w-100">
-      <h3>Zduplikowany przedmiot.</h3>
-      <p id="popup4msg"></p>
-      <button type="button" onclick="closePopup('popup4')" class="btn btn-success mx-3">OK</button>
-    </section>
+      <section class="popup-column w-100">
+        <h3>Zduplikowany przedmiot.</h3>
+        <p id="popup4msg"></p>
+        <button type="button" onclick="closePopup('popup4')" class="btn btn-success mx-3">OK</button>
+      </section>
     </section>
   </span>
 </span>
@@ -150,7 +160,7 @@
     });
   });
 
-  function step(){
+  async function step(){
     const employee = document.getElementById('search-employee').value;
     const items = document.getElementsByName('item'); // Gets all fields with name=item
     // Validate employee
@@ -178,6 +188,15 @@
       // alert('Podaj przynajmniej jeden przedmiot.');
       showPopup('popup3');
       return;
+    }
+
+    var table = document.getElementById('popup1table').getElementsByTagName('table')[0];
+    table.innerHTML = "<tr id=\"poput1table_th\"><th scope=\"col\">ID</th><th scope=\"col\">IT</th><th scope=\"col\">SN</th><th scope=\"col\">KK</th></tr>";
+    for(let e of seen){
+      let res = await fetch("{% url 'API2Items' %}?id=" + e);
+      let data = await res.json();
+      data = data[0];
+      table.innerHTML += '<tr><td>' + data.id + '</td><td>' + data.item_it + '</td><td>' + data.item_sn + '</td><td>' + data.item_kk + '</td></tr>';
     }
 
     showPopup('popup1');
