@@ -730,7 +730,7 @@ def API2EmployeesView(request):
         employees = Employee.objects.all()
     if request.GET and request.GET.get('limit', False):
         employees = employees[:int(request.GET.get('limit', 10))]
-    employees = list(employees)
+    employees = list(sorted(employees, key=attrgetter('id')))
     if len(employees) < 1:
         return HttpResponse("[]", content_type='application/json')
     last = employees.pop(-1)
@@ -764,7 +764,7 @@ def API2ItemsView(request):
         items = Item.objects.all()
     if request.GET and request.GET.get('limit', False):
         items = items[:int(request.GET.get('limit', 10))]
-    items = list(items)
+    items = list(sorted(items, key=attrgetter('id')))
     if len(items) < 1:
         return HttpResponse("[]", content_type='application/json')
     last = items.pop(-1)
