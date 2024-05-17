@@ -782,7 +782,7 @@ def API2ItemsView(request):
         json += "\"utilization_id\":\"" + str(e.utilization_id) + "\""  
         json += "},"       
     json += "{"        
-    json += "\"id\":\""              + str(last.id)              + "\","
+    json += "\"id\":\""             + str(last.id)              + "\","
     json += "\"category\":\""       + str(last.category)       + "\"," 
     json += "\"item_producent\":\"" + str(last.item_producent) + "\"," 
     json += "\"item_model\":\""     + str(last.item_model)     + "\"," 
@@ -791,6 +791,49 @@ def API2ItemsView(request):
     json += "\"item_kk\":\""        + str(last.item_kk)        + "\","  
     json += "\"item_user\":\""      + str(last.item_user)      + "\","  
     json += "\"utilization_id\":\"" + str(last.utilization_id) + "\""
+    json += "}]"
+    return HttpResponse(json, content_type='application/json')
+
+#      
+@login_required
+def API2ProtocolsView(request):
+    if request.GET and request.GET.get('q', False):
+        protocols = Protocol.objects.raw("select * from management_system_protocol where barcode ilike %s;", ['%' + request.GET['q'] + '%'])
+    else:
+        protocols = Protocol.objects.all()
+    if request.GET and request.GET.get('limit', False):
+        protocols = protocols[:int(request.GET.get('limit', 10))]
+    protocols = list(sorted(protocols, key=attrgetter('id')))
+    if len(protocols) < 1:
+        return HttpResponse("[]", content_type='application/json')
+    last = protocols.pop(-1)
+    json = "["
+    for e in protocols:
+        json += "{" 
+        json += "\"id\":\""            + str(e.id)            + "\"," 
+        json += "\"created\":\""       + str(e.created)       + "\"," 
+        json += "\"modified\":\""      + str(e.modified)      + "\"," 
+        json += "\"description\":\""   + str(e.description)   + "\"," 
+        json += "\"is_return\":\""     + str(e.is_return)     + "\"," 
+        json += "\"employee_id\":\""   + str(e.employee_id)   + "\"," 
+        json += "\"barcode\":\""       + str(e.barcode)       + "\","  
+        json += "\"created_by_id\":\"" + str(e.created_by_id) + "\","  
+        json += "\"is_scanned\":\""    + str(e.is_scanned)    + "\","  
+        json += "\"protocol_scan\":\"" + str(e.protocol_scan) + "\","  
+        json += "\"printed_count\":\"" + str(e.printed_count) + "\""  
+        json += "},"       
+    json += "{"        
+    json += "\"id\":\""            + str(last.id)         + "\","
+    json += "\"created\":\""       + str(last.created)       + "\"," 
+    json += "\"modified\":\""      + str(last.modified)      + "\"," 
+    json += "\"description\":\""   + str(last.description)   + "\"," 
+    json += "\"is_return\":\""     + str(last.is_return)     + "\"," 
+    json += "\"employee_id\":\""   + str(last.employee_id)   + "\"," 
+    json += "\"barcode\":\""       + str(last.barcode)       + "\","  
+    json += "\"created_by_id\":\"" + str(last.created_by_id) + "\","  
+    json += "\"is_scanned\":\""    + str(last.is_scanned)    + "\","  
+    json += "\"protocol_scan\":\"" + str(last.protocol_scan) + "\","  
+    json += "\"printed_count\":\"" + str(last.printed_count) + "\""
     json += "}]"
     return HttpResponse(json, content_type='application/json')
 
