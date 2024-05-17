@@ -5,5 +5,45 @@
 
 
 <h1>HOME</h1>
+<hr />
+
+<section id="main_panel">
+	<section class="panel panel-light" id="protocols">
+		<h2 class="panel-title">Protokoly</h2>
+		<section class="panel-cnt" style="background-color: red;"></section>
+	</section>
+	<section style="float:left;" class="h-100 w-50">
+		<section class="panel" id="alerts">
+			<h2 class="panel-title">ALERTY</h2>
+			<section class="panel-cnt" style="background-color: red;"></section>
+		</section>
+		<section class="panel" id="last_added">
+			<h2 class="panel-title">Ostatnio dodane przedmioty</h2>
+			<section class="panel-cnt" style="background-color: red;"></section>
+		</section>
+	</section>
+</section>
+
+<style>
+#main_panel{
+	height: calc(100% - 5rem);
+	overflow: hidden;
+}
+#protocols{
+	height: 100%;
+	width: 50%;
+	float: left;
+}
+
+#alerts{
+	height: 50%;
+	width: 100%;
+}
+
+#last_added{
+	height: 50%;
+	width: 100%;
+}
+</style>
 
 {% endblock content %}
