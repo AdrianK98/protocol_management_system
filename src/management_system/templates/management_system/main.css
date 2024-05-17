@@ -47,9 +47,16 @@ nav a{
 }
 
 .popup-column{
-	display: flex;
+	display: inline-flex;
 	align-content: center;
 	flex-direction: column;
+	flex-wrap: wrap;
+}
+
+.popup-row{
+	display: inline-flex;
+	align-content: center;
+	flex-direction: row;
 	flex-wrap: wrap;
 }
 
