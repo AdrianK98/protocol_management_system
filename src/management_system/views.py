@@ -724,13 +724,16 @@ class NewProtocolAdd(View):
 
 @login_required
 def API2EmployeesView(request):
-    if request.GET and request.GET.get('q', False):
-        employees = Employee.objects.raw("select * from users_employee where concat(user_name, \' \', user_surname) ilike %s;", ['%' + request.GET['q'] + '%'])
+    if request.GET and request.GET.get('id', False):
+        employees = [ Employee.objects.get(id=request.GET.get('id', 0)) ]
     else:
-        employees = Employee.objects.all()
-    if request.GET and request.GET.get('limit', False):
-        employees = employees[:int(request.GET.get('limit', 10))]
-    employees = list(sorted(employees, key=attrgetter('id')))
+        if request.GET and request.GET.get('q', False):
+            employees = Employee.objects.raw("select * from users_employee where concat(user_name, \' \', user_surname) ilike %s;", ['%' + request.GET['q'] + '%'])
+        else:
+            employees = Employee.objects.all()
+        if request.GET and request.GET.get('limit', False):
+            employees = employees[:int(request.GET.get('limit', 10))]
+        employees = list(sorted(employees, key=attrgetter('id')))
     if len(employees) < 1:
         return HttpResponse("[]", content_type='application/json')
     last = employees.pop(-1)
@@ -800,13 +803,16 @@ def API2ItemsView(request):
 #      
 @login_required
 def API2ProtocolsView(request):
-    if request.GET and request.GET.get('q', False):
-        protocols = Protocol.objects.raw("select * from management_system_protocol where barcode ilike %s;", ['%' + request.GET['q'] + '%'])
+    if request.GET and request.GET.get('id', False):
+        protocols = [ Protocol.objects.get(id=request.GET.get('id', 0)) ]
     else:
-        protocols = Protocol.objects.all()
-    if request.GET and request.GET.get('limit', False):
-        protocols = protocols[:int(request.GET.get('limit', 10))]
-    protocols = list(sorted(protocols, key=attrgetter('id')))
+        if request.GET and request.GET.get('q', False):
+            protocols = Protocol.objects.raw("select * from management_system_protocol where barcode ilike %s;", ['%' + request.GET['q'] + '%'])
+        else:
+            protocols = Protocol.objects.all()
+        if request.GET and request.GET.get('limit', False):
+            protocols = protocols[:int(request.GET.get('limit', 10))]
+        protocols = list(sorted(protocols, key=attrgetter('id')))
     if len(protocols) < 1:
         return HttpResponse("[]", content_type='application/json')
     last = protocols.pop(-1)
