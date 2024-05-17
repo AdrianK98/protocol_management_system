@@ -759,7 +759,7 @@ def API2EmployeesView(request):
 @login_required
 def API2ItemsView(request):
     if request.GET and request.GET.get('q', False):
-        items = Item.objects.raw("select * from management_system_item where concat(item_it, \' \', item_model) ilike %s;", ['%' + request.GET['q'] + '%'])
+        items = Item.objects.raw("select * from management_system_item where concat(item_it, \' \', item_sn, \' \', item_kk, \' \', item_model) ilike %s;", ['%' + request.GET['q'] + '%'])
     else:
         items = Item.objects.all()
     if request.GET and request.GET.get('limit', False):

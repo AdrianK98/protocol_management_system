@@ -107,7 +107,7 @@
         return {
           results: data.map(e => {
             if(e.item_user != "None") return e;
-            return {id: e.id, text: e.item_it + ' ' + e.item_model}
+            return {id: e.id, text: e.item_it + ' ' + e.item_sn + ' ' + e.item_model}
           })
         }
       },
