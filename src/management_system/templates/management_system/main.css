@@ -4,6 +4,7 @@ body{
 
 main{
 	max-height: 100vh;
+	overflow-y: auto;
 }
 
 .nav-item{
