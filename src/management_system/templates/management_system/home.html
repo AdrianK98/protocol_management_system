@@ -103,9 +103,6 @@
 	}
 
 	$(document).ready(async function(){
-		// Cash fetched employees
-		let employees = {};
-
 		// Create table in protocols
 		let protocols_cnt = document.getElementById('protocols_cnt');
 		let protocols_table = document.createElement('table');
@@ -122,21 +119,12 @@
 			// Prepare date
 			let d = new Date(e.created);
 
-			// Try to get employee from cash, but fetch it if failed
-			let employee = employees[e.employee_id];
-			if(!employee){
-				let employee_data = await fetch("/api2/employees?id=" + e.employee_id);
-				employee = await employee_data.json();
-				employee = employee[0];
-				employees[e.employee_id] = employee;
-			}
-
 			// Prepare table row
 			let row = "";
 			row += "<tr>";
 			row += "<td><a href=\"/protocols/" + e.id + "\">" + e.barcode + "</a></td>";
 			row += "<td>" + dtos(d) + "</td>";
-			row += "<td>" + employee.user_name + " " + employee.user_surname + "</td>";
+			row += "<td>" + e.employee + "</td>";
 			row += "<td>" + (e.is_returned?"Zwrot":"Przekazanie") + "</td>";
 			//row += "<td><a href=\"/protocols/" + e.id + "\" role=\"button\" class=\"btn btn-success\">Wyswietl</a></td>";
 			row += "</tr>";

@@ -824,6 +824,7 @@ def API2ProtocolsView(request):
         json += "\"description\":\""   + str(e.description)   + "\"," 
         json += "\"is_return\":\""     + str(e.is_return)     + "\"," 
         json += "\"employee_id\":\""   + str(e.employee_id)   + "\"," 
+        json += "\"employee\":\""      + str(e.employee)      + "\"," 
         json += "\"barcode\":\""       + str(e.barcode)       + "\","  
         json += "\"created_by_id\":\"" + str(e.created_by_id) + "\","  
         json += "\"is_scanned\":\""    + str(e.is_scanned)    + "\","  
