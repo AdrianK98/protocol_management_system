@@ -49,51 +49,43 @@
 <!-- <span class="popup" id="popup1" onclick="closePopup('popup1')"> -->
 <span class="popup" id="popup1">
   <span class="popup-cnt">
-    <section class="popup-row fill">
-      <section class="popup-column w-100">
-        <h3>Czy na pewno chcesz utworzyc nowe przekazanie?</h3>
-        <section id="popup1table" style="overflow: scroll;" class="w-100 h-50 my-1">
-          <table class="table w-100"></table>
-        </section>
-        <section>
-          <button type="button" onclick="send()" class="btn btn-success mx-3">Tak</button>
-          <button type="button" onclick="closePopup('popup1')" class="btn btn-danger mx-3">Nie</button>
-        </section>
-      </section>
+    <h3 class="popup-title">Czy na pewno chcesz utworzyc nowe przekazanie?</h3>
+    <section class="popup-msg" id="popup1table">
+      <table class="table w-100"></table>
+    </section>
+    <section class="popup-btns">
+      <button type="button" onclick="send()" class="btn btn-success mx-3">Tak</button>
+      <button type="button" onclick="closePopup('popup1')" class="btn btn-danger mx-3">Nie</button>
     </section>
   </span>
 </span>
 <!-- <span class="popup" id="popup2" onclick="closePopup('popup2')"> -->
 <span class="popup" id="popup2">
   <span class="popup-cnt">
-    <section class="popup-row fill">
-      <section class="popup-column w-100">
-        <h3>Pole pracownik jest wymagane.</h3>
-        <button type="button" onclick="closePopup('popup2')" class="btn btn-success mx-3">OK</button>
-      </section>
+    <h3 class="popup-title">Pole pracownik jest wymagane</h3>
+    <section class="popup-msg"></section>
+    <section class="popup-btns">
+      <button type="button" onclick="closePopup('popup2')" class="btn btn-success mx-3">OK</button>
     </section>
   </span>
 </span> 
 <!-- <span class="popup" id="popup3" onclick="closePopup('popup3')"> -->
 <span class="popup" id="popup3">
   <span class="popup-cnt">
-    <section class="popup-row fill">
-      <section class="popup-column w-100">
-        <h3>Pole przedmiot jest wymagane.</h3>
-        <button type="button" onclick="closePopup('popup3')" class="btn btn-success mx-3">OK</button>
-      </section>
+    <h3 class="popup-title">Pole przedmiot jest wymagane.</h3>
+    <section class="popup-msg"></section>
+    <section class="popup-btns">
+      <button type="button" onclick="closePopup('popup3')" class="btn btn-success mx-3">OK</button>
     </section>
   </span>
 </span> 
 <!-- <span class="popup" id="popup4" onclick="closePopup('popup4')"> -->
 <span class="popup" id="popup4">
   <span class="popup-cnt">
-    <section class="popup-row fill">
-      <section class="popup-column w-100">
-        <h3>Zduplikowany przedmiot.</h3>
-        <p id="popup4msg"></p>
-        <button type="button" onclick="closePopup('popup4')" class="btn btn-success mx-3">OK</button>
-      </section>
+    <h3 class="popup-title">Zduplikowany przedmiot.</h3>
+    <section class="popup-msg" id="popup4msg"></section>
+    <section class="popup-btns">
+      <button type="button" onclick="closePopup('popup4')" class="btn btn-success mx-3">OK</button>
     </section>
   </span>
 </span>
@@ -178,7 +170,7 @@
       if(seen.includes(item.value)){
         // Alert user with name (got from span)
         // alert("Zduplikowany przedmiot " + item.parentElement.children[1].innerText);
-        document.getElementById('popup4msg').innerHTML = item.parentElement.children[1].innerText;
+        document.getElementById('popup4msg').innerHTML = "Przedmiot: " + item.parentElement.children[1].innerText;
         showPopup('popup4');
         return;
       }
