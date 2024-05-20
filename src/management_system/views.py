@@ -768,6 +768,8 @@ def API2ItemsView(request):
             items = Item.objects.raw("select * from management_system_item where concat(item_it, \' \', item_sn, \' \', item_kk, \' \', item_model) ilike %s;", ['%' + request.GET['q'] + '%'])
         else:
             items = Item.objects.all()
+        if request.GET and request.GET.get('free', False):
+            items = items.filter(utilization_id__isnull=True, item_user__isnull=True)
         if request.GET and request.GET.get('limit', False):
             items = items[:int(request.GET.get('limit', 10))]
         items = list(sorted(items, key=attrgetter('id')))
