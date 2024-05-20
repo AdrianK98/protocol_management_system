@@ -727,13 +727,12 @@ def API2EmployeesView(request):
     if request.GET and request.GET.get('id', False):
         employees = [ Employee.objects.get(id=request.GET.get('id', 0)) ]
     else:
+        employees = Employee.objects.order_by('-id')
         if request.GET and request.GET.get('q', False):
-            employees = Employee.objects.raw("select * from users_employee where concat(user_name, \' \', user_surname) ilike %s;", ['%' + request.GET['q'] + '%'])
-        else:
-            employees = Employee.objects.all()
+            employees = employees.raw("select * from users_employee where concat(user_name, \' \', user_surname) ilike %s;", ['%' + request.GET['q'] + '%'])
         if request.GET and request.GET.get('limit', False):
             employees = employees[:int(request.GET.get('limit', 10))]
-        employees = list(sorted(employees, key=attrgetter('id')))
+        employees = list(employees)
     if len(employees) < 1:
         return HttpResponse("[]", content_type='application/json')
     last = employees.pop(-1)
@@ -764,15 +763,14 @@ def API2ItemsView(request):
     if request.GET and request.GET.get('id', False):
         items = [ Item.objects.get(id=request.GET.get('id', 0)) ]
     else:
+        items = Item.objects.order_by('-id')
         if request.GET and request.GET.get('q', False):
-            items = Item.objects.raw("select * from management_system_item where concat(item_it, \' \', item_sn, \' \', item_kk, \' \', item_model) ilike %s;", ['%' + request.GET['q'] + '%'])
-        else:
-            items = Item.objects.all()
+            items = items.raw("select * from management_system_item where concat(item_it, \' \', item_sn, \' \', item_kk, \' \', item_model) ilike %s;", ['%' + request.GET['q'] + '%'])
         if request.GET and request.GET.get('free', False):
             items = items.filter(utilization_id__isnull=True, item_user__isnull=True)
         if request.GET and request.GET.get('limit', False):
             items = items[:int(request.GET.get('limit', 10))]
-        items = list(sorted(items, key=attrgetter('id')))
+        items = list(items)
     if len(items) < 1:
         return HttpResponse("[]", content_type='application/json')
     last = items.pop(-1)
@@ -808,13 +806,12 @@ def API2ProtocolsView(request):
     if request.GET and request.GET.get('id', False):
         protocols = [ Protocol.objects.get(id=request.GET.get('id', 0)) ]
     else:
+        protocols = Protocol.objects.order_by('-id')
         if request.GET and request.GET.get('q', False):
-            protocols = Protocol.objects.raw("select * from management_system_protocol where barcode ilike %s;", ['%' + request.GET['q'] + '%'])
-        else:
-            protocols = Protocol.objects.all()
+            protocols = protocols.raw("select * from management_system_protocol where barcode ilike %s;", ['%' + request.GET['q'] + '%'])
         if request.GET and request.GET.get('limit', False):
             protocols = protocols[:int(request.GET.get('limit', 10))]
-        protocols = list(sorted(protocols, key=attrgetter('id')))
+        protocols = list(protocols)
     if len(protocols) < 1:
         return HttpResponse("[]", content_type='application/json')
     last = protocols.pop(-1)
