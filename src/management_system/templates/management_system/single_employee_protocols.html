@@ -2,27 +2,10 @@
 
 
 {% block content %}
-<nav class="navbar navbar-expand-lg" style="background-color:#DBD5D3;">
-    <div class="container-fluid">
-      <h3 class="text-black">{{employee}}</h3>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse " id="navbarSupportedContent">
-        <ul class="navbar-nav ms-center mx-5 mb-lg-0">
-
-          <li class="nav-item">
-            <a class="btn btn-light me-2" href="{% url 'singleEmployee' employee.id %}" role="button">Sprzęt</a>
-          </li>
-        </ul>
-        <form class="d-flex ms-auto" role="search">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-info" type="submit">Search</button>
-        </form>
-      </div>
-    </div>
-  </nav>
-
+<section class="titlebar">
+  <h3 class="text-black title-float">{{employee}}</h3>
+  <a class="btn-title btn btn-secondary me-2" href="{% url 'singleEmployee' employee.id %}" role="button">Sprzęt</a>
+</section>
 
   <table class="table mb-0">
     <thead>
