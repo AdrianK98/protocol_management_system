@@ -11,7 +11,7 @@
 	<section class="panel-pad" id="protocols">
 		<section class="panel panel-light fill">
 			<h2 class="panel-title">Protokoly</h2>
-			<section class="panel-cnt" style="background-color: red;"></section>
+			<section class="panel-cnt" id="protocols_cnt"></section>
 		</section>
 	</section>
 	<section style="float:left;" class="h-100 w-50">
@@ -50,6 +50,66 @@
 	height: 50%;
 	width: 100%;
 }
+
+.panel-cnt{
+	overflow: scroll;
+}
 </style>
+
+<script>
+	// Like Date.toDateString() but custom (shorter)
+	function dtos(d){
+		let day = d.getDay();
+		let month = d.getMonth();
+		let year = d.getFullYear();
+
+		if(day < 10) day = "0" + day;
+		if(month < 10) month = "0" + month;
+		return day + "." + month + "." + year;
+	}
+
+	$(document).ready(async function(){
+		// Cash fetched employees
+		let employees = {};
+
+		// Create table in protocols
+		let protocols_cnt = document.getElementById('protocols_cnt');
+		let protocols_table = document.createElement('table');
+		protocols_table.innerHTML = "<tr><th scope=\"col\" class=\"w-0\">Kod</th><th scope=\"col\" class=\"w-0\">Data</th><th scope=\"col\">Pracownik</th><th class=\"w-0\" scope=\"col\"></th></tr>";
+		protocols_table.classList = "table";
+		protocols_cnt.appendChild(protocols_table);
+
+		// Fetch data from server using API2
+		let protocols_data = await fetch("/api2/protocols?limit=15");
+		let protocols = await protocols_data.json();
+
+		// For each element
+		for(let e of protocols){
+			// Prepare date
+			let d = new Date(e.modified);
+
+			// Try to get employee from cash, but fetch it if failed
+			let employee = employees[e.employee_id];
+			if(!employee){
+				let employee_data = await fetch("/api2/employees?id=" + e.employee_id);
+				employee = await employee_data.json();
+				employee = employee[0];
+				employees[e.employee_id] = employee;
+			}
+
+			// Prepare table row
+			let row = "";
+			row += "<tr>";
+			row += "<td>" + e.barcode + "</td>";
+			row += "<td>" + dtos(d) + "</td>";
+			row += "<td>" + employee.user_name + " " + employee.user_surname + "</td>";
+			row += "<td><a href=\"/protocols/" + e.id + "\" role=\"button\" class=\"btn btn-success\">Wyswietl</a></td>";
+			row += "</tr>";
+
+			//Append row
+			protocols_table.innerHTML += row;
+		}
+	});
+</script>
 
 {% endblock content %}
