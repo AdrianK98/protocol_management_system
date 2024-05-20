@@ -87,8 +87,8 @@ nav a{
 }
 
 .panel-light{
-	border-color: #7777;
-	background-color: #aaaa;
+	border-color: grey;
+	background-color: lightgrey;
 }
 
 .panel-title{

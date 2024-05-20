@@ -75,7 +75,7 @@
 		// Create table in protocols
 		let protocols_cnt = document.getElementById('protocols_cnt');
 		let protocols_table = document.createElement('table');
-		protocols_table.innerHTML = "<tr><th scope=\"col\" class=\"w-0\">Kod</th><th scope=\"col\" class=\"w-0\">Data</th><th scope=\"col\">Pracownik</th><th class=\"w-0\" scope=\"col\"></th></tr>";
+		protocols_table.innerHTML = "<tr><th scope=\"col\">Kod</th><th scope=\"col\">Data</th><th scope=\"col\">Pracownik</th><th scope=\"col\">Typ</th><!--<th class=\"w-0\" scope=\"col\"></th>--></tr>";
 		protocols_table.classList = "table";
 		protocols_cnt.appendChild(protocols_table);
 
@@ -86,7 +86,7 @@
 		// For each element
 		for(let e of protocols){
 			// Prepare date
-			let d = new Date(e.modified);
+			let d = new Date(e.created);
 
 			// Try to get employee from cash, but fetch it if failed
 			let employee = employees[e.employee_id];
@@ -100,10 +100,11 @@
 			// Prepare table row
 			let row = "";
 			row += "<tr>";
-			row += "<td>" + e.barcode + "</td>";
+			row += "<td><a href=\"/protocols/" + e.id + "\">" + e.barcode + "</a></td>";
 			row += "<td>" + dtos(d) + "</td>";
 			row += "<td>" + employee.user_name + " " + employee.user_surname + "</td>";
-			row += "<td><a href=\"/protocols/" + e.id + "\" role=\"button\" class=\"btn btn-success\">Wyswietl</a></td>";
+			row += "<td>" + (e.is_returned?"Zwrot":"Przekazanie") + "</td>";
+			//row += "<td><a href=\"/protocols/" + e.id + "\" role=\"button\" class=\"btn btn-success\">Wyswietl</a></td>";
 			row += "</tr>";
 
 			//Append row
