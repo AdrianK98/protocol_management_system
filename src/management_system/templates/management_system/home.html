@@ -14,7 +14,7 @@
 			<section class="panel-cnt" id="protocols_cnt"></section>
 		</section>
 	</section>
-	<section style="float:left;" class="h-100 w-50">
+	<section id="panel_grp">
 		<section class="panel-pad" id="alerts">
 			<section class="panel panel-light fill">
 				<h2 class="panel-title">ALERTY</h2>
@@ -31,24 +31,58 @@
 </section>
 
 <style>
-#main_panel{
-	height: calc(100% - 5rem);
-	overflow: hidden;
-}
-#protocols{
-	height: 100%;
-	width: 50%;
-	float: left;
+@media (min-width:1150px){
+	#main_panel{
+		height: calc(100% - 5rem);
+	}
+
+	#protocols{
+		height: 100%;
+		width: 50%;
+		float: left;
+	}
+
+	#panel_grp{
+		height: 100%;
+		width: 50%;
+		float: left;
+	}
+	
+	#alerts{
+		height: 50%;
+		width: 100%;
+	}
+	
+	#last_added{
+		height: 50%;
+		width: 100%;
+	}
 }
 
-#alerts{
-	height: 50%;
-	width: 100%;
-}
+@media (max-width:1150px){
+	#main_panel{
+		height: calc(100% - 5rem);
+	}
 
-#last_added{
-	height: 50%;
-	width: 100%;
+	#protocols{
+		height: 100%;
+		width: 100%;
+	}
+	
+	#panel_grp{
+		height: 100%;
+		width: 100%;
+	}
+
+	#alerts{
+		height: 50%;
+		width: 100%;
+	}
+	
+	#last_added{
+		height: 50%;
+		width: 100%;
+	}
 }
 
 .panel-cnt{
