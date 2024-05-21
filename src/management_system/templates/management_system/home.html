@@ -137,7 +137,7 @@
 		// Create table in last_added
 		let last_added_cnt = document.getElementById('last_added_cnt');
 		let last_added_table = document.createElement('table');
-		last_added_table.innerHTML = "<tr><th scope=\"col\">Typ</th><th scope=\"col\">Producent</th><th scope=\"col\">Model</th><th scope=\"col\">IT</th><th scope=\"col\">SN</th><th scope=\"col\">KK</th></tr>";
+		last_added_table.innerHTML = "<tr><th scope=\"col\">IT</th><th scope=\"col\">Data</th><th scope=\"col\">Producent</th><th scope=\"col\">Typ</th></tr>";
 		last_added_table.classList = "table";
 		last_added_cnt.appendChild(last_added_table);
 
@@ -147,15 +147,16 @@
 
 		// For each element
 		for(let e of last_added){
+			// Prepare date
+			let d = new Date(e.created);
+
 			// Prepare table row
 			let row = "";
 			row += "<tr>";
-			row += "<td><a href=\"/items/" + e.id + "\">" + e.category + "</a></td>";
+			row += "<td><a href=\"/items/" + e.id + "\">" + e.item_it + "</a></td>";
+			row += "<td>" + dtos(d) + "</td>";
 			row += "<td>" + e.item_producent + "</td>";
-			row += "<td>" + e.item_model + "</td>";
-			row += "<td>" + e.item_it + "</td>";
-			row += "<td>" + e.item_sn + "</td>";
-			row += "<td>" + e.item_kk + "</td>";
+			row += "<td>" + e.category + "</td>";
 			row += "</tr>";
 
 			//Append row

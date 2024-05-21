@@ -778,6 +778,7 @@ def API2ItemsView(request):
     for e in items:
         json += "{" 
         json += "\"id\":\""             + str(e.id)             + "\"," 
+        json += "\"created\":\""        + str(e.created)        + "\"," 
         json += "\"category\":\""       + str(e.category)       + "\"," 
         json += "\"item_producent\":\"" + str(e.item_producent) + "\"," 
         json += "\"item_model\":\""     + str(e.item_model)     + "\"," 
@@ -789,7 +790,8 @@ def API2ItemsView(request):
         json += "\"utilization_id\":\"" + str(e.utilization_id) + "\""  
         json += "},"       
     json += "{"        
-    json += "\"id\":\""             + str(last.id)              + "\","
+    json += "\"id\":\""             + str(last.id)             + "\","
+    json += "\"created\":\""        + str(last.created)        + "\"," 
     json += "\"category\":\""       + str(last.category)       + "\"," 
     json += "\"item_producent\":\"" + str(last.item_producent) + "\"," 
     json += "\"item_model\":\""     + str(last.item_model)     + "\"," 
