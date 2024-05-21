@@ -41,7 +41,7 @@ nav a{
 }
 
 .popup-cnt{
-	--popup-cnt-height: 50vh;
+	--popup-cnt-height: 50vmin;
 	position: absolute;
 	top: 30vh;
 	left: calc((100vw - (var(--popup-cnt-height) * 1.62)) / 2);
@@ -53,6 +53,7 @@ nav a{
 	border-radius: 10px;
 	display: flex;
 	flex-flow: row wrap;
+	overflow: auto;
 }
 
 .popup-title-nowrap{
