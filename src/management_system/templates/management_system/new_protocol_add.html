@@ -43,10 +43,42 @@
     </div>
 {% endif %}
      
+
+
+<button type="button" class="btn btn-primary mt-3" onclick="step()">
+  Zapisz (Bootstrap ver.)
+</button>
+
     <button type="button" onclick="step()" class="btn btn-success mt-3" name="saveAndEnd">Zapisz</button>
     <button type="button" onclick="addItem()" class="btn btn-secondary mt-3" name="saveAndContinue">Dodaj Kolejny</button>
 </form>
 <!-- <span class="popup" id="popup1" onclick="closePopup('popup1')"> -->
+
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Czy na pewno chcesz utworzyć protokół?</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+
+          <div class="container-fluid" id="modalRowsContainer">>
+
+            
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" onclick="send()">Utwórz</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
 <span class="popup" id="popup1">
   <span class="popup-cnt">
     <section class="popup-title">Czy na pewno chcesz utworzyc nowe przekazanie?<hr /></section>
@@ -91,6 +123,7 @@
 </span>
 
 <script type="text/javascript">
+
   const select2conf = {
     // Use AJAX to call to API2 to get the list of employees
     ajax: {
@@ -183,16 +216,46 @@
       return;
     }
 
-    var table = document.getElementById('popup1table').getElementsByTagName('table')[0];
-    table.innerHTML = "<tr id=\"poput1table_th\"><th scope=\"col\">ID</th><th scope=\"col\">IT</th><th scope=\"col\">SN</th><th scope=\"col\">KK</th></tr>";
-    for(let e of seen){
-      let res = await fetch("{% url 'API2Items' %}?id=" + e);
+
+    const modalRowsContainer = document.getElementById('modalRowsContainer');
+  
+    // Clear the container before adding new rows
+    modalRowsContainer.innerHTML = '';
+
+    const headerRow = `
+    <div class="row font-weight-bold">
+      <div class="col-md-3"><strong>Typ</strong></div>
+      <div class="col-md-3"><strong>IT</strong></div>
+      <div class="col-md-3"><strong>SN</strong></div>
+      <div class="col-md-3"><strong>KK</strong></div>
+    </div>
+  `;
+  modalRowsContainer.innerHTML += headerRow;
+  
+    for (let e of seen) {
+      let res = await fetch(`{% url 'API2Items' %}?id=${e}`);
       let data = await res.json();
       data = data[0];
-      table.innerHTML += '<tr><td>' + data.id + '</td><td>' + data.item_it + '</td><td>' + data.item_sn + '</td><td>' + data.item_kk + '</td></tr>';
+      
+      // Create a new row div
+      let rowDiv = document.createElement('div');
+      rowDiv.className = 'row';
+      
+      // Create and append individual columns
+      ['category', 'item_it', 'item_sn', 'item_kk'].forEach(field => {
+        let colDiv = document.createElement('div');
+        colDiv.className = 'col-md-3';
+        colDiv.textContent = data[field];
+        rowDiv.appendChild(colDiv);
+      });
+      // Append the row to the container
+      modalRowsContainer.appendChild(rowDiv);
     }
 
-    showPopup('popup1');
+    const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
+    modal.show();
+
+
   }
 
   async function send(){
