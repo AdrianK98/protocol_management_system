@@ -24,7 +24,7 @@
 		<section class="panel-pad" id="last_added">
 			<section class="panel panel-light fill">
 				<h2 class="panel-title">Ostatnio dodane przedmioty</h2>
-				<section class="panel-cnt" style="background-color: red;"></section>
+				<section class="panel-cnt" id="last_added_cnt"></section>
 			</section>
 		</section>
 	</section>
@@ -102,6 +102,7 @@
 		return day + "." + month + "." + year;
 	}
 
+
 	$(document).ready(async function(){
 		// Create table in protocols
 		let protocols_cnt = document.getElementById('protocols_cnt');
@@ -132,6 +133,35 @@
 			//Append row
 			protocols_table.innerHTML += row;
 		}
+
+		// Create table in last_added
+		let last_added_cnt = document.getElementById('last_added_cnt');
+		let last_added_table = document.createElement('table');
+		last_added_table.innerHTML = "<tr><th scope=\"col\">Typ</th><th scope=\"col\">Producent</th><th scope=\"col\">Model</th><th scope=\"col\">IT</th><th scope=\"col\">SN</th><th scope=\"col\">KK</th></tr>";
+		last_added_table.classList = "table";
+		last_added_cnt.appendChild(last_added_table);
+
+		// Fetch data from server using API2
+		let last_added_data = await fetch("/api2/items?limit=8");
+		let last_added = await last_added_data.json();
+
+		// For each element
+		for(let e of last_added){
+			// Prepare table row
+			let row = "";
+			row += "<tr>";
+			row += "<td><a href=\"/items/" + e.id + "\">" + e.category + "</a></td>";
+			row += "<td>" + e.item_producent + "</td>";
+			row += "<td>" + e.item_model + "</td>";
+			row += "<td>" + e.item_it + "</td>";
+			row += "<td>" + e.item_sn + "</td>";
+			row += "<td>" + e.item_kk + "</td>";
+			row += "</tr>";
+
+			//Append row
+			last_added_table.innerHTML += row;
+		}
+
 	});
 </script>
 
