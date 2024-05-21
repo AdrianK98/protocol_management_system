@@ -12,6 +12,7 @@ from django.core.files import File
 DATE_INPUT_FORMATS = ['%d-%m-%Y']
 
 class Item(models.Model):
+    created=models.DateTimeField('Data utworzenia',auto_now_add=True)
     category = models.ForeignKey("ItemCategory", on_delete=models.PROTECT,null=True,blank=False,verbose_name="Kategoria")
     item_producent = models.CharField('Producent',max_length=200)
     item_model = models.CharField('Model',max_length=200)
@@ -19,6 +20,7 @@ class Item(models.Model):
     item_it = models.CharField('Numer IT',max_length=200,blank=True,null=True)
     item_kk = models.CharField("Numer KK",max_length=200,blank=True,null=True)
     item_user = models.ForeignKey("users.Employee", on_delete=models.PROTECT,null=True,blank=True,verbose_name="Pracownik")
+    utilization_id = models.ForeignKey("management_system.Utilization", on_delete=models.PROTECT,null=True,blank=True,verbose_name="Utylizacja")
 
 
 
@@ -33,11 +35,12 @@ class Item(models.Model):
 
 
 class Protocol(models.Model):
-    created=models.DateField('Data utworzenia',auto_now_add=True)
+    created=models.DateTimeField('Data utworzenia',auto_now_add=True)
     barcode=models.CharField(max_length=20,blank=True, unique=True)
-    modified=models.DateField('Data modyfikacji',auto_now=True,blank=True,null=True)
+    modified=models.DateTimeField('Data modyfikacji',blank=True,null=True)
     description=models.CharField('Opis',max_length=200,blank=True,null=True)
     is_return=models.BooleanField('Zwrot',blank=True)
+    printed_count=models.IntegerField('Druk',default=0,blank=True)
     is_scanned=models.BooleanField('Skan',default=False, null=False, blank=False)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -55,7 +58,7 @@ class Protocol(models.Model):
         currentMinute = str(datetime.now().minute)
         currentHour = str(datetime.now().hour) 
         employeeId= str(self.employee.id)
-        ean = f'{currentYear.zfill(4)}{currentMonth.zfill(2)}{currentDay.zfill(2)}{currentMinute.zfill(2)}{currentSecond.zfill(2)}{employeeId.zfill(2)}'
+        ean = f'{currentYear.zfill(4)}{currentMonth.zfill(2)}{currentDay.zfill(2)}{currentMinute.zfill(2)}{currentSecond.zfill(2)}{employeeId.zfill(4)}'
         self.barcode = ean
         # buffer = BytesIO()
         # ean.write(buffer)
@@ -80,3 +83,17 @@ class ItemCategory(models.Model):
     def __str__(self):
         return self.category_name
     
+
+class Utilization(models.Model):
+    created=models.DateField('Data utworzenia',auto_now_add=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,blank=True,null=True
+    )
+    utilization_company = models.CharField('Firma utylizujaca',blank=True,max_length=200)
+    inform_dzm = models.BooleanField('Ponfirmowano DZM',blank=False, default=False)
+    utilization_protocol_scan = models.BinaryField('Skan protokolu utylizacji',blank=True,null=True, editable=True, default=None)
+    company_transfer_date=models.DateField('Data przekazania firmie zewnetrznej',auto_now=False,blank=True,null=True)
+
+    def __str__(self):
+        return 'id ' + str(self.id) + '  date '+str(self.created)

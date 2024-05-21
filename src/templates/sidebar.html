@@ -2,64 +2,135 @@
 {%block sidebar%}
 
 {%if user.is_authenticated%}
+<!-- Security token -->
+{% csrf_token %}
 
-<div class="container-fluid">
-    <div class="row flex-nowrap">
-        <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
-            
-            <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100 sticky-top">
-                <a href="/" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-                    <span class="fs-5 d-none d-sm-inline ">Menu</span>
-                </a>
-                <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
-                    <li class="nav-item">
-                        <a href="{% url 'newprotocol' %}" class="nav-link align-middle px-0">
-                            <button type="button" class="btn btn-warning text-black fw-bold"><span class="ms-1 d-none d-sm-inline">Nowe przekazanie</span></button>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'newprotocolReturn' %}" class="nav-link align-middle px-0">
-                            <button type="button" class="btn btn-danger text-black fw-bold"><span class="ms-1 d-none d-sm-inline">Nowy zwrot</span></button>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'protocollist' %}" class="nav-link px-0 align-middle">
-                            <i class="fs-4 bi-people"></i> <span class="ms-1 d-none d-sm-inline">Przekazania</span> </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'employees' %}" class="nav-link px-0 align-middle">
-                            <i class="fs-4 bi-people"></i> <span class="ms-1 d-none d-sm-inline">Pracownicy</span> </a>
-                    </li>
-
-                    <li>
-                        <a href="{% url 'newemployee' %}" class="nav-link px-0 align-middle">
-                            <i class="fs-4 bi-people"></i> <span class="ms-1 d-none d-sm-inline">Dodaj nowego pracownika</span> </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'itemsView' %}" class="nav-link px-0 align-middle">
-                            <i class="fs-4 bi-people"></i> <span class="ms-1 d-none d-sm-inline">Sprzęt</span> </a>
-                    </li>                    <li>
-                        <a href="{% url 'itemsAddNew' %}" class="nav-link px-0 align-middle">
-                            <i class="fs-4 bi-people"></i> <span class="ms-1 d-none d-sm-inline">Dodaj nowy sprzęt</span> </a>
-                    </li>
-                </ul>
-                <hr>
-                <div class="dropdown pb-4">
-                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="https://www.pngall.com/wp-content/uploads/5/Profile-PNG-Images.png" alt="hugenerd" width="30" height="30" class="rounded-circle">
-                        <span class="d-none d-sm-inline mx-1">{{ user.username }}</span>
+<nav class="col-auto col-md-3 col-lg-2 px-sm-2 px-0 bg-dark">
+    <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 min-vh-100 sticky-top">
+        <a href="/" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+            <span class="fs-5 d-none d-sm-inline ">Menu</span>
+        </a>
+        <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
+            <li class="nav-item">
+                <div class="dropdown">
+                    <a href="{% url 'protocollist' %}" class="shortcut">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-text" viewBox="0 0 16 16"><path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"/><path d="M3 5.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5M3 8a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 8m0 2.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5"/></svg>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-
-                        <li><a class="dropdown-item" href="#">TBA...</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
+                    <a href="#" class="d-flex align-items-center dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="d-none d-sm-inline mx-1">Protokoly</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow" style="">
+                        <li class="nav-item">
+                            <a href="{% url 'protocollist' %}" class="dropdown-item">
+                                <span class="ms-1 d-none d-sm-inline">Przekazania</span>
+                            </a>
                         </li>
-                        <li><a class="dropdown-item" href="{% url 'logout' %}">Wyloguj</a></li>
+                        <li>
+                            <a href="{% url 'newprotocol' %}" class="dropdown-item">
+                                <span class="ms-1 d-none d-sm-inline">Nowe przekazanie</span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
-            </div>
+            </li>
+            <li class="nav-item">
+                <div class="dropdown">
+                    <a href="#" class="shortcut"></a>
+                    <a href="#" class="d-flex align-items-center dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="d-none d-sm-inline mx-1">Pracownicy</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow" style="">
+                        <li class="nav-item">
+                            <a href="{% url 'employees' %}" class="dropdown-item">
+                                <span class="ms-1 d-none d-sm-inline">Lista</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'newemployee' %}" class="dropdown-item">
+                                <span class="ms-1 d-none d-sm-inline">Dodaj pracownika</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            <li class="nav-item">
+                <div class="dropdown">
+                    <a href="#" class="shortcut"></a>
+                    <a href="#" class="d-flex align-items-center dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="d-none d-sm-inline mx-1">Sprzęt</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow" style="">
+                        <li class="nav-item">
+                            <a href="{% url 'itemsView' %}" class="dropdown-item">
+                                <span class="ms-1 d-none d-sm-inline">Lista</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'itemsAddNew' %}" class="dropdown-item">
+                                <span class="ms-1 d-none d-sm-inline">Dodaj sprzęt</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            <li class="nav-item">
+                <div class="dropdown">
+                    <a href="#" class="shortcut"></a>
+                    <a href="#" class="d-flex align-items-center dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="d-none d-sm-inline mx-1">Utylizacja</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow" style="">
+                        <li class="nav-item">
+                            <a href="{% url 'utilization' %}" class="dropdown-item">
+                                <span class="ms-1 d-none d-sm-inline">Lista</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" onclick="addUtilization()" class="dropdown-item">
+                                <span class="ms-1 d-none d-sm-inline">Dodaj utylizacje</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+        <hr />
+        <div class="dropdown pb-4">
+            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="https://www.pngall.com/wp-content/uploads/5/Profile-PNG-Images.png" alt="hugenerd" width="30" height="30" class="rounded-circle">
+                <span class="d-none d-sm-inline mx-1">{{ user.username }}</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                <li>
+                    <a class="dropdown-item" href="#">TBA...</a>
+                </li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li>
+                    <a class="dropdown-item" href="{% url 'logout' %}">Wyloguj</a>
+                </li>
+            </ul>
         </div>
+    </div>
+</nav>
+<script>
+    async function addUtilization(){
+        // Get the token to form
+        const token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+        // Send the token
+        var data = new FormData();
+        data.append('csrfmiddlewaretoken', token);
+        // Send request and wait for the response (json with pk field)
+        var res = await fetch('/utilization/add_item', {
+            method: 'POST',
+            body: new URLSearchParams(data)
+        });
+        // Get pk from response and redirect to newly created utilization
+        var d = await res.json();
+        window.location.href = "{% url 'utilization' %}" + d.pk;
+    }
+</script>
 
 {%endif%}
 {%endblock sidebar%}

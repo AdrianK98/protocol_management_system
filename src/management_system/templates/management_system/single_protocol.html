@@ -6,7 +6,7 @@
 
 
 
-  <h2>{{protocol.is_return|yesno:"Zwrot,Przekazanie"}} dla {{protocol.employee}} z {{protocol.created|date:"d.m.Y"}}</h2>
+  <h2>{{protocol.is_return|yesno:"Zwrot,Przekazanie"}} dla {{protocol.employee}} z {{protocol.created|date:"d.m.Y G:i:s"}}</h2>
   <b>Sporządzony przez:  </b>{{protocol.created_by.first_name}} {{protocol.created_by.last_name}}<br><br>
   <form action="{% url 'protocolRaportToPrint' %}" method="get">
     <button class="btn btn-dark  me-5" role="button" type="submit" name='protocol' value='{{protocol.id}}'>Drukuj</button>
@@ -86,11 +86,12 @@
         <li class="list-group-item"><b>Barcode:</b> {{protocol.barcode}}</li>
         <li class="list-group-item"><b>Osoba odbierająca:</b> <a  class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="{%url 'singleEmployee' protocol.employee.id%}"role="button">{{protocol.employee}}</li></a>
         <li class="list-group-item"><b>Informatyk:</b> {{protocol.created_by.first_name}} {{protocol.created_by.last_name}}</li>
-        <li class="list-group-item"><b>Data przekazania:</b> {{protocol.created|date:"d.m.Y"}}</li>
+        <li class="list-group-item"><b>Data przekazania:</b> {{protocol.created|date:"d.m.Y G:i:s"}}</li>
         <li class="list-group-item"><b>Typ:</b> {{protocol.is_return|yesno:"Zwrot,Przekazanie"}}</li>
         <li class="list-group-item"><b>Lokalizacja:</b> {{protocol.employee.user_location}}</li>
         <li class="list-group-item"><b>Dział:</b> {{protocol.employee.user_department}}</li>
         <li class="list-group-item"><b>Skan:</b> {{protocol.is_scanned|yesno:"TAK,NIE"}}</li>
+        <li class="list-group-item"><b>Druk:</b> {{protocol.printed_count}}</li>
         <li class="list-group-item"><b>Opis:</b> {{protocol.description|default_if_none:"--"}}</li>
       </ul>
 

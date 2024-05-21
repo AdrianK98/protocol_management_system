@@ -12,6 +12,8 @@ class RaportManager(View):
     def get(self, request):
         protocol = Protocol.objects.get(id=request.GET.get('protocol'))
         protocolItems= ProtocolItem.objects.filter(protocol_id=protocol)
+        protocol.printed_count += 1
+        protocol.save()
 
 
 
