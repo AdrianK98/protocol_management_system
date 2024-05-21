@@ -9,7 +9,6 @@
 
   <h2>Utylizacja</h2>
   <hr />
-  <button class="btn btn-success me-2" onclick="add()" href="{% url 'utilizationAddItem'  %}" role="button">Stwórz utylizacje</button>
 
   <form action="{% url 'utilization' %}" method="get">
     <input name="qcreator" type="text" placeholder="Twórca..." value='{{qcreator}}'>
@@ -78,22 +77,6 @@
     </table>
   </div>
 
-  <script>
-
-    async function add(){
-      const token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
-      var data = new FormData();
-      data.append('csrfmiddlewaretoken', token);
-      var res = await fetch('/utilization/add_item', {
-        method: 'POST',
-        body: new URLSearchParams(data)
-      });
-      var d = await res.json();
-      window.location.href = "{% url 'utilization' %}" + d.pk;
-    }
-  </script>
-
-    
   <div class="card-footer text-end p-3">
   </div>
   <div class="container p-4">

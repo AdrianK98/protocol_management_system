@@ -4,7 +4,31 @@
 {% block content %}
 
 
-<h1>Usuń Przedmiot {{item}}</h1>
+<h1>Usuń Przedmiot</h1>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Typ</th>
+      <th scope="col">Producent</th>
+      <th scope="col">Model</th>
+      <th scope="col">IT</th>
+      <th scope="col">S/N</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">{{item.id}}</th>
+      <td>{{item.category}}</td>
+      <td>{{item.item_producent}}</td>
+      <td>{{item.item_model}}</td>
+      <td>{{item.item_it}}</td>
+      <td>{{item.item_sn}}</td>
+    </tr>
+  </tbody>
+</table>
+
+
 {% if messages %}
   <ul class="messages">
     {% for message in messages %}

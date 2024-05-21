@@ -5,5 +5,165 @@
 
 
 <h1>HOME</h1>
+<hr />
+
+<section id="main_panel">
+	<section class="panel-pad" id="protocols">
+		<section class="panel panel-light fill">
+			<h2 class="panel-title">Protokoly</h2>
+			<section class="panel-cnt" id="protocols_cnt"></section>
+		</section>
+	</section>
+	<section id="panel_grp">
+		<section class="panel-pad" id="alerts">
+			<section class="panel panel-light fill">
+				<h2 class="panel-title">ALERTY</h2>
+				<section class="panel-cnt" style="background-color: red;"></section>
+			</section>
+		</section>
+		<section class="panel-pad" id="last_added">
+			<section class="panel panel-light fill">
+				<h2 class="panel-title">Ostatnio dodane przedmioty</h2>
+				<section class="panel-cnt" id="last_added_cnt"></section>
+			</section>
+		</section>
+	</section>
+</section>
+
+<style>
+@media (min-width:1150px){
+	#main_panel{
+		height: calc(100% - 5rem);
+	}
+
+	#protocols{
+		height: 100%;
+		width: 50%;
+		float: left;
+	}
+
+	#panel_grp{
+		height: 100%;
+		width: 50%;
+		float: left;
+	}
+	
+	#alerts{
+		height: 50%;
+		width: 100%;
+	}
+	
+	#last_added{
+		height: 50%;
+		width: 100%;
+	}
+}
+
+@media (max-width:1150px){
+	#main_panel{
+		height: calc(100% - 5rem);
+	}
+
+	#protocols{
+		height: 100%;
+		width: 100%;
+	}
+	
+	#panel_grp{
+		height: 100%;
+		width: 100%;
+	}
+
+	#alerts{
+		height: 50%;
+		width: 100%;
+	}
+	
+	#last_added{
+		height: 50%;
+		width: 100%;
+	}
+}
+
+.panel-cnt{
+	overflow: auto;
+}
+</style>
+
+<script>
+	// Like Date.toDateString() but custom (shorter)
+	function dtos(d){
+		let day = d.getDay();
+		let month = d.getMonth();
+		let year = d.getFullYear();
+
+		if(day < 10) day = "0" + day;
+		if(month < 10) month = "0" + month;
+		return day + "." + month + "." + year;
+	}
+
+
+	$(document).ready(async function(){
+		// Create table in protocols
+		let protocols_cnt = document.getElementById('protocols_cnt');
+		let protocols_table = document.createElement('table');
+		protocols_table.innerHTML = "<tr><th scope=\"col\">Kod</th><th scope=\"col\">Data</th><th scope=\"col\">Pracownik</th><th scope=\"col\">Typ</th><!--<th class=\"w-0\" scope=\"col\"></th>--></tr>";
+		protocols_table.classList = "table";
+		protocols_cnt.appendChild(protocols_table);
+
+		// Fetch data from server using API2
+		let protocols_data = await fetch("/api2/protocols?limit=15");
+		let protocols = await protocols_data.json();
+
+		// For each element
+		for(let e of protocols){
+			// Prepare date
+			let d = new Date(e.created);
+
+			// Prepare table row
+			let row = "";
+			row += "<tr>";
+			row += "<td><a href=\"/protocols/" + e.id + "\">" + e.barcode + "</a></td>";
+			row += "<td>" + dtos(d) + "</td>";
+			row += "<td>" + e.employee + "</td>";
+			row += "<td>" + (e.is_returned?"Zwrot":"Przekazanie") + "</td>";
+			//row += "<td><a href=\"/protocols/" + e.id + "\" role=\"button\" class=\"btn btn-success\">Wyswietl</a></td>";
+			row += "</tr>";
+
+			//Append row
+			protocols_table.innerHTML += row;
+		}
+
+		// Create table in last_added
+		let last_added_cnt = document.getElementById('last_added_cnt');
+		let last_added_table = document.createElement('table');
+		last_added_table.innerHTML = "<tr><th scope=\"col\">IT</th><th scope=\"col\">Data</th><th scope=\"col\">Producent</th><th scope=\"col\">Typ</th></tr>";
+		last_added_table.classList = "table";
+		last_added_cnt.appendChild(last_added_table);
+
+		// Fetch data from server using API2
+		let last_added_data = await fetch("/api2/items?limit=8");
+		let last_added = await last_added_data.json();
+
+		// For each element
+		for(let e of last_added){
+			// Prepare date
+			let d = new Date(e.created);
+
+			// Prepare table row
+			let row = "";
+			row += "<tr>";
+			row += "<td><a href=\"/items/" + e.id + "\">" + e.item_it + "</a></td>";
+			row += "<td>" + dtos(d) + "</td>";
+			row += "<td>" + e.item_producent + "</td>";
+			row += "<td>" + e.category + "</td>";
+			row += "</tr>";
+
+			//Append row
+			last_added_table.innerHTML += row;
+		}
+
+	});
+</script>
 
 {% endblock content %}

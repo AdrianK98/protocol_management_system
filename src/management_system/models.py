@@ -12,6 +12,7 @@ from django.core.files import File
 DATE_INPUT_FORMATS = ['%d-%m-%Y']
 
 class Item(models.Model):
+    created=models.DateTimeField('Data utworzenia',auto_now_add=True)
     category = models.ForeignKey("ItemCategory", on_delete=models.PROTECT,null=True,blank=False,verbose_name="Kategoria")
     item_producent = models.CharField('Producent',max_length=200)
     item_model = models.CharField('Model',max_length=200)
