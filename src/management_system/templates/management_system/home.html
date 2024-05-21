@@ -126,7 +126,7 @@
 			row += "<td><a href=\"/protocols/" + e.id + "\">" + e.barcode + "</a></td>";
 			row += "<td>" + dtos(d) + "</td>";
 			row += "<td>" + e.employee + "</td>";
-			row += "<td>" + (e.is_returned?"Zwrot":"Przekazanie") + "</td>";
+			row += "<td>" + (e.is_return=="True"?"Zwrot":"Przekazanie") + "</td>";
 			//row += "<td><a href=\"/protocols/" + e.id + "\" role=\"button\" class=\"btn btn-success\">Wyswietl</a></td>";
 			row += "</tr>";
 
