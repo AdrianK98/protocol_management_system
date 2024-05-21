@@ -69,7 +69,7 @@ nav a{
 
 .popup-msg{
 	width: 100%;
-	max-height: calc(100% - 8rem);
+	max-height: calc(50%);
 	overflow: auto;
 	text-align: left;
 }
