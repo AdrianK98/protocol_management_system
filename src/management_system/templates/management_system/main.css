@@ -41,19 +41,31 @@ nav a{
 }
 
 .popup-cnt{
-	--popup-cnt-height: 50vmin;
 	position: absolute;
-	top: 30vh;
-	left: calc((100vw - (var(--popup-cnt-height) * 1.62)) / 2);
-	width: calc(var(--popup-cnt-height) * 1.62);
-	height: var(--popup-cnt-height);
+	top: 25vh;
 	background-color: #f5f5f5;
 	text-align: center;
 	padding: 1rem;
 	border-radius: 10px;
 	display: flex;
 	flex-flow: row wrap;
-	overflow: auto;
+}
+
+@media (min-width: 800px){
+	.popup-cnt{
+		--popup-cnt-height: 50vmin;
+		left: calc((100vw - (var(--popup-cnt-height) * 1.62)) / 2);
+		width: calc(var(--popup-cnt-height) * 1.62);
+		height: var(--popup-cnt-height);
+	}
+}
+
+@media (max-width: 800px){
+	.popup-cnt{
+		left: 10px;
+		width: calc(100vw - 20px);
+		height: calc(70vh - 20px);
+	}
 }
 
 .popup-title-nowrap{
