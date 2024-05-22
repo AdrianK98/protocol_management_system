@@ -224,10 +224,10 @@
 
     const headerRow = `
     <div class="row font-weight-bold">
-      <div class="col-md-3"><strong>Typ</strong></div>
-      <div class="col-md-3"><strong>IT</strong></div>
-      <div class="col-md-3"><strong>SN</strong></div>
-      <div class="col-md-3"><strong>KK</strong></div>
+      <div class="col-3"><strong>Typ</strong></div>
+      <div class="col-3"><strong>IT</strong></div>
+      <div class="col-3"><strong>SN</strong></div>
+      <div class="col-3"><strong>KK</strong></div>
     </div>
   `;
   modalRowsContainer.innerHTML += headerRow;
@@ -244,7 +244,7 @@
       // Create and append individual columns
       ['category', 'item_it', 'item_sn', 'item_kk'].forEach(field => {
         let colDiv = document.createElement('div');
-        colDiv.className = 'col-md-3';
+        colDiv.className = 'col-3 mt-3';
         colDiv.textContent = data[field];
         rowDiv.appendChild(colDiv);
       });
