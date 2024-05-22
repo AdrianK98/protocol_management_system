@@ -33,6 +33,7 @@
         <thead>
           <tr>
             <th scope="col">Typ</th>
+            <th scope="col">Data</th>
             <th scope="col">Producent</th>
             <th scope="col">Model</th>
             <th scope="col">IT</th>
@@ -48,7 +49,10 @@
           <tr class="fw-normal">
             <td>
               <span>{{item.item_id.category}}</span>
-            </td>            
+            </td>  
+            <td>
+              <span>{{item.item_id.created}}</span>
+            </td>          
             <td>
               <span>{{item.item_id.item_producent}}</span>
             </td>
