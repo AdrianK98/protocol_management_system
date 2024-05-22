@@ -13,6 +13,7 @@
 
   <!-- Using the formset -->
   {{ itemForm|crispy }}
+  <button class="btn btn-secondary" type="button" onclick="toggleAdvanced()">Zaawansowane</button>
   <div id="div_id_item_user" class="form-group">
     <label for="id_item_user">Pracownik</label>
     <div>
@@ -57,7 +58,22 @@
               },
             }
           });
+
+          // Hide advanced options
+          let div_id_item_user = document.getElementById('div_id_item_user');
+          div_id_item_user.style.display = "none";
         });
+
+        let shown = false;
+        function toggleAdvanced(){
+          let div_id_item_user = document.getElementById('div_id_item_user');
+          if(shown){
+            div_id_item_user.style.display = "none";
+          } else{
+            div_id_item_user.style.display = "block";
+          }
+          shown = !shown;
+        }
         
 </script>
 {% endblock content %}
