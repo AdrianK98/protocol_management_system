@@ -17,17 +17,16 @@ from rest_framework import filters
 
 
 class ItemViewSet(viewsets.ModelViewSet):
-    queryset = Item.objects.all().order_by('id')
+    queryset = Item.objects.all()
     serializer_class = ItemSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     filter_backends = [filters.SearchFilter,DjangoFilterBackend,filters.OrderingFilter]
     filterset_class = ItemFilter
-    search_fields = ["item_sn","item_it","item_kk",'item_model','item_user__user_surname']
-    filterset_fields = '__all__'
+    search_fields = ["item_sn","item_it","item_kk",'item_model','item_user__user_surname','category__category_name']
     ordering_fields = '__all__'
     #defualt ordering field
-    ordering = ['id']
+    ordering = ['-id']
 
     @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
     def highlight(self, request, *args, **kwargs):
@@ -39,7 +38,7 @@ class ItemViewSet(viewsets.ModelViewSet):
 
 
 class EmployeeViewSet(viewsets.ModelViewSet):
-    queryset = Employee.objects.all().order_by('id')
+    queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter,DjangoFilterBackend,filters.OrderingFilter]
@@ -48,7 +47,7 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     filterset_fields = '__all__'
     ordering_fields = '__all__'
     #defualt ordering field
-    ordering = ['id']
+    ordering = ['-id']
 
 
 
@@ -63,7 +62,7 @@ class EmployeeViewSet(viewsets.ModelViewSet):
 
 
 class ProtocolViewSet(viewsets.ModelViewSet):
-    queryset = Protocol.objects.all().order_by('id')
+    queryset = Protocol.objects.all()
     serializer_class = ProtocolSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter,DjangoFilterBackend,filters.OrderingFilter]
@@ -72,7 +71,7 @@ class ProtocolViewSet(viewsets.ModelViewSet):
     filterset_fields = '__all__'
     ordering_fields = '__all__'
     #defualt ordering field
-    ordering = ['id']
+    ordering = ['-id']
 
     @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
     def highlight(self, request, *args, **kwargs):

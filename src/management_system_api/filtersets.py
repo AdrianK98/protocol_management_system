@@ -1,4 +1,4 @@
-from django_filters import FilterSet, AllValuesFilter, DateTimeFilter, NumberFilter, CharFilter
+from django_filters import FilterSet, AllValuesFilter, DateTimeFilter, NumberFilter, CharFilter, BooleanFilter
 from management_system.models import Item, Protocol
 from users.models import Employee
 
@@ -7,10 +7,11 @@ class ItemFilter(FilterSet):
     item_it = CharFilter(lookup_expr='icontains')
     item_kk = CharFilter(lookup_expr='icontains')
     item_model = CharFilter(lookup_expr='icontains')
+    item_user = BooleanFilter(field_name='item_user', lookup_expr='isnull')
 
     class Meta:
         model = Item
-        fields = ['item_sn', 'item_it','item_kk','item_model']
+        fields = ['item_sn', 'item_it','item_kk','item_model','item_user']
 
 class EmployeeFilter(FilterSet):
     user_name = CharFilter(lookup_expr='icontains')

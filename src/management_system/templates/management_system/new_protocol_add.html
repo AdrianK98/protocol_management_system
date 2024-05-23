@@ -125,24 +125,23 @@
 <script type="text/javascript">
 
   const select2conf = {
-    // Use AJAX to call to API2 to get the list of employees
+    // Use AJAX to call to API2 to get the list of items
     ajax: {
-      url: "{% url 'API2Items' %}",
+      url: "{% url 'item-list' %}",
       dataType: 'json',
       delay: 300,
       data: function(params){
-        // We send only query as 'q' and limit = 10
+        // item_user true because value of that field is null, we dont want to search used items
         return {
-          q: params.term,
-          free: 1,
+          item_user: true,
+          search: params.term,
           limit: 10
         }
       },
       processResults: function(data){
         // We get raw data, so we are formating it that select2 can work with them
         return {
-          results: data.map(e => {
-            if(e.item_user != "None") return e;
+          results: data.results.map(e => {
             return {id: e.id, text: e.item_it + ' ' + e.item_sn + ' ' + e.item_model}
           })
         }
@@ -155,20 +154,20 @@
       $('#search-employee').select2({
       // Use AJAX to call to API2 to get the list of employees
       ajax: {
-        url: "{% url 'API2Employees' %}",
+        url: "{% url 'employee-list' %}",
         delay: 300,
         dataType: 'json',
         data: function(params){
           // We send only query as 'q' and limit = 10
           return {
-            q: params.term,
+            search: params.term,
             limit: 10
           }
         },
         processResults: function(data){
           // We get raw data, so we are formating it that select2 can work with them
           return {
-            results: data.map(e => {
+            results: data.results.map(e => {
               return {id: e.id, text: e.user_name + ' ' + e.user_surname}
             })
           }
