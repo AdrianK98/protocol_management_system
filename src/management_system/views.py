@@ -1,11 +1,9 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-from rest_framework import generics
 import json
 from datetime import datetime
 from django.utils.decorators import method_decorator
-from .serializers import ItemSerializer,EmployeeSerializer,ProtocolSerializer
 from .forms import EmployeeForm, ProtocolFormAdd, ItemForm, ProtocolFormReturn,ProtocolFormReturnNext,UtilizationItemForm, UtilizationFinalizationForm
 from django.contrib import messages
 from django.views import View
@@ -853,32 +851,5 @@ def API2ProtocolsView(request):
 
 
 
-class ItemList(generics.ListCreateAPIView):
-    queryset = Item.objects.all()
-    serializer_class = ItemSerializer
 
 
-class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Item.objects.all()
-    serializer_class = ItemSerializer
-
-class EmployeeList(generics.ListCreateAPIView):
-    queryset = Employee.objects.all()
-    serializer_class = EmployeeSerializer
-
-
-class EmployeeDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Employee.objects.all()
-    serializer_class = EmployeeSerializer
-
-class ProtocolList(generics.ListCreateAPIView):
-    queryset = Protocol.objects.all()
-    serializer_class = ProtocolSerializer
-
-
-class ProtocolDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Protocol.objects.all()
-    serializer_class = ProtocolSerializer
-
-def MainCSSView(request):
-    return render(request, "management_system/main.css", content_type="text/css")
