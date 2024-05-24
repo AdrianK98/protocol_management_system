@@ -42,6 +42,7 @@ class ItemSerializer(serializers.HyperlinkedModelSerializer):
             "item_it",
             "item_kk",
             "item_user",
+            "item_producent",
             "created",
             "item_model",
             "category",

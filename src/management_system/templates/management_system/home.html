@@ -112,8 +112,9 @@
 		protocols_cnt.appendChild(protocols_table);
 
 		// Fetch data from server using API2
-		let protocols_data = await fetch("/api2/protocols?limit=15");
+		let protocols_data = await fetch("{% url 'protocol-list' %}?limit=15");
 		let protocols = await protocols_data.json();
+		protocols = protocols.results;
 
 		// For each element
 		for(let e of protocols){
@@ -125,8 +126,8 @@
 			row += "<tr>";
 			row += "<td><a href=\"/protocols/" + e.id + "\">" + e.barcode + "</a></td>";
 			row += "<td>" + dtos(d) + "</td>";
-			row += "<td>" + e.employee + "</td>";
-			row += "<td>" + (e.is_return=="True"?"Zwrot":"Przekazanie") + "</td>";
+			row += "<td>" + e.employee.user_name + ' ' + e.employee.user_surname + "</td>";
+			row += "<td>" + (e.is_return?"Zwrot":"Przekazanie") + "</td>";
 			//row += "<td><a href=\"/protocols/" + e.id + "\" role=\"button\" class=\"btn btn-success\">Wyswietl</a></td>";
 			row += "</tr>";
 
@@ -142,8 +143,9 @@
 		last_added_cnt.appendChild(last_added_table);
 
 		// Fetch data from server using API2
-		let last_added_data = await fetch("/api2/items?limit=8");
+		let last_added_data = await fetch("{% url 'item-list' %}?limit=8");
 		let last_added = await last_added_data.json();
+		last_added = last_added.results;
 
 		// For each element
 		for(let e of last_added){
@@ -156,7 +158,7 @@
 			row += "<td><a href=\"/items/" + e.id + "\">" + e.item_it + "</a></td>";
 			row += "<td>" + dtos(d) + "</td>";
 			row += "<td>" + e.item_producent + "</td>";
-			row += "<td>" + e.category + "</td>";
+			row += "<td>" + e.category.category_name + "</td>";
 			row += "</tr>";
 
 			//Append row

@@ -38,20 +38,19 @@
           $('#id_item_user').select2({
             // Use AJAX to call to API2 to get the list of employees
             ajax: {
+              url: "{% url 'employee-list' %}",
               delay: 300,
-              url: "{% url 'API2Employees' %}",
               dataType: 'json',
               data: function(params){
-                // We send only query as 'q' and limit = 10
                 return {
-                  q: params.term,
+                  search: params.term,
                   limit: 10
                 }
               },
               processResults: function(data){
                 // We get raw data, so we are formating it that select2 can work with them
                 return {
-                  results: data.map(e => {
+                  results: data.results.map(e => {
                     return {id: e.id, text: e.user_name + ' ' + e.user_surname}
                   })
                 }
