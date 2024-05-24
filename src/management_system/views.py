@@ -457,7 +457,8 @@ class ProtocolsView(View):
         queryName = str(request.GET.get('qname',''))
         querySurname = str(request.GET.get('qsurname',''))
         queryDate = str(request.GET.get('qdate',''))
-        protocolQuery = sorted(self.get_query(queryName,querySurname,queryDate), key=attrgetter('id'),reverse=True)
+        queryBarcode = str(request.GET.get('qbarcode',''))
+        protocolQuery = sorted(self.get_query(queryName,querySurname,queryDate,queryBarcode), key=attrgetter('id'),reverse=True)
         
 
         page = request.GET.get('page',1)
@@ -478,7 +479,7 @@ class ProtocolsView(View):
         }
         return render(request, "management_system/protocols.html", context)
     
-    def get_query(self,qname,qsurname,qdate):  # new
+    def get_query(self,qname,qsurname,qdate,qbarcode):  # new
         query = Q()
         if qname:
             query = query & (
@@ -488,6 +489,11 @@ class ProtocolsView(View):
         if qsurname:
             query = query & (
                 Q(employee__user_surname__icontains=qsurname)
+            )   
+        
+        if qbarcode:
+            query = query & (
+                Q(barcode__icontains=qbarcode)
             )   
 
         if qdate:

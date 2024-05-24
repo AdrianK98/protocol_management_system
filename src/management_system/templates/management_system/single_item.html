@@ -28,7 +28,7 @@
           
             <ul class="list-group list-group-flush">
               <li class="list-group-item"><b>Kategoria:</b> {{item.category}}</li>
-              <li class="list-group-item"><b>Data:</b> {{item.created|date:"d.m.Y G:i:s"}}</li>
+              <li class="list-group-item"><b>Data:</b> {{item.created|date:"d.m.Y G:i"}}</li>
               <li class="list-group-item"><b>Producent:</b> {{item.item_producent}}</li>
               <li class="list-group-item"><b>Model:</b> {{item.item_model}}</li>
               <li class="list-group-item"><b>Numer S/N:</b> {{item.item_sn}}</li>
@@ -56,7 +56,7 @@
                   <tr class="fw-normal">
                     <td>{{protocol.protocol_id.barcode}}</td>
                     <td>{{protocol.protocol_id.employee}}</td>
-                    <td>{{protocol.protocol_id.created|date:"d.m.Y G:i:s"}}</td>
+                    <td>{{protocol.protocol_id.created|date:"d.m.Y G:i"}}</td>
                     <td>{{protocol.protocol_id.is_return|yesno:"Zwrot,Przekazanie"}}</td>
                     <td><a class="btn btn-success mb-1" role="button" href="{% url 'singleProtocol' protocol.protocol_id.id %}">Wyswietl</a></td>
                   </tr>

@@ -10,6 +10,7 @@
   <form action="{% url 'protocollist' %}" method="get">
     <input name="qname" type="text" placeholder="Imię..." value='{{qname_value}}'>
     <input name="qsurname" type="text" placeholder="Nazwisko..." value='{{qsurname_value}}'>
+    <input name="qbarcode" type="text" placeholder="Kod..." value='{{qbarcode_value}}'>
     <input name="qdate" type="text" placeholder="Data przekazania..." pattern="((3[0-1])|([1-2][0-9])|(0[1-9]))\.((0[1-9])|(1[0-2]))\.[1-9][0-9]{3}" value='{{qdate_value}}' onfocus="(this.type='date')">
     <input type='submit' value='Szukaj'>
 
@@ -48,7 +49,7 @@
           </td>
           <td>{{protocol.barcode}}</td>
           <td>{{protocol.employee}}</td>
-          <td>{{protocol.created|date:"d.m.Y G:i:s"}}</td>
+          <td>{{protocol.created|date:"d.m.Y G:i"}}</td>
           <td>{{protocol.is_return|yesno:"Zwrot,Przekazanie"}}</td>
           <td><a class="btn btn-success mb-1" role="button" href="{% url 'singleProtocol' protocol.id %}">Wyswietl</a></td>
         </tr>
