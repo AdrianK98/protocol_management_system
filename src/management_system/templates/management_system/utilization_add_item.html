@@ -27,10 +27,36 @@
     <button type="button" onclick="addItem()" class="btn btn-secondary mt-3" name="saveAndContinue">Dodaj Kolejny</button>
 </form>
 <script type="text/javascript">
+  const select2conf = {
+    // Use AJAX to call to API2 to get the list of items
+    ajax: {
+      url: "{% url 'item-list' %}",
+      dataType: 'json',
+      delay: 300,
+      data: function(params){
+        // item_user true because value of that field is null, we dont want to search used items
+        return {
+          item_user: true,
+          utilization_id: true,
+          search: params.term,
+          limit: 10
+        }
+      },
+      processResults: function(data){
+        // We get raw data, so we are formating it that select2 can work with them
+        return {
+          results: data.results.map(e => {
+            return {id: e.id, text: e.item_it + ' ' + e.item_sn + ' ' + e.item_model}
+          })
+        }
+      },
+    }
+  };
+
   $(document).ready(function() {
-    $('.select2field').select2();
+    //$('.select2field').select2();
     // Add event listener to search-items 
-    $('#search-items').on('select2:select', () => {
+    $('#search-items').select2(select2conf).on('select2:select', () => {
       // Add new search-item and get its id
       var ix = addItem();
       // Open newly created select
@@ -116,9 +142,9 @@
 
     // A 'lil trick here, for some reason we must update both new and the very first field in that order
     // Otherwise it breaks everything
-    $('#search-items' + id).select2();
-    $('#search-items').select2();
-    $('#search-items' + id).select2();
+    $('#search-items' + id).select2(select2conf);
+    $('#search-items').select2(select2conf);
+    $('#search-items' + id).select2(select2conf);
 
     // Add event listener to search-items 
     $('#search-items' + id).on('select2:select', () => {
