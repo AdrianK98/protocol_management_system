@@ -1,8 +1,8 @@
 from django.shortcuts import render
-from management_system.models import Item, Protocol
+from management_system.models import Item, Protocol, Utilization
 from users.models import Employee
 from rest_framework import generics, permissions, viewsets
-from .serializers import ItemSerializer,EmployeeSerializer,ProtocolSerializer
+from .serializers import ItemSerializer,EmployeeSerializer,ProtocolSerializer, UtlizationSerializer
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -77,6 +77,22 @@ class ProtocolViewSet(viewsets.ModelViewSet):
     def highlight(self, request, *args, **kwargs):
         protocol = self.get_object()
         return Response(protocol)
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
+class UtilizationViewSet(viewsets.ModelViewSet):
+    queryset = Utilization.objects.all()
+    serializer_class = UtlizationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    #defualt ordering field
+    ordering = ['-id']
+
+    @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
+    def highlight(self, request, *args, **kwargs):
+        utilization = self.get_object()
+        return Response(utilization)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)

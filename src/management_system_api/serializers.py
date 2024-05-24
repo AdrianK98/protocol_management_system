@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from management_system.models import Item, Protocol, ItemCategory
+from management_system.models import Item, Protocol, ItemCategory, Utilization
 from users.models import Employee
 
 class ItemCategorySerializer(serializers.HyperlinkedModelSerializer):
@@ -9,6 +9,13 @@ class ItemCategorySerializer(serializers.HyperlinkedModelSerializer):
             "category_name",
         )
 
+class UtlizationSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Utilization
+        fields = (
+            "id",
+            'created',
+        )
 
 class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -23,6 +30,8 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ItemSerializer(serializers.HyperlinkedModelSerializer):
+    utilization_id = UtlizationSerializer(read_only=True)
+    category = ItemCategorySerializer(read_only=True)
     category = ItemCategorySerializer(read_only=True)
     item_user = EmployeeSerializer(read_only=True)
     class Meta:
@@ -36,6 +45,7 @@ class ItemSerializer(serializers.HyperlinkedModelSerializer):
             "created",
             "item_model",
             "category",
+            'utilization_id'
         )
 
 
