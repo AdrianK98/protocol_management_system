@@ -86,6 +86,7 @@ class UtilizationViewSet(viewsets.ModelViewSet):
     queryset = Utilization.objects.all()
     serializer_class = UtlizationSerializer
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [filters.SearchFilter,DjangoFilterBackend,filters.OrderingFilter]
     #defualt ordering field
     ordering = ['-id']
 

@@ -14,39 +14,6 @@
   </form>
 </section>
 
-{% comment %} 
-
-        <div class="row">
-          <div class="col-2 text-center"><b>Typ </b></div>
-          <div class="col text-center"><b>Model</b></div>
-          <div class="col-2 text-center bg-primary"><b>IT</b></div>
-          <div class="col text-center"><b>SN</b></div>
-          <div class="col text-center"><b>KK</b></div>
-          <div class="col text-center"></div>
-          <div class="col-2 text-center"></div>
-
-        {% for item in items%}
-        <hr>
-            <div class="row mt-2">
-                <div class="col-2 text-center">{{item.category}}</div>
-                <div class="col text-center">{{item.item_model}}</div>
-                <div class="col-2 text-center bg-primary">{{item.item_it|default_if_none:""}}</div>
-                <div class="col text-center">{{item.item_sm|default_if_none:""}}</div>
-                <div class="col text-center">{{item.item_kk|default_if_none:""}}</div>
-
-                <div class="col-2"></div>
-                <div class="col text-center mb-2"><a class="btn btn-primary" href="{% url 'singleItem' item.id %}" role="button">Wyświetl</a></div>
-                <div class="col "><a class="btn btn-danger zdajBtn"  role="button" data-item-id="{{item.id}}">Zdaj</a></div>
-                
-            </div>
-            
-        {%endfor%}  
-        <hr> {% endcomment %}
-
-
-
-
-
 
 
 
@@ -71,7 +38,7 @@
             <span>{{item.category}}</span>
           </td>
           <td>
-            <span>{{item.created}}</span>
+            <span>{{item.created|date:"d.m.Y G:i:s"}}</span>
           </td>
          <td>
             <span>{{item.item_producent}}</span>

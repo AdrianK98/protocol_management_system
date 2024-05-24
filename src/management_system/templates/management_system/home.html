@@ -155,7 +155,7 @@
 			// Prepare table row
 			let row = "";
 			row += "<tr>";
-			row += "<td><a href=\"/items/" + e.id + "\">" + e.item_it + "</a></td>";
+			row += "<td><a href=\"/items/" + e.id + "\">" + (e.item_it ? e.item_it : "Brak numeru IT") + "</a></td>";
 			row += "<td>" + dtos(d) + "</td>";
 			row += "<td>" + e.item_producent + "</td>";
 			row += "<td>" + e.category.category_name + "</td>";

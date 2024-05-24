@@ -45,10 +45,10 @@
           </td>
           <td>{{utilization.id}}</td>
           <td>{{utilization.created_by}}</td>
-          <td>{{utilization.created|date:"d/m/Y"}}</td>
+          <td>{{utilization.created|date:"d.m.Y"}}</td>
           <td>
         {% if utilization.company_transfer_date %}
-        {{utilization.company_transfer_date|date:"d/m/Y"}}
+        {{utilization.company_transfer_date|date:"d.m.Y"}}
           {% else %}
             W toku
           {% endif %}    
