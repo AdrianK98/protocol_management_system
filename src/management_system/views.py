@@ -12,6 +12,7 @@ from django.db.models import Q
 from operator import attrgetter
 from django.views.decorators.cache import cache_page
 from django.core.cache import cache
+from .snippets import get_data_for_region
 import base64
 
 
@@ -20,16 +21,19 @@ from pprint import pprint
 
 # Create your views here.
 from users.models import Employee
-from .models import Item,Protocol, ProtocolItem, Utilization
-
+from .models import Item,Protocol, ProtocolItem, Utilization, RegionContent
+from django.contrib.contenttypes.models import ContentType
 # TODO: Test if item is utilizated while adding new protocol, or in utilization
+
+
+    
+
 
 @method_decorator(login_required, name="dispatch")
 class utilizationDelete(View):
     def post(self, request, pk):
         try:
             obj = get_object_or_404(Utilization, id = pk )
-            print(obj)
             obj.delete()
             return redirect('utilization')
         except Exception as e:
@@ -294,8 +298,7 @@ class editEmployeeView(View):
 
 @login_required
 def mainView(request):
-    print(request.user.first_name)
-    print(request.user.last_name)
+    # print(request.user.userinfo.region)
     return render(request, "management_system/home.html", {})
 
 @login_required
@@ -368,7 +371,7 @@ def newProtocolReturn(request):
                 if protocolFormData['item'].item_user == protocolFormData['employee']:
                     protocolFormData['item'].item_user = None
                     protocolFormData['item'].save()
-                    print('OK')
+                    # print('OK')
 
                 #IF IS RETURN AND USER ITEM IS NOT EMPLOYEE AND ITEM USER IS NOT EMPTY
                 elif protocolFormData['item'].item_user != protocolFormData['employee'] and protocolFormData['item'].item_user :
@@ -413,7 +416,8 @@ class EmployeesView(View):
     def get(self,request):
         queryName = str(request.GET.get('qname',''))
         querySurname = str(request.GET.get('qsurname',''))
-        employeeQuery = sorted(self.get_query(queryName,querySurname), key=attrgetter('id'),reverse=True)
+        
+        employeeQuery = sorted(self.get_query(queryName,querySurname,request.user.userinfo.region), key=attrgetter('id'),reverse=True)
         
 
         page = request.GET.get('page',1)
@@ -434,7 +438,7 @@ class EmployeesView(View):
         return render(request, "management_system/employees.html", context)
 
 
-    def get_query(self,qname,qsurname):  # new
+    def get_query(self,qname,qsurname,region_id):  # new
         query = Q()
         if qname:
             query = query & (
@@ -445,8 +449,9 @@ class EmployeesView(View):
             query = query & (
                 Q(user_surname__icontains=qsurname)
             )   
-                     
-        object_list = Employee.objects.filter(query)
+        
+        object_list = get_data_for_region(Employee,region_id).filter(query)
+        # object_list = Employee.objects.filter(query)
 
         return object_list
     
@@ -509,8 +514,23 @@ def addEmployeeView(request):
     form = EmployeeForm(request.POST or None)
     if request.method == 'POST':
         if form.is_valid():
-            form.save()
-            return redirect("home")
+            try:
+                newEmployee = form.save()
+                region_id = request.user.userinfo.region
+
+                content_type = ContentType.objects.get_for_model(Employee)
+                try:
+                    RegionContent.objects.create(
+                    region=region_id,
+                    content_type=content_type,
+                    object_id=newEmployee.id
+                    )
+                except Exception as e:
+                    print('Failed employee to save into region content!')
+                    print(e)
+            except Exception as e:
+                print(e)
+            return redirect("employees")
     context={
             "form":form
         }

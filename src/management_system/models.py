@@ -4,12 +4,45 @@ from django.conf import settings
 import barcode
 from barcode.writer import ImageWriter
 from datetime import datetime
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.auth.models import User
+
 
 from django.core.files import File
 # Create your models here.
+USER_REGION_CHOICES = (
+      (1, 'Południowy'),
+      (2, 'Północny'),
 
+      )
 
 DATE_INPUT_FORMATS = ['%d-%m-%Y']
+
+
+class Region(models.Model):
+    name = models.CharField("Typ", null=False,max_length=200)
+
+    def __str__(self):
+        return self.name
+    
+
+class UserInfo(models.Model):
+    region = models.ForeignKey("Region", on_delete=models.PROTECT,null=True,blank=True,verbose_name="regg")
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+
+class RegionContent(models.Model):
+    region = models.PositiveSmallIntegerField(
+                  choices=USER_REGION_CHOICES,
+                  null=True, blank=True
+                  )
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+    
+    def __str__(self):
+        return dict(USER_REGION_CHOICES).get(self.region, "Unknown Region") + ' ' + str(self.content_type) + ' ' + str(self.content_object.id)
 
 class Item(models.Model):
     created=models.DateTimeField('Data utworzenia',auto_now_add=True)
