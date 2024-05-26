@@ -24,7 +24,7 @@ from users.models import Employee
 from .models import Item,Protocol, ProtocolItem, Utilization, RegionContent
 from django.contrib.contenttypes.models import ContentType
 # TODO: Test if item is utilizated while adding new protocol, or in utilization
-
+#TODO ALERT IF ITEM/PROTOCOL/UTILIZATION WITHOUT REGION
 
     
 
@@ -116,11 +116,11 @@ class utilizationFinalizationView(View):
 @method_decorator(login_required, name="dispatch")
 class utilizationView(View):
     def get(self, request):
-
+        region=request.user.userinfo.region
         queryCreator = str(request.GET.get('qcreator',''))
         queryCreatedDate = str(request.GET.get('qcreateddate',''))
         queryEndDate = str(request.GET.get('qenddate',''))
-        utilizationQuery = sorted(self.get_query(queryCreator,queryCreatedDate,queryEndDate), key=attrgetter('id'),reverse=True)
+        utilizationQuery = sorted(self.get_query(queryCreator,queryCreatedDate,queryEndDate,region), key=attrgetter('id'),reverse=True)
         
 
         page = request.GET.get('page',1)
@@ -142,7 +142,7 @@ class utilizationView(View):
         }
         return render(request, "management_system/utilization.html", context)
     
-    def get_query(self,qcreator,qcreated,qend):  # new
+    def get_query(self,qcreator,qcreated,qend,region):  # new
         query = Q()
         if qcreator:
             query = query & (
@@ -161,7 +161,7 @@ class utilizationView(View):
                 Q(company_transfer_date__icontains=date2)
             )      
                      
-        object_list = Utilization.objects.filter(query)
+        object_list = get_data_for_region(Utilization,region).filter(query)
 
         return object_list
     
@@ -189,6 +189,15 @@ class utilizationAddView(View):
             newUtilization = Utilization()
             newUtilization.created_by = request.user
             newUtilization.save()
+
+            region = request.user.userinfo.region
+            content_type = ContentType.objects.get_for_model(Utilization)
+            RegionContent.objects.create(
+                region=region.id,
+                content_type=content_type,
+                object_id=newUtilization.id
+                )
+
             # Send pk to client in JSON format
             return HttpResponse('{\"pk\": \"' + str(newUtilization.id) + '\"}')
 
@@ -339,11 +348,21 @@ def itemsAddNew(request):
                 newItem = itemForm.save(commit=False)
                 if request.POST.get('item_user'):
                     newItem.item_user = Employee.objects.get(id=request.POST.get('item_user'))
-                
+
                 newItem.save()
+
+                region = request.user.userinfo.region
+                content_type = ContentType.objects.get_for_model(Item)
+                RegionContent.objects.create(
+                    region=region.id,
+                    content_type=content_type,
+                    object_id=newItem.id
+                    )
+                
                 return redirect('home')
-            except:
+            except Exception as e:
                 print('ERROR OCCURED WHILE SAVING DATA TO DB!')
+                print(e)
         else:
             print('Form not valid!')
             print(itemForm.errors)
@@ -414,10 +433,11 @@ def newProtocolReturn(request):
 @method_decorator(login_required, name="dispatch")
 class EmployeesView(View):
     def get(self,request):
+        region = request.user.userinfo.region
         queryName = str(request.GET.get('qname',''))
         querySurname = str(request.GET.get('qsurname',''))
-        
-        employeeQuery = sorted(self.get_query(queryName,querySurname,request.user.userinfo.region), key=attrgetter('id'),reverse=True)
+
+        employeeQuery = sorted(self.get_query(queryName,querySurname,region), key=attrgetter('id'),reverse=True)
         
 
         page = request.GET.get('page',1)
@@ -438,7 +458,7 @@ class EmployeesView(View):
         return render(request, "management_system/employees.html", context)
 
 
-    def get_query(self,qname,qsurname,region_id):  # new
+    def get_query(self,qname,qsurname,region):  # new
         query = Q()
         if qname:
             query = query & (
@@ -450,7 +470,7 @@ class EmployeesView(View):
                 Q(user_surname__icontains=qsurname)
             )   
         
-        object_list = get_data_for_region(Employee,region_id).filter(query)
+        object_list = get_data_for_region(Employee,region).filter(query)
         # object_list = Employee.objects.filter(query)
 
         return object_list
@@ -459,11 +479,12 @@ class EmployeesView(View):
 class ProtocolsView(View):
 
     def get(self,request):
+        region = request.user.userinfo.region
         queryName = str(request.GET.get('qname',''))
         querySurname = str(request.GET.get('qsurname',''))
         queryDate = str(request.GET.get('qdate',''))
         queryBarcode = str(request.GET.get('qbarcode',''))
-        protocolQuery = sorted(self.get_query(queryName,querySurname,queryDate,queryBarcode), key=attrgetter('id'),reverse=True)
+        protocolQuery = sorted(self.get_query(queryName,querySurname,queryDate,queryBarcode,region), key=attrgetter('id'),reverse=True)
         
 
         page = request.GET.get('page',1)
@@ -484,7 +505,7 @@ class ProtocolsView(View):
         }
         return render(request, "management_system/protocols.html", context)
     
-    def get_query(self,qname,qsurname,qdate,qbarcode):  # new
+    def get_query(self,qname,qsurname,qdate,qbarcode,region):  # new
         query = Q()
         if qname:
             query = query & (
@@ -506,7 +527,7 @@ class ProtocolsView(View):
             query = query & (
                 Q(created__icontains=date)
             )                       
-        object_list = Protocol.objects.filter(query)
+        object_list = get_data_for_region(Protocol,region).filter(query)
         return object_list
 
 @login_required
@@ -516,12 +537,12 @@ def addEmployeeView(request):
         if form.is_valid():
             try:
                 newEmployee = form.save()
-                region_id = request.user.userinfo.region
+                region = request.user.userinfo.region
 
                 content_type = ContentType.objects.get_for_model(Employee)
                 try:
                     RegionContent.objects.create(
-                    region=region_id,
+                    region=region.id,
                     content_type=content_type,
                     object_id=newEmployee.id
                     )
@@ -547,13 +568,15 @@ def itemsView(request):
 @method_decorator(login_required, name="dispatch")
 class ItemsView(View):
     def get(self,request):
+        region = request.user.userinfo.region
+        print(region.id)
         queryType = str(request.GET.get('qtype',''))
         queryModel = str(request.GET.get('qmodel',''))
         queryIt = str(request.GET.get('qit',''))
         querySn = str(request.GET.get('qsn',''))
         queryKk = str(request.GET.get('qkk',''))
         queryQused = request.GET.get('qused','')
-        itemQuery = sorted(self.get_query(queryType,queryModel,queryIt,querySn,queryKk,queryQused), key=attrgetter('id'),reverse=True)
+        itemQuery = sorted(self.get_query(queryType,queryModel,queryIt,querySn,queryKk,queryQused,region), key=attrgetter('id'),reverse=True)
         
         page = request.GET.get('page',1)
         protocols_paginator = Paginator(itemQuery,20)
@@ -577,7 +600,7 @@ class ItemsView(View):
         }
         return render(request, "management_system/items.html", context)
     
-    def get_query(self,qtype,qmodel,qit,qsn,qkk,qused):  # new
+    def get_query(self,qtype,qmodel,qit,qsn,qkk,qused,region):  # new
         query = Q()
         if qtype:
             query = query & (
@@ -605,7 +628,7 @@ class ItemsView(View):
             query = query & (
                 Q(item_user__isnull=False)
             )    
-        object_list = Item.objects.filter(query)
+        object_list = get_data_for_region(Item,region).filter(query)
         return object_list  
 
 @login_required
@@ -719,13 +742,14 @@ class NewProtocolAdd(View):
 
                 ProtocolItem(protocol_id=newProtocol,item_id=protocolFormData.item).save()
 
-                # This if is not used by me, but i decided not to delete it just in case
-                if 'saveAndEnd' in request.POST:
-                    return redirect("singleProtocol",pk=newProtocol.id)
-                elif 'saveAndContinue' in request.POST:
-                    return redirect("addNextItem",status='add',pk=newProtocol.id)
-                
-                # Send pk to client in JSON format
+                region = request.user.userinfo.region
+                content_type = ContentType.objects.get_for_model(Protocol)
+                RegionContent.objects.create(
+                    region=region.id,
+                    content_type=content_type,
+                    object_id=newProtocol.id
+                    )
+
                 return HttpResponse('{\"pk\": \"' + str(newProtocol.id) + '\"}')
                 
             except Exception as e:
