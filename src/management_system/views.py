@@ -189,24 +189,24 @@ class utilizationAddView(View):
             newUtilization = Utilization()
             newUtilization.created_by = request.user
             newUtilization.save()
-
-            region = request.user.userinfo.region
-            content_type = ContentType.objects.get_for_model(Utilization)
-            RegionContent.objects.create(
-                region=region.id,
-                content_type=content_type,
-                object_id=newUtilization.id
-                )
-
-            # Send pk to client in JSON format
-            return HttpResponse('{\"pk\": \"' + str(newUtilization.id) + '\"}')
+            try:
+                region = request.user.userinfo.region
+                content_type = ContentType.objects.get_for_model(Utilization)
+                RegionContent.objects.create(
+                    region=region.id,
+                    content_type=content_type,
+                    object_id=newUtilization.id
+                    )
+            except Exception as e:
+                print(e)
+                # Send pk to client in JSON format
+            finally:
+                return HttpResponse('{\"pk\": \"' + str(newUtilization.id) + '\"}')
 
         utilizationForm = UtilizationItemForm(request.POST)
         if utilizationForm.is_valid():
             try:
                 utilizationFormData = utilizationForm.cleaned_data
-
-                pprint(request.POST)
 
                                 
                 #IF ITS NOT RETURN AND USER ITEM IS NOT EMPLOYEE AND ITEM USER IS NOT EMPTY
@@ -359,10 +359,11 @@ def itemsAddNew(request):
                     object_id=newItem.id
                     )
                 
-                return redirect('home')
+                
             except Exception as e:
-                print('ERROR OCCURED WHILE SAVING DATA TO DB!')
                 print(e)
+            finally:
+                return redirect('home')
         else:
             print('Form not valid!')
             print(itemForm.errors)
@@ -569,7 +570,6 @@ def itemsView(request):
 class ItemsView(View):
     def get(self,request):
         region = request.user.userinfo.region
-        print(region.id)
         queryType = str(request.GET.get('qtype',''))
         queryModel = str(request.GET.get('qmodel',''))
         queryIt = str(request.GET.get('qit',''))
@@ -755,6 +755,8 @@ class NewProtocolAdd(View):
             except Exception as e:
                 print(e)
                 return HttpResponse('ERROR')
+            finally:
+                return HttpResponse('{\"pk\": \"' + str(newProtocol.id) + '\"}')
         else:
             print("Form is invalid")
         return HttpResponse('ERROR')
