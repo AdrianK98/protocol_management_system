@@ -277,10 +277,17 @@ def deleteEmployeeView(request,pk):
 @login_required
 def itemsEdit(request,pk):
 
-    context ={}
+    context = {
+        'region': request.user.userinfo.region,
+        'regions': Region.objects.all()
+    }
  
     # fetch the object related to passed id
     obj = get_object_or_404(Item, id = pk)
+    content_type = ContentType.objects.get_for_model(Item)
+    region = RegionContent.objects.get(content_type=content_type, object_id=obj.id)
+    context["my_region"] = region.region
+
  
     # pass the object as instance in form
     form = ItemForm(request.POST or None, instance = obj)
@@ -290,6 +297,8 @@ def itemsEdit(request,pk):
     if form.is_valid():
         try:
             form.save()
+            region.region = request.POST.get('region') or region.region
+            region.save()
             return redirect("itemsView")
         except Exception as e:
             return HttpResponse(f"{e}")

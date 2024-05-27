@@ -13,6 +13,20 @@
 
   <!-- Using the formset -->
   {{ itemForm|crispy }}
+
+  {% if region == None %}
+  <div id="div_id_item_region" class="form-group">
+    <label for="id_item_region">Region</label>
+    <div>
+      <select id="id_item_region" name="region" class="w-25 m-2 select form-control">
+        {% for r in regions %}
+          <option value="{{r.id}}">{{r}}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  {% endif %}
+
   {% comment %} <button id="show-employee-btn" class="btn btn-secondary mt-3" type="button">Dodaj pracownika</button> {% endcomment %}
   <hr>
 
@@ -30,6 +44,8 @@
             });
         }); {% endcomment %}
         $(document).ready(function () {
+          $('#id_item_region').select2();
+          $('#id_item_region').val("{{my_region}}").trigger("change");
           $('#search-employee').select2({
             ajax: {
               url: '/get_filtered_employees/',
