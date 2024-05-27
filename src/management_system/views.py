@@ -814,16 +814,16 @@ class NewProtocolAdd(View):
         return HttpResponse('ERROR')
 
     def get(self,request):
+        context = {
+            'region': request.user.userinfo.region,
+            'regions': Region.objects.all()
+        }
         if request.GET.get('eid'):
-            # protocolFormClass = ProtocolFormAdd
-            # protocolForm = protocolFormClass(initial={
-            #     'employee': Employee.objects.get(id=request.GET.get('eid'))
-            # })
-            return render(request, self.template,{'employee':Employee.objects.get(id=request.GET.get('eid'))})
+            context['employee'] = Employee.objects.get(id=request.GET.get('eid'))
+            return render(request, self.template,context)
         else:
             protocolFormClass = ProtocolFormAdd
-            return render(request, self.template,{'protocolForm':protocolFormClass,
-            'region': request.user.userinfo.region,
-            'regions': Region.objects.all()})
+            context['protocolForm'] = protocolFormClass
+            return render(request, self.template,context)
 
 
