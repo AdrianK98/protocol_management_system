@@ -826,15 +826,6 @@ class NewProtocolAdd(View):
             return render(request, self.template,context)
         else:
             protocolFormClass = ProtocolFormAdd
-<<<<<<< HEAD
             context['protocolForm'] = protocolFormClass
             return render(request, self.template,context)
-=======
-            return render(request, self.template,{
-            'protocolForm':protocolFormClass,                              
-            'region': request.user.userinfo.region,
-            'regions': Region.objects.all()
-            })
->>>>>>> c6fda873b978585eba5a45ad46dae46277740365
-
 
