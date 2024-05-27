@@ -32,9 +32,20 @@
        </div> 
     </div>
     {{ protocolForm|crispy }}
-    <hr>
+{% if region == None %}
+  <div id="div_id_item_region" class="form-group">
+    <label for="id_item_region">Region</label>
+    <div>
+      <select id="id_item_region" name="region" class="w-25 m-2 select form-control">
+        {% for r in regions %}
+          <option value="{{r.id}}">{{r}}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  {% endif %}
 
-    
+    <hr>
     {% if messages %}
     <div class="alert alert-danger">
         {% for message in messages %}
@@ -163,6 +174,10 @@
     });
     $('#search-items').select2(select2conf);
 
+    {% if region == None %}
+      $('#id_item_region').select2();
+    {% endif %}
+
     // Add event listener to search-items 
     $('#search-items').on('select2:select', () => {
       // Add new search-item and get its id
@@ -254,6 +269,7 @@
     // Get data from form, including token
     const token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
     const employee = document.getElementById('search-employee').value;
+    const region = document.getElementsByName('region')[0].value;
     const items = document.getElementsByName('item'); // Gets all fields with name=item
 
     // Validate employee
@@ -290,6 +306,7 @@
       data.append('csrfmiddlewaretoken', token);
       data.append('employee', employee);
       data.append('item', item.value);
+      data.append('region', region);
 
       // If we have pk send it too
       if(id != undefined)

@@ -418,6 +418,19 @@ def newProtocolReturn(request):
                 newProtocol.created_by = request.user
                 newProtocol.save()
 
+                region = request.user.userinfo.region or Region.objects.get(id=request.POST.get('region'))
+                content_type = ContentType.objects.get_for_model(Protocol)
+                try:
+                    RegionContent.objects.create(
+                    region=region.id,
+                    content_type=content_type,
+                    object_id=newProtocol.id
+                    )
+                except Exception as e:
+                    print('Failed protocol to save into region content!')
+                    print(e)
+
+
                 ProtocolItem(protocol_id=newProtocol,item_id=protocolFormData['item']).save()
                 if 'saveAndEnd' in request.POST:
                     return redirect("singleProtocol",pk=newProtocol.id)
@@ -429,6 +442,8 @@ def newProtocolReturn(request):
 
     context={
             "protocolForm":protocolForm,
+            'region': request.user.userinfo.region,
+            'regions': Region.objects.all()
         }
     return render(request, "management_system/new_protocol_return.html", context)
 
@@ -533,7 +548,6 @@ class ProtocolsView(View):
         object_list = get_data_for_region(Protocol,region).filter(query)
         return object_list
 
-# TODO: Choose region by admin
 @login_required
 def addEmployeeView(request):
     form = EmployeeForm(request.POST or None)
@@ -739,6 +753,13 @@ class NewProtocolAdd(View):
                 # If pk was send to us, we use it otherwise we create new protocol
                 if 'pk' in request.POST:
                     newProtocol = Protocol.objects.get(id=request.POST['pk'])
+                    region = request.user.userinfo.region or Region.objects.get(id=request.POST.get('region'))
+                    content_type = ContentType.objects.get_for_model(Protocol)
+                    RegionContent.objects.create(
+                        region=region.id,
+                        content_type=content_type,
+                        object_id=newProtocol.id
+                    )
                 else:
                     newProtocol = protocolFormData
                     newProtocol.is_return = False
@@ -747,14 +768,7 @@ class NewProtocolAdd(View):
 
                 ProtocolItem(protocol_id=newProtocol,item_id=protocolFormData.item).save()
 
-                region = request.user.userinfo.region
-                content_type = ContentType.objects.get_for_model(Protocol)
-                RegionContent.objects.create(
-                    region=region.id,
-                    content_type=content_type,
-                    object_id=newProtocol.id
-                    )
-
+                
                 return HttpResponse('{\"pk\": \"' + str(newProtocol.id) + '\"}')
                 
             except Exception as e:
@@ -775,6 +789,8 @@ class NewProtocolAdd(View):
             return render(request, self.template,{'employee':Employee.objects.get(id=request.GET.get('eid'))})
         else:
             protocolFormClass = ProtocolFormAdd
-            return render(request, self.template,{'protocolForm':protocolFormClass})
+            return render(request, self.template,{'protocolForm':protocolFormClass,
+            'region': request.user.userinfo.region,
+            'regions': Region.objects.all()})
 
 
