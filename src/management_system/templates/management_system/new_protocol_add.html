@@ -269,7 +269,6 @@
     // Get data from form, including token
     const token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
     const employee = document.getElementById('search-employee').value;
-    const region = document.getElementsByName('region')[0].value;
     const items = document.getElementsByName('item'); // Gets all fields with name=item
 
     // Validate employee
@@ -306,7 +305,11 @@
       data.append('csrfmiddlewaretoken', token);
       data.append('employee', employee);
       data.append('item', item.value);
+
+      {% if region == None %}
+    const region = document.getElementsByName('region')[0].value;
       data.append('region', region);
+      {% endif %}
 
       // If we have pk send it too
       if(id != undefined)
