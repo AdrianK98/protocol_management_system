@@ -9,10 +9,11 @@ class ItemFilter(FilterSet):
     item_model = CharFilter(lookup_expr='icontains')
     item_user = BooleanFilter(field_name='item_user', lookup_expr='isnull')
     utilization_id = BooleanFilter(field_name='utilization_id', lookup_expr='isnull')
+    utilization_id_int = CharFilter(field_name='utilization_id__id', lookup_expr='contains')
 
     class Meta:
         model = Item
-        fields = ['item_sn', 'item_it','item_kk','item_model','item_user','utilization_id']
+        fields = ['item_sn', 'item_it','item_kk','item_model','item_user','utilization_id','utilization_id_int']
 
 class EmployeeFilter(FilterSet):
     user_name = CharFilter(lookup_expr='icontains')
