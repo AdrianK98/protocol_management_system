@@ -270,6 +270,7 @@
     const token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
     const employee = document.getElementById('search-employee').value;
     const items = document.getElementsByName('item'); // Gets all fields with name=item
+    const protocolDescription = document.getElementById('protocolDescription').value;
 
     // Validate employee
     if(!employee){
@@ -305,6 +306,7 @@
       data.append('csrfmiddlewaretoken', token);
       data.append('employee', employee);
       data.append('item', item.value);
+      data.append('description', protocolDescription);
 
       {% if region == None %}
     const region = document.getElementsByName('region')[0].value;

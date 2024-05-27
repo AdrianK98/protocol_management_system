@@ -772,8 +772,12 @@ class NewProtocolAdd(View):
         if protocolForm.is_valid():
             try:
                 protocolFormData = protocolForm.save(commit=False)
+
+                
                 protocolFormData.item = Item.objects.get(id=request.POST['item'])
                 protocolFormData.employee = Employee.objects.get(id=request.POST['employee'])
+                protocolFormData.description = request.POST['description']
+
                 
                 #IF ITS NOT RETURN AND USER ITEM IS NOT EMPLOYEE AND ITEM USER IS NOT EMPTY
                 if protocolFormData.item.item_user != protocolFormData.employee and protocolFormData.item.item_user:
@@ -782,6 +786,7 @@ class NewProtocolAdd(View):
                 else:
                     protocolFormData.item.item_user = protocolFormData.employee
                     protocolFormData.item.save()
+
                     
                 # If pk was send to us, we use it otherwise we create new protocol
                 if 'pk' in request.POST:
@@ -805,8 +810,6 @@ class NewProtocolAdd(View):
 
                 ProtocolItem(protocol_id=newProtocol,item_id=protocolFormData.item).save()
 
-                
-                
             except Exception as e:
                 print(e)
                 return HttpResponse('ERROR')
