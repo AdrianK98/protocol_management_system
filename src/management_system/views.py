@@ -786,6 +786,13 @@ class NewProtocolAdd(View):
                 # If pk was send to us, we use it otherwise we create new protocol
                 if 'pk' in request.POST:
                     newProtocol = Protocol.objects.get(id=request.POST['pk'])
+                    
+
+                else:
+                    newProtocol = protocolFormData
+                    newProtocol.is_return = False
+                    newProtocol.created_by = request.user
+                    newProtocol.save()
                     region = request.user.userinfo.region or Region.objects.get(id=request.POST.get('region'))
                     content_type = ContentType.objects.get_for_model(Protocol)
                     RegionContent.objects.create(
@@ -793,16 +800,12 @@ class NewProtocolAdd(View):
                         content_type=content_type,
                         object_id=newProtocol.id
                     )
-                else:
-                    newProtocol = protocolFormData
-                    newProtocol.is_return = False
-                    newProtocol.created_by = request.user
-                    newProtocol.save()
+
+
 
                 ProtocolItem(protocol_id=newProtocol,item_id=protocolFormData.item).save()
 
                 
-                return HttpResponse('{\"pk\": \"' + str(newProtocol.id) + '\"}')
                 
             except Exception as e:
                 print(e)
@@ -823,7 +826,15 @@ class NewProtocolAdd(View):
             return render(request, self.template,context)
         else:
             protocolFormClass = ProtocolFormAdd
+<<<<<<< HEAD
             context['protocolForm'] = protocolFormClass
             return render(request, self.template,context)
+=======
+            return render(request, self.template,{
+            'protocolForm':protocolFormClass,                              
+            'region': request.user.userinfo.region,
+            'regions': Region.objects.all()
+            })
+>>>>>>> c6fda873b978585eba5a45ad46dae46277740365
 
 
