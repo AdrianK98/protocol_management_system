@@ -134,7 +134,10 @@
           item_user: true,
           utilization_id: true,
           search: params.term,
-          limit: 10
+          limit: 10,
+          {% if request.user.userinfo.region.id %}
+          region: {{request.user.userinfo.region.id}}
+          {% endif %}
         }
       },
       processResults: function(data){
@@ -159,7 +162,10 @@
         data: function(params){
           return {
             search: params.term,
-            limit: 10
+            limit: 10,
+            {% if request.user.userinfo.region.id %}
+            region: {{request.user.userinfo.region.id}}
+            {% endif %}
           }
         },
         processResults: function(data){

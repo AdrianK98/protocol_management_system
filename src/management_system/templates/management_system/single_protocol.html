@@ -90,7 +90,7 @@
         <li class="list-group-item"><b>Barcode:</b> {{protocol.barcode}}</li>
         <li class="list-group-item"><b>Osoba odbierająca:</b> <a  class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="{%url 'singleEmployee' protocol.employee.id%}"role="button">{{protocol.employee}}</li></a>
         <li class="list-group-item"><b>Informatyk:</b> {{protocol.created_by.first_name}} {{protocol.created_by.last_name}}</li>
-        <li class="list-group-item"><b>Data przekazania:</b> {{protocol.created|date:"d.m.Y G:i"}}</li>
+        <li class="list-group-item"><b>Data stworzenia protokołu:</b> {{protocol.created|date:"d.m.Y G:i"}}</li>
         <li class="list-group-item"><b>Typ:</b> {{protocol.is_return|yesno:"Zwrot,Przekazanie"}}</li>
         <li class="list-group-item"><b>Lokalizacja:</b> {{protocol.employee.user_location}}</li>
         <li class="list-group-item"><b>Dział:</b> {{protocol.employee.user_department}}</li>

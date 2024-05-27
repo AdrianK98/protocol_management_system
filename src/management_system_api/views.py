@@ -11,6 +11,7 @@ from rest_framework.decorators import action
 from django_filters import rest_framework as filters
 from django_filters.rest_framework import DjangoFilterBackend
 from .filtersets import ItemFilter, EmployeeFilter, ProtocolFilter
+from management_system.snippets import get_data_for_region_api
 
 from rest_framework import filters
 # Create your views here.
@@ -27,6 +28,13 @@ class ItemViewSet(viewsets.ModelViewSet):
     ordering_fields = '__all__'
     #defualt ordering field
     ordering = ['-id']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        region = self.request.query_params.get('region')
+        if region:
+            queryset = get_data_for_region_api(Item,region)
+        return queryset
 
     @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
     def highlight(self, request, *args, **kwargs):
@@ -49,7 +57,12 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     #defualt ordering field
     ordering = ['-id']
 
-
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        region = self.request.query_params.get('region')
+        if region:
+            queryset = get_data_for_region_api(Employee,region)
+        return queryset
 
     @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
     def highlight(self, request, *args, **kwargs):
@@ -73,6 +86,13 @@ class ProtocolViewSet(viewsets.ModelViewSet):
     #defualt ordering field
     ordering = ['-id']
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        region = self.request.query_params.get('region')
+        if region:
+            queryset = get_data_for_region_api(Protocol,region)
+        return queryset
+
     @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
     def highlight(self, request, *args, **kwargs):
         protocol = self.get_object()
@@ -89,6 +109,13 @@ class UtilizationViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter,DjangoFilterBackend,filters.OrderingFilter]
     #defualt ordering field
     ordering = ['-id']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        region = self.request.query_params.get('region')
+        if region:
+            queryset = get_data_for_region_api(Utilization,region)
+        return queryset
 
     @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
     def highlight(self, request, *args, **kwargs):

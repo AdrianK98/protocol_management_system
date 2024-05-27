@@ -45,17 +45,17 @@
         }); {% endcomment %}
         $(document).ready(function () {
           $('#id_item_region').select2();
-          $('#id_item_region').val("{{my_region}}").trigger("change");
+          $('#id_item_region').val("{{item_region}}").trigger("change");
           $('#search-employee').select2({
             ajax: {
               url: '/get_filtered_employees/',
               dataType: 'json',
               delay: 250,
               data: function (params) {
-                print('xd')
+
               },
               processResults: function (data) {
-                print('xd')
+
               },
               cache: true,
             },

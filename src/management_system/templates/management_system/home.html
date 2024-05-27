@@ -112,7 +112,7 @@
 		protocols_cnt.appendChild(protocols_table);
 
 		// Fetch data from server using API2
-		let protocols_data = await fetch("{% url 'protocol-list' %}?limit=15");
+		let protocols_data = await fetch("{% url 'protocol-list' %}?limit=19&region={{request.user.userinfo.region.id}}");
 		let protocols = await protocols_data.json();
 		protocols = protocols.results;
 
@@ -143,7 +143,7 @@
 		last_added_cnt.appendChild(last_added_table);
 
 		// Fetch data from server using API2
-		let last_added_data = await fetch("{% url 'item-list' %}?limit=8");
+		let last_added_data = await fetch("{% url 'item-list' %}?limit=8&region={{request.user.userinfo.region.id}}");
 		let last_added = await last_added_data.json();
 		last_added = last_added.results;
 

@@ -12,7 +12,7 @@ from django.db.models import Q
 from operator import attrgetter
 from django.views.decorators.cache import cache_page
 from django.core.cache import cache
-from .snippets import get_data_for_region
+from .snippets import get_data_for_region, save_model_into_region
 import base64
 
 
@@ -183,26 +183,26 @@ class utilizationAddView(View):
 
     def post(self,request):
         # If pk was send to us, we use it otherwise we create new protocol
+
         if 'pk' in request.POST:
+
             newUtilization = Utilization.objects.get(id=request.POST['pk'])
         else:
-            region = request.user.userinfo.region or Region.objects.get(id=request.POST.get('region')) 
+            pprint(request.POST)
+            region = request.user.userinfo.region or (Region.objects.get(id=request.POST.get('region')) if request.POST.get('region') else None )
+            pprint(region)
             if not region:
-                return HttpResponse("ERROR")
+                return HttpResponse("Waiting for region")
 
             newUtilization = Utilization()
             newUtilization.created_by = request.user
             newUtilization.save()
             try:
-                content_type = ContentType.objects.get_for_model(Utilization)
-                RegionContent.objects.create(
-                    region=region.id,
-                    content_type=content_type,
-                    object_id=newUtilization.id
-                    )
+                save_model_into_region(Utilization,region,newUtilization.id)
+
             except Exception as e:
                 print(e)
-                # Send pk to client in JSON format
+                return HttpResponse("ERROR",e)
             finally:
                 return HttpResponse('{\"pk\": \"' + str(newUtilization.id) + '\"}')
 
@@ -233,7 +233,7 @@ class utilizationAddView(View):
 
 
     def get(self, request):
-        pk = 'undefined'
+        pk = None
         if 'pk' in request.GET:
             pk = request.GET['pk']
             utilizationFormClass = UtilizationItemForm
@@ -276,19 +276,11 @@ def deleteEmployeeView(request,pk):
 
 @login_required
 def itemsEdit(request,pk):
-
-    context = {
-        'region': request.user.userinfo.region,
-        'regions': Region.objects.all()
-    }
- 
     # fetch the object related to passed id
     obj = get_object_or_404(Item, id = pk)
     content_type = ContentType.objects.get_for_model(Item)
     region = RegionContent.objects.get(content_type=content_type, object_id=obj.id)
-    context["my_region"] = region.region
 
- 
     # pass the object as instance in form
     form = ItemForm(request.POST or None, instance = obj)
  
@@ -302,7 +294,13 @@ def itemsEdit(request,pk):
             return redirect("itemsView")
         except Exception as e:
             return HttpResponse(f"{e}")
-    context["itemForm"] = form
+    context = {
+        'region': request.user.userinfo.region,
+        'regions': Region.objects.all(),
+        'itemForm': form,
+        'item_region':region.region,
+    }
+ 
     return render(request, "management_system/items_edit.html", context)
 
 @method_decorator(login_required, name="dispatch")
@@ -385,18 +383,15 @@ def itemsAddNew(request):
                 newItem.save()
 
                 region = request.user.userinfo.region or Region.objects.get(id=request.POST.get('region'))
-                content_type = ContentType.objects.get_for_model(Item)
-                RegionContent.objects.create(
-                    region=region.id,
-                    content_type=content_type,
-                    object_id=newItem.id
-                    )
-                
-                
+
+                save_model_into_region(Item,region,newItem.id)
+
+
             except Exception as e:
                 print(e)
-            finally:
-                return redirect('home')
+                return HttpResponse("ERROR",e)
+
+            return redirect('home')
         else:
             print('Form not valid!')
             print(itemForm.errors)
@@ -410,75 +405,75 @@ def itemsAddNew(request):
 
 
 
+#CURRENTLY NOT USED, CAN BE IMPLEMENTED DO TO RETURN WITHOUT CREATING PROTOCOL
 
+# @login_required
+# def newProtocolReturn(request):
+#     protocolForm = ProtocolFormReturn(request.POST or None)
 
-@login_required
-def newProtocolReturn(request):
-    protocolForm = ProtocolFormReturn(request.POST or None)
+#     if request.method == 'POST':
+#         if protocolForm.is_valid():
+#             try:
+#                 protocolFormData = protocolForm.cleaned_data
 
-    if request.method == 'POST':
-        if protocolForm.is_valid():
-            try:
-                protocolFormData = protocolForm.cleaned_data
+#                 #CHECK IF ITEM THAT WE WANT TO RETURN BELONG TO USER WE WANT TO TAKE IT FROM
+#                 #IF IS RETURN AND USER ITEM IS EMPLOYEE AND ITEM USER IS NOT EMPY
+#                 if protocolFormData['item'].item_user == protocolFormData['employee']:
+#                     protocolFormData['item'].item_user = None
+#                     protocolFormData['item'].save()
+#                     # print('OK')
 
-                #CHECK IF ITEM THAT WE WANT TO RETURN BELONG TO USER WE WANT TO TAKE IT FROM
-                #IF IS RETURN AND USER ITEM IS EMPLOYEE AND ITEM USER IS NOT EMPY
-                if protocolFormData['item'].item_user == protocolFormData['employee']:
-                    protocolFormData['item'].item_user = None
-                    protocolFormData['item'].save()
-                    # print('OK')
-
-                #IF IS RETURN AND USER ITEM IS NOT EMPLOYEE AND ITEM USER IS NOT EMPTY
-                elif protocolFormData['item'].item_user != protocolFormData['employee'] and protocolFormData['item'].item_user :
-                    messages.error(request, 'Nie można zwrócic, przedmiot jest używany przez innego użytkownika')
-                    return redirect('newProtocol')
-                    #CANT COMPLETE
+#                 #IF IS RETURN AND USER ITEM IS NOT EMPLOYEE AND ITEM USER IS NOT EMPTY
+#                 elif protocolFormData['item'].item_user != protocolFormData['employee'] and protocolFormData['item'].item_user :
+#                     messages.error(request, 'Nie można zwrócic, przedmiot jest używany przez innego użytkownika')
+#                     return redirect('newProtocol')
+#                     #CANT COMPLETE
                 
-                #IF IS RETURN AND USER ITEM IS NOT EMPLOYEE AND ITEM USER IS NOT EMPTY
-                elif protocolFormData['item'].item_user != protocolFormData['employee'] and protocolFormData['item'].item_user is None:
-                    request.session['item_to_return_id'] = protocolFormData['item'].id
-                    request.session['employee_item_to_return_id'] = protocolFormData['employee'].id
+#                 #IF IS RETURN AND USER ITEM IS NOT EMPLOYEE AND ITEM USER IS NOT EMPTY
+#                 elif protocolFormData['item'].item_user != protocolFormData['employee'] and protocolFormData['item'].item_user is None:
+#                     request.session['item_to_return_id'] = protocolFormData['item'].id
+#                     request.session['employee_item_to_return_id'] = protocolFormData['employee'].id
 
-                    context={
-                        'message':'Przedmiot nie należy do żadnego pracownika',
-                    }
-                    return render(request,"management_system/confirm_add_protocol.html",context)
-                    #TODO add cofirm button
-
-
-                newProtocol = protocolForm.save(commit=False)
-                newProtocol.is_return = True
-                newProtocol.created_by = request.user
-                newProtocol.save()
-
-                region = request.user.userinfo.region or Region.objects.get(id=request.POST.get('region'))
-                content_type = ContentType.objects.get_for_model(Protocol)
-                try:
-                    RegionContent.objects.create(
-                    region=region.id,
-                    content_type=content_type,
-                    object_id=newProtocol.id
-                    )
-                except Exception as e:
-                    print('Failed protocol to save into region content!')
-                    print(e)
+#                     context={
+#                         'message':'Przedmiot nie należy do żadnego pracownika',
+#                     }
+#                     return render(request,"management_system/confirm_add_protocol.html",context)
+#                     #TODO add cofirm button
 
 
-                ProtocolItem(protocol_id=newProtocol,item_id=protocolFormData['item']).save()
-                if 'saveAndEnd' in request.POST:
-                    return redirect("singleProtocol",pk=newProtocol.id)
-                elif 'saveAndContinue' in request.POST:
-                    return redirect("addNextItem",status='return',pk=newProtocol.id)
+#                 newProtocol = protocolForm.save(commit=False)
+#                 newProtocol.is_return = True
+#                 newProtocol.created_by = request.user
+#                 newProtocol.save()
+
+#                 region = request.user.userinfo.region or Region.objects.get(id=request.POST.get('region'))
+#                 content_type = ContentType.objects.get_for_model(Protocol)
+#                 try:
+#                     RegionContent.objects.create(
+#                     region=region,
+#                     content_type=content_type,
+#                     object_id=newProtocol.id
+#                     )
+#                 except Exception as e:
+#                     print('Failed protocol to save into region content!')
+#                     print(e)
+
+
+#                 ProtocolItem(protocol_id=newProtocol,item_id=protocolFormData['item']).save()
+#                 if 'saveAndEnd' in request.POST:
+#                     return redirect("singleProtocol",pk=newProtocol.id)
+#                 elif 'saveAndContinue' in request.POST:
+#                     return redirect("addNextItem",status='return',pk=newProtocol.id)
                 
-            except:
-                print("An exception occurred")
+#             except:
+#                 print("An exception occurred")
 
-    context={
-            "protocolForm":protocolForm,
-            'region': request.user.userinfo.region,
-            'regions': Region.objects.all()
-        }
-    return render(request, "management_system/new_protocol_return.html", context)
+#     context={
+#             "protocolForm":protocolForm,
+#             'region': request.user.userinfo.region,
+#             'regions': Region.objects.all()
+#         }
+#     return render(request, "management_system/new_protocol_return.html", context)
 
 
 @method_decorator(login_required, name="dispatch")
@@ -522,7 +517,7 @@ class EmployeesView(View):
             )   
         
         object_list = get_data_for_region(Employee,region).filter(query)
-        # object_list = Employee.objects.filter(query)
+
 
         return object_list
     
@@ -590,18 +585,11 @@ def addEmployeeView(request):
                 newEmployee = form.save()
                 region = request.user.userinfo.region or Region.objects.get(id=request.POST.get('region'))
 
-                content_type = ContentType.objects.get_for_model(Employee)
-                try:
-                    RegionContent.objects.create(
-                    region=region.id,
-                    content_type=content_type,
-                    object_id=newEmployee.id
-                    )
-                except Exception as e:
-                    print('Failed employee to save into region content!')
-                    print(e)
+                save_model_into_region(Employee,region,newEmployee.id)
+
             except Exception as e:
                 print(e)
+                return HttpResponse("ERROR",e)
             return redirect("employees")
     context={
             "form":form,
@@ -744,6 +732,15 @@ def employeeItemsReturn(request, employee_id):
 
                 newProtocolItem = ProtocolItem(protocol_id=newProtocol,item_id=itemObj)
                 newProtocolItem.save()
+
+            if request.user.userinfo.region:
+                region = request.user.userinfo.region 
+            else:
+                content_type = ContentType.objects.get_for_model(Employee)
+                region = RegionContent.objects.get(content_type=content_type, object_id=employee_id).region
+
+            save_model_into_region(Protocol,region,newProtocol.id)
+
             return redirect("singleProtocol",pk=newProtocol.id)
         
         listOfItemId = json.loads(request.POST.get("idList"))
@@ -798,14 +795,8 @@ class NewProtocolAdd(View):
                     newProtocol.is_return = False
                     newProtocol.created_by = request.user
                     newProtocol.save()
-                    region = request.user.userinfo.region or Region.objects.get(id=request.POST.get('region'))
-                    content_type = ContentType.objects.get_for_model(Protocol)
-                    RegionContent.objects.create(
-                        region=region.id,
-                        content_type=content_type,
-                        object_id=newProtocol.id
-                    )
-
+                region = request.user.userinfo.region or Region.objects.get(id=request.POST.get('region'))
+                save_model_into_region(Protocol,region,newProtocol.id)
 
 
                 ProtocolItem(protocol_id=newProtocol,item_id=protocolFormData.item).save()
@@ -820,15 +811,16 @@ class NewProtocolAdd(View):
         return HttpResponse('ERROR')
 
     def get(self,request):
+        protocolFormClass = ProtocolFormAdd
         context = {
             'region': request.user.userinfo.region,
-            'regions': Region.objects.all()
+            'regions': Region.objects.all(),
+            'protocolForm': protocolFormClass
         }
         if request.GET.get('eid'):
             context['employee'] = Employee.objects.get(id=request.GET.get('eid'))
+            
             return render(request, self.template,context)
         else:
-            protocolFormClass = ProtocolFormAdd
-            context['protocolForm'] = protocolFormClass
             return render(request, self.template,context)
 

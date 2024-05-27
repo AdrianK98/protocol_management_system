@@ -28,7 +28,7 @@ class Region(models.Model):
     
 
 class UserInfo(models.Model):
-    region = models.ForeignKey("Region", on_delete=models.PROTECT,null=True,blank=True,verbose_name="regg")
+    region = models.ForeignKey("Region", on_delete=models.PROTECT,null=True,blank=True,verbose_name="region")
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
 
