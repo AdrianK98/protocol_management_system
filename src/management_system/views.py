@@ -541,7 +541,7 @@ def addEmployeeView(request):
         if form.is_valid():
             try:
                 newEmployee = form.save()
-                region = request.user.userinfo.region
+                region = request.user.userinfo.region or Region.objects.get(id=request.POST.get('region'))
 
                 content_type = ContentType.objects.get_for_model(Employee)
                 try:
@@ -557,7 +557,9 @@ def addEmployeeView(request):
                 print(e)
             return redirect("employees")
     context={
-            "form":form
+            "form":form,
+            'region': request.user.userinfo.region,
+            'regions': Region.objects.all()
         }
     return render(request, "management_system/add_new_employee.html", context)
     
