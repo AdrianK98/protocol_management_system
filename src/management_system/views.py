@@ -309,20 +309,32 @@ def itemsEdit(request,pk):
 class editEmployeeView(View):
     def post(self, request):
         obj = get_object_or_404(Employee, id = request.GET.get('id',''))
+        content_type = ContentType.objects.get_for_model(Employee)
+        region = RegionContent.objects.get(content_type=content_type, object_id=obj.id)
         form = EmployeeForm(request.POST or None,instance = obj)
         if form.is_valid():
             form.save()
+            region.region = request.POST.get('region') or region.region
+            region.save()
             return redirect("employees")
         context={
-            "form":form
+            "form":form,
+            'region': request.user.userinfo.region,
+            'regions': Region.objects.all(),
+            'my_region': region.region
         }
         return render(request, "management_system/edit_employee.html", context)
 
     def get(self, request):
         obj = get_object_or_404(Employee, id = request.GET.get('id',''))
+        content_type = ContentType.objects.get_for_model(Employee)
+        region = RegionContent.objects.get(content_type=content_type, object_id=obj.id)
         form = EmployeeForm(instance = obj)
         context={
-                "form":form
+                "form":form,
+                'region': request.user.userinfo.region,
+                'regions': Region.objects.all(),
+                'my_region': region.region
             }
         return render(request, "management_system/edit_employee.html", context)
 
