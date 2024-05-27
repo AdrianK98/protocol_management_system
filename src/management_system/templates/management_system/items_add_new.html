@@ -6,6 +6,7 @@
 
 
 <h1>Nowy sprzęt</h1>
+{{region.id}}
 <form method="POST" enctype="multipart/form-data">
 
   <!-- Security token -->
@@ -22,15 +23,22 @@
       </select>
     </div>
   </div>
+  {% if region == None %}
+  <div id="div_id_item_region" class="form-group">
+    <label for="id_item_region">Region</label>
+    <div>
+      <select id="id_item_region" name="region" class="w-25 m-2 select form-control">
+        {% for r in regions %}
+          <option value="{{r.id}}">{{r}}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  {% endif %}
   {% comment %} <button id="show-employee-btn" class="btn btn-secondary mt-3" type="button">Dodaj pracownika</button> {% endcomment %}
   <hr>
-
-   
   <button type="submit" class="btn btn-success mt-3" name="saveAndEnd">Zapisz</button>
-
 </form>
-
-
 <script>
         // When page is ready
         $(document).ready(function () {
@@ -57,10 +65,14 @@
               },
             }
           });
-
+          
           // Hide advanced options
-          let div_id_item_user = document.getElementById('div_id_item_user');
-          div_id_item_user.style.display = "none";
+          document.getElementById('div_id_item_user').style.display = "none";
+          {% if region == None %}
+            $('#id_item_region').select2();
+            document.getElementById('div_id_item_region').style.display = "none";
+          {% endif %}
+
         });
 
         let shown = false;
@@ -68,8 +80,14 @@
           let div_id_item_user = document.getElementById('div_id_item_user');
           if(shown){
             div_id_item_user.style.display = "none";
+            {% if region == None %}
+              document.getElementById('div_id_item_region').style.display = "none";
+            {% endif %}
           } else{
             div_id_item_user.style.display = "block";
+            {% if region == None %}
+              document.getElementById('div_id_item_region').style.display = "block";
+            {% endif %}
           }
           shown = !shown;
         }

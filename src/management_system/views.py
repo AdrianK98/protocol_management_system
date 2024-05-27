@@ -21,7 +21,7 @@ from pprint import pprint
 
 # Create your views here.
 from users.models import Employee
-from .models import Item,Protocol, ProtocolItem, Utilization, RegionContent
+from .models import Item,Protocol, ProtocolItem, Utilization, RegionContent, Region
 from django.contrib.contenttypes.models import ContentType
 # TODO: Test if item is utilizated while adding new protocol, or in utilization
 #TODO ALERT IF ITEM/PROTOCOL/UTILIZATION WITHOUT REGION
@@ -351,7 +351,7 @@ def itemsAddNew(request):
 
                 newItem.save()
 
-                region = request.user.userinfo.region
+                region = request.user.userinfo.region or Region.objects.get(id=request.POST.get('region'))
                 content_type = ContentType.objects.get_for_model(Item)
                 RegionContent.objects.create(
                     region=region.id,
@@ -369,7 +369,9 @@ def itemsAddNew(request):
             print(itemForm.errors)
 
     context={
-        'itemForm':itemForm
+        'itemForm':itemForm,
+        'region': request.user.userinfo.region,
+        'regions': Region.objects.all() 
     }
     return render(request, "management_system/items_add_new.html", context)
 
