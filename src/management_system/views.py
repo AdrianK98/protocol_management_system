@@ -186,11 +186,14 @@ class utilizationAddView(View):
         if 'pk' in request.POST:
             newUtilization = Utilization.objects.get(id=request.POST['pk'])
         else:
+            region = request.user.userinfo.region or Region.objects.get(id=request.POST.get('region')) 
+            if not region:
+                return HttpResponse("ERROR")
+
             newUtilization = Utilization()
             newUtilization.created_by = request.user
             newUtilization.save()
             try:
-                region = request.user.userinfo.region
                 content_type = ContentType.objects.get_for_model(Utilization)
                 RegionContent.objects.create(
                     region=region.id,
@@ -233,8 +236,17 @@ class utilizationAddView(View):
         pk = 'undefined'
         if 'pk' in request.GET:
             pk = request.GET['pk']
-        utilizationFormClass = UtilizationItemForm
-        return render(request, self.template,{'utilizationForm':utilizationFormClass, 'pk': pk})
+            utilizationFormClass = UtilizationItemForm
+            return render(request, self.template,{
+                'utilizationForm':utilizationFormClass, 
+                'pk': pk, 
+            })
+        else:
+            context = {
+                'region': request.user.userinfo.region,
+                'regions': Region.objects.all()
+            }
+            return render(request, "management_system/utilization_add_region.html", context)
 
 
 

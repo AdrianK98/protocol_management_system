@@ -115,20 +115,26 @@
     </div>
 </nav>
 <script>
-    async function addUtilization(){
+    async function addUtilization(region){
         // Get the token to form
         const token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
         // Send the token
         var data = new FormData();
         data.append('csrfmiddlewaretoken', token);
+        if(region)
+            data.append('region', region);
         // Send request and wait for the response (json with pk field)
         var res = await fetch('/utilization/add_item', {
             method: 'POST',
             body: new URLSearchParams(data)
         });
         // Get pk from response and redirect to newly created utilization
-        var d = await res.json();
-        window.location.href = "{% url 'utilization' %}" + d.pk;
+        try{
+            var d = await res.json();
+            window.location.href = "{% url 'utilization' %}" + d.pk;
+        } catch(e){
+            window.location.href = "/utilization/add_item";
+        }
     }
 </script>
 
