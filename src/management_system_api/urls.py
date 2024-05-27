@@ -7,6 +7,7 @@ router = routers.DefaultRouter()
 router.register(r'items', views.ItemViewSet)
 router.register(r'employees', views.EmployeeViewSet)
 router.register(r'protocols', views.ProtocolViewSet)
+router.register(r'utilizations', views.UtilizationViewSet)
 # router.register(r'items/<int:pk>', views.ItemViewSet)
 
 
