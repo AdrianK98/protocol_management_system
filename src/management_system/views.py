@@ -116,7 +116,7 @@ class utilizationFinalizationView(View):
 @method_decorator(login_required, name="dispatch")
 class utilizationView(View):
     def get(self, request):
-        region=request.user.userinfo.region
+        region=request.user.userinfo.region or None
         queryCreator = str(request.GET.get('qcreator',''))
         queryCreatedDate = str(request.GET.get('qcreateddate',''))
         queryEndDate = str(request.GET.get('qenddate',''))
@@ -434,7 +434,7 @@ def newProtocolReturn(request):
 @method_decorator(login_required, name="dispatch")
 class EmployeesView(View):
     def get(self,request):
-        region = request.user.userinfo.region
+        region = request.user.userinfo.region or None
         queryName = str(request.GET.get('qname',''))
         querySurname = str(request.GET.get('qsurname',''))
 
@@ -480,7 +480,7 @@ class EmployeesView(View):
 class ProtocolsView(View):
 
     def get(self,request):
-        region = request.user.userinfo.region
+        region = request.user.userinfo.region or None
         queryName = str(request.GET.get('qname',''))
         querySurname = str(request.GET.get('qsurname',''))
         queryDate = str(request.GET.get('qdate',''))
@@ -531,6 +531,7 @@ class ProtocolsView(View):
         object_list = get_data_for_region(Protocol,region).filter(query)
         return object_list
 
+# TODO: Choose region by admin
 @login_required
 def addEmployeeView(request):
     form = EmployeeForm(request.POST or None)
@@ -569,7 +570,7 @@ def itemsView(request):
 @method_decorator(login_required, name="dispatch")
 class ItemsView(View):
     def get(self,request):
-        region = request.user.userinfo.region
+        region = request.user.userinfo.region or None
         queryType = str(request.GET.get('qtype',''))
         queryModel = str(request.GET.get('qmodel',''))
         queryIt = str(request.GET.get('qit',''))
