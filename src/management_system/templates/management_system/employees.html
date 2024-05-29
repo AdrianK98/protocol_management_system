@@ -8,9 +8,8 @@
 <hr />
 
 <form action="{% url 'employees' %}" method="get">
-    <input id="qname" name="qname" type="text" placeholder="Imię..." value='{{qname_value}}'>
-    <input id="qsurname" name="qsurname" type="text" placeholder="Nazwisko..." value='{{qsurname_value}}'>
-    <button onclick="page(0)">Szukaj</button>
+    <input id="search" type="text" placeholder="Imię..." value='{{search_value}}'>
+    <button type="button" onclick="page(0)">Szukaj</button>
 
 </form>
 
@@ -23,39 +22,7 @@
         <th scope="col"></th>
       </tr>
     </thead>
-    <tbody id="data">
-
-      {% comment %}
-    {% for employee in employeeList%}
-
-      <tr class="fw-normal">
-        <th>
-          <svg xmlns="http://www.w3.org/2000/svg" width="55px" height="auto" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16"><path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/><path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/></svg>
-          <span class="ms-2">{{employee}}</span>
-        </th>
-        <td class="align-middle">
-          <span>{{employee.user_department|default_if_none:""}}</span>
-        </td>
-        <td class="align-middle">
-          <h6 class="mb-0"><span class="badge bg-danger">{{employee.user_location|default_if_none:""}}</span></h6>
-        </td>
-        <td >
-          <div class="btn-group">
-            <a class="btn btn-secondary" href="{% url 'singleEmployee' employee.id %}" role="button">Wyświetl</a>
-            <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
-              <span class="visually-hidden">Toggle Dropdown</span>
-            </button>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="{% url 'editEmployee' %}?id={{employee.id}}">Edycja</a></li>
-              <li><a class="dropdown-item" href="{% url 'deleteEmployee' employee.id %}">Usuń</a></li>
-            </ul>
-          </div>
-        </td>
-      </tr>
-
-      {%endfor%} 
-    {% endcomment %}
-    </tbody>
+    <tbody id="data"></tbody>
   </table>
 
   
@@ -96,10 +63,6 @@
       let data = document.getElementById('data');
       data.innerHTML = '';
 
-      let qname = document.getElementById('qname').value;
-      let qsurname = document.getElementById('qsurname').value;
-      let hasSearch = qname || qsurname;
-      
       let params = {
         limit: page_size,
         offset: p * page_size,
@@ -108,13 +71,10 @@
         {% endif %}
       };
 
-      if(hasSearch){
-        let search = "";
-        if(qname && !qsurname) search = qname;
-        else if(qname) search = qname + " " + qsurname;
-        else if(qsurname) search = qsurname;
+      let search = document.getElementById('search').value;
+      
+      if(search)
         params["search"] = search;
-      }
 
       let employees_data = await fetch("{% url 'employee-list' %}?" + new URLSearchParams(params).toString());
 	  let employees = await employees_data.json();

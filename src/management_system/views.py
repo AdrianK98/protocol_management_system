@@ -480,28 +480,7 @@ def itemsAddNew(request):
 class EmployeesView(View):
     def get(self,request):
         region = request.user.userinfo.region or None
-        queryName = str(request.GET.get('qname',''))
-        querySurname = str(request.GET.get('qsurname',''))
-
-        # employeeQuery = sorted(self.get_query(queryName,querySurname,region), key=attrgetter('id'),reverse=True)
-        
-
-        # page = request.GET.get('page',1)
-        # protocols_paginator = Paginator(employeeQuery,20)
-
-        # try:
-        #     employeeQuery = protocols_paginator.page(page)
-        # except PageNotAnInteger:
-        #     employeeQuery = protocols_paginator.page(1)
-        # except EmptyPage:
-        #     employeeQuery = protocols_paginator.page(1)
-
-        context={
-            # "employeeList":employeeQuery,
-            "qname_value": queryName,
-            "qsurname_value": querySurname,
-        }
-        return render(request, "management_system/employees.html", context)
+        return render(request, "management_system/employees.html", {})
 
 
     def get_query(self,qname,qsurname,region):  # new
