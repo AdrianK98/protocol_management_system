@@ -483,21 +483,21 @@ class EmployeesView(View):
         queryName = str(request.GET.get('qname',''))
         querySurname = str(request.GET.get('qsurname',''))
 
-        employeeQuery = sorted(self.get_query(queryName,querySurname,region), key=attrgetter('id'),reverse=True)
+        # employeeQuery = sorted(self.get_query(queryName,querySurname,region), key=attrgetter('id'),reverse=True)
         
 
-        page = request.GET.get('page',1)
-        protocols_paginator = Paginator(employeeQuery,20)
+        # page = request.GET.get('page',1)
+        # protocols_paginator = Paginator(employeeQuery,20)
 
-        try:
-            employeeQuery = protocols_paginator.page(page)
-        except PageNotAnInteger:
-            employeeQuery = protocols_paginator.page(1)
-        except EmptyPage:
-            employeeQuery = protocols_paginator.page(1)
+        # try:
+        #     employeeQuery = protocols_paginator.page(page)
+        # except PageNotAnInteger:
+        #     employeeQuery = protocols_paginator.page(1)
+        # except EmptyPage:
+        #     employeeQuery = protocols_paginator.page(1)
 
         context={
-            "employeeList":employeeQuery,
+            # "employeeList":employeeQuery,
             "qname_value": queryName,
             "qsurname_value": querySurname,
         }

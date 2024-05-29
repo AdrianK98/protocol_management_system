@@ -8,9 +8,9 @@
 <hr />
 
 <form action="{% url 'employees' %}" method="get">
-    <input name="qname" type="text" placeholder="Imię..." value='{{qname_value}}'>
-    <input name="qsurname" type="text" placeholder="Nazwisko..." value='{{qsurname_value}}'>
-    <input type='submit' value='Szukaj'>
+    <input id="qname" name="qname" type="text" placeholder="Imię..." value='{{qname_value}}'>
+    <input id="qsurname" name="qsurname" type="text" placeholder="Nazwisko..." value='{{qsurname_value}}'>
+    <button onclick="page(0)">Szukaj</button>
 
 </form>
 
@@ -23,13 +23,13 @@
         <th scope="col"></th>
       </tr>
     </thead>
-    <tbody>
+    <tbody id="data">
 
+      {% comment %}
     {% for employee in employeeList%}
 
       <tr class="fw-normal">
         <th>
-          <!-- <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="shadow-1-strong rounded-circle" alt="avatar 1" style="width: 55px; height: auto;"> -->
           <svg xmlns="http://www.w3.org/2000/svg" width="55px" height="auto" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16"><path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/><path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/></svg>
           <span class="ms-2">{{employee}}</span>
         </th>
@@ -50,13 +50,11 @@
               <li><a class="dropdown-item" href="{% url 'deleteEmployee' employee.id %}">Usuń</a></li>
             </ul>
           </div>
-          {% comment %} <a href="#!" data-mdb-toggle="tooltip" title="Remove"><i
-              class="fas fa-trash-alt text-danger"></i></a> {% endcomment %}
         </td>
       </tr>
 
       {%endfor%} 
-
+    {% endcomment %}
     </tbody>
   </table>
 
@@ -67,60 +65,82 @@
   <div class="container p-4">
     <div class="pagination justify-content-center">
         <span class="step-links">
-          {% if employeeList.has_previous %}
-              <a href="?page=1&q={{q_value}}">&laquo; first</a>
-              <a href="?page={{ employeeList.previous_page_number }}&q={{q_value}}">previous</a>
-          {% endif %}
-
-            <span class="current">
-                Page {{ employeeList.number }} of {{ employeeList.paginator.num_pages }}
-            </span>
-
-          {% if employeeList.has_next %}
-              <a href="?page={{ employeeList.next_page_number }}&q={{q_value}}">next</a>
-              <a href="?page={{ employeeList.paginator.num_pages }}&q={{q_value}}">last &raquo;</a>
-          {% endif %}
+              <button class="btn" onclick="page(0)">&laquo; first</button>
+              <button class="btn" onclick="page(page_no - 1)">previous</button>
+  
+            <span class="current"> 
+              Page <span id="pg_no"></span> of <span id="pg_max"></span>
+            </span>  
+  
+              <button class="btn" onclick="page(page_no + 1)">next</button>
+              <button class="btn" onclick="page(count)">last &raquo;</button>
         </span>
         </div>
     </div>
   </div>    
+  <script>
+    const page_size = 20;
+    let page_no = 0;
+    let count = -1;
+    $(document).ready(async () => {
+      page(0);
+    });
 
-        
-        
-        
-        
+    async function page(p){
+      if(p < 0)
+        p = 0;
+      else if(count > 0 && (count / page_size - 1) < p)
+        p = Math.ceil(count / page_size - 1);
+      page_no = p;
 
+      let data = document.getElementById('data');
+      data.innerHTML = '';
 
-     
+      let qname = document.getElementById('qname').value;
+      let qsurname = document.getElementById('qsurname').value;
+      let hasSearch = qname || qsurname;
+      
+      let params = {
+        limit: page_size,
+        offset: p * page_size,
+        {% if request.user.userinfo.region.id %}
+        region: "{{request.user.userinfo.region.id}}" 
+        {% endif %}
+      };
 
-    {% comment %} <div class="container text-center">
-        <div class="row">
-          <div class="col"><b>Imię i nazwisko </b></div>
-          <div class="col"><b>Dział</b></div>
-          <div class="col"><b>Lokalizacja</b></div>
-          <div class="col"><b>Akcje</b></div>
-          <div class="col"></div>
-          <div class="col-5"></div>
+      if(hasSearch){
+        let search = "";
+        if(qname && !qsurname) search = qname;
+        else if(qname) search = qname + " " + qsurname;
+        else if(qsurname) search = qsurname;
+        params["search"] = search;
+      }
 
-        {% for employee in employeeList%}
-        <hr>
-            <div class="row mt-2">
-                <div class="col">{{employee}}</div>
-                <div class="col">{{employee.user_surname}}</div>
-                <div class="col">{{employee.user_department|default_if_none:""}}</div>
-                <div class="col">{{employee.user_location|default_if_none:""}}</div>
-                <div class="col"><a class="btn btn-primary mb-1" href="{% url 'singleEmployee' employee.id %}" role="button">Wyświetl</a></div>
-                <div class="col-5"></div>
-                
-            </div>
-            
-        {%endfor%}  
-        <hr>
-    </div> {% endcomment %}
+      let employees_data = await fetch("{% url 'employee-list' %}?" + new URLSearchParams(params).toString());
+	  let employees = await employees_data.json();
+      count = employees.count;
+	  employees = employees.results;
 
+      for(let employee of employees){
+        data.innerHTML += '<tr class="fw-normal">'
+                       + '<th><svg xmlns="http://www.w3.org/2000/svg" width="55px" height="auto" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16"><path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/><path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/></svg>'
+                       + '<span class="ms-2">' + employee.user_name + ' ' + employee.user_surname + '</span>'
+                       + '</th><td class="align-middle">'
+                       + '<span>' + employee.user_department + '</span>'
+                       + '</td><td class="align-middle">'
+                       + '<h6 class="mb-0"><span class="badge bg-danger">' + employee.user_location + '</span></h6>'
+                       + '</td><td>'
+                       + '<div class="btn-group"><a class="btn btn-secondary" href="/employees/' + employee.id + '/items" role="button">Wyświetl</a>'
+                       + '<button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">'
+                       + '<span class="visually-hidden">Toggle Dropdown</span></button><ul class="dropdown-menu">'
+                       + '<li><a class="dropdown-item" href="{% url 'editEmployee' %}?id=' + employee.id + '">Edycja</a></li>'
+                       + '<li><a class="dropdown-item" href="/employees/' + employee.id + '/delete">Usuń</a></li></ul></div>'
+                       + '</td></tr>';
+      }
 
+      document.getElementById('pg_no').innerHTML = page_no;
+      document.getElementById('pg_max').innerHTML = Math.ceil(count / page_size - 1);
+    }
+  </script>
 
-
-
-
-{% endblock content %}
+  {% endblock content %}

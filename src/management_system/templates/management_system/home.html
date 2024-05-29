@@ -116,7 +116,7 @@ function dtos(date) {
 		protocols_table.classList = "table";
 		protocols_cnt.appendChild(protocols_table);
 
-		// Fetch data from server using API2
+		// Fetch data from server using API
 		let protocols_data = await fetch("{% url 'protocol-list' %}?limit=19&region={{request.user.userinfo.region.id}}");
 		let protocols = await protocols_data.json();
 		protocols = protocols.results;
