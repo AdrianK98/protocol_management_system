@@ -262,12 +262,21 @@ class deleteEmployee(View):
         employee = get_object_or_404(Employee, id = pk)
         employee.delete()
         return JsonResponse({'success': True})
+    
+@method_decorator(login_required, name="dispatch")
+class deleteItems(View):
+    def post(self, request, pk):
+        item = get_object_or_404(Item, id = pk)
+        item.delete()
+        return JsonResponse({'success': True})
 
 
 @login_required
 def itemsEdit(request,pk):
     # fetch the object related to passed id
     obj = get_object_or_404(Item, id = pk)
+    if not obj.editable:
+        return HttpResponse(f"Przedmiot zablokowany do edycji!")
     content_type = ContentType.objects.get_for_model(Item)
     region = RegionContent.objects.get(content_type=content_type, object_id=obj.id)
 
@@ -560,78 +569,78 @@ def addEmployeeView(request):
         }
     return render(request, "management_system/add_new_employee.html", context)
     
-@login_required
-def itemsView(request):
-    itemListQuery = Item.objects.all()
-    context={
-        "itemList":itemListQuery
-    }
-    return render(request, "management_system/items.html", context)
-
 @method_decorator(login_required, name="dispatch")
 class ItemsView(View):
     def get(self,request):
-        region = request.user.userinfo.region or None
-        queryType = str(request.GET.get('qtype',''))
-        queryModel = str(request.GET.get('qmodel',''))
-        queryIt = str(request.GET.get('qit',''))
-        querySn = str(request.GET.get('qsn',''))
-        queryKk = str(request.GET.get('qkk',''))
-        queryQused = request.GET.get('qused','')
-        itemQuery = sorted(self.get_query(queryType,queryModel,queryIt,querySn,queryKk,queryQused,region), key=attrgetter('id'),reverse=True)
-        
-        page = request.GET.get('page',1)
-        protocols_paginator = Paginator(itemQuery,20)
-
-        try:
-            itemQuery = protocols_paginator.page(page)
-        except PageNotAnInteger:
-            itemQuery = protocols_paginator.page(1)
-        except EmptyPage:
-            itemQuery = protocols_paginator.page(1)
-
-        context={
-            "itemList":itemQuery,
-            "qtype_value": queryType,
-            "qmodel_value": queryModel,
-            "qit_value": queryIt,
-            "qsn_value": querySn,
-            "qkk_value": queryKk,
-            "qused": queryQused,
-
-        }
+        context={}
         return render(request, "management_system/items.html", context)
     
-    def get_query(self,qtype,qmodel,qit,qsn,qkk,qused,region):  # new
-        query = Q()
-        if qtype:
-            query = query & (
-                Q(category__category_name__icontains=qtype)
-            )
-        if qmodel:
-            query = query & (
-                Q(item_model__icontains=qmodel)
-            )   
 
-        if qit:
-            query = query & (
-                Q(item_it__icontains=qit)
-            )
-        if qsn:
-            query = query & (
-                Q(item_sn__icontains=qsn)
-            )
+    
+# @method_decorator(login_required, name="dispatch")
+# class ItemsView(View):
+#     def get(self,request):
+#         region = request.user.userinfo.region or None
+#         queryType = str(request.GET.get('qtype',''))
+#         queryModel = str(request.GET.get('qmodel',''))
+#         queryIt = str(request.GET.get('qit',''))
+#         querySn = str(request.GET.get('qsn',''))
+#         queryKk = str(request.GET.get('qkk',''))
+#         queryQused = request.GET.get('qused','')
+#         itemQuery = sorted(self.get_query(queryType,queryModel,queryIt,querySn,queryKk,queryQused,region), key=attrgetter('id'),reverse=True)
+        
+#         page = request.GET.get('page',1)
+#         protocols_paginator = Paginator(itemQuery,20)
 
-        if qkk:
-            query = query & (
-                Q(item_kk__icontains=qkk)
-            )
-        if qused:
-            query = query & (
-                Q(item_user__isnull=False)
-            )    
-        object_list = get_data_for_region(Item,region).filter(query)
-        return object_list  
+#         try:
+#             itemQuery = protocols_paginator.page(page)
+#         except PageNotAnInteger:
+#             itemQuery = protocols_paginator.page(1)
+#         except EmptyPage:
+#             itemQuery = protocols_paginator.page(1)
+
+#         context={
+#             "itemList":itemQuery,
+#             "qtype_value": queryType,
+#             "qmodel_value": queryModel,
+#             "qit_value": queryIt,
+#             "qsn_value": querySn,
+#             "qkk_value": queryKk,
+#             "qused": queryQused,
+
+#         }
+#         return render(request, "management_system/items.html", context)
+    
+#     def get_query(self,qtype,qmodel,qit,qsn,qkk,qused,region):  # new
+#         query = Q()
+#         if qtype:
+#             query = query & (
+#                 Q(category__category_name__icontains=qtype)
+#             )
+#         if qmodel:
+#             query = query & (
+#                 Q(item_model__icontains=qmodel)
+#             )   
+
+#         if qit:
+#             query = query & (
+#                 Q(item_it__icontains=qit)
+#             )
+#         if qsn:
+#             query = query & (
+#                 Q(item_sn__icontains=qsn)
+#             )
+
+#         if qkk:
+#             query = query & (
+#                 Q(item_kk__icontains=qkk)
+#             )
+#         if qused:
+#             query = query & (
+#                 Q(item_user__isnull=False)
+#             )    
+#         object_list = get_data_for_region(Item,region).filter(query)
+#         return object_list  
 
 @login_required
 def singleProtocolView(request,pk):

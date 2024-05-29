@@ -24,7 +24,7 @@ class ItemViewSet(viewsets.ModelViewSet):
 
     filter_backends = [filters.SearchFilter,DjangoFilterBackend,filters.OrderingFilter]
     filterset_class = ItemFilter
-    search_fields = ["item_sn","item_it","item_kk",'item_model','item_user__user_surname','category__category_name']
+    search_fields = ["item_sn","item_it","item_producent","item_kk",'item_model','item_user__user_surname','item_user__user_name','category__category_name']
     ordering_fields = '__all__'
     #defualt ordering field
     ordering = ['-id']

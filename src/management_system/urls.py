@@ -35,6 +35,7 @@ urlpatterns = [
     path("items/",views.ItemsView.as_view(), name="itemsView" ),
     path("items/add_new",views.itemsAddNew, name="itemsAddNew" ),
     path("items/edit/<int:pk>",views.itemsEdit, name="itemsEdit" ),
+    path("items/delete/<int:pk>",views.deleteItems.as_view(), name="itemsEdit" ),
     path("items/<int:pk>",views.singleItemView, name="singleItem" ),
     path("employees/<int:employee_id>/returns", views.employeeItemsReturn, name="employeeReturns"),
     path("protocols/view/<int:pk>",views.singleProtocolViewScan, name="singleProtocolScan" ),

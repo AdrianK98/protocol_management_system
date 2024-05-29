@@ -1,26 +1,73 @@
 {% extends 'main.html' %}
-
+{% load bootstrap_icons %}
 
 {% block content %}
 <h2>Sprzęt</h2>
 <hr />
-<form action="{% url 'itemsView' %}" method="get">
-    <input name="qtype" type="text" placeholder="Typ..." value='{{qtype_value}}'>
-    <input name="qmodel" type="text" placeholder="Model..." value='{{qmodel_value}}'>
-    <input name="qit" type="text" placeholder="IT..." value='{{qit_value}}'>
-    <input name="qsn" type="text" placeholder="S/N..." value='{{qsn_value}}'>
-    <input name="qkk" type="text" placeholder="KK..." value='{{qkk_value}}'>
-    <input name="qused" type="checkbox" id="myCheckbox" value="true" {% if qused %}checked{% endif %}> Używany
-    <input type='submit' value='Szukaj'>
+    <input id="search" class='mb-2' type="text" placeholder="Szukaj sprzętu..." value="{{ search_value }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.2/font/bootstrap-icons.min.css">
 
-</form>
+    <button class="btn btn-primary mt-2 mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+    Zaawansowane
+  </button>
+
+
+
+<div class="collapse" id="collapseExample">
+  <div class="card card-body">
+  
+        <b>Zakres dat:</b>
+      <div id="date-range-inputs">
+      
+        <input id="start-date" type="date" placeholder="Wybierz datę początkową..."> do
+        <input id="end-date" type="date" placeholder="Wybierz datę końcową...">
+      </div>
+
+
+      <div class="form-check mt-3">
+          <input class="form-check-input" type="radio" name="return-option" id="flexRadioDefault1" value='true'>
+          <label class="form-check-label" for="flexRadioDefault1">
+            Zwrot
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="return-option" id="flexRadioDefault2" value='false'>
+          <label class="form-check-label" for="flexRadioDefault2">
+            Przekazanie
+          </label>
+        </div>
+
+      </div>
+</div>
+
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="deleteModalLabel">Czy na pewno chcesz usunąć ten przedmiot?</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid" id="modalRowsContainer">Ta operacja jest nieodwracalna.</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" id="confirmDeleteButton">Usuń</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
 
 <table class="table mb-0">
     <thead>
       <tr>
         <th scope="col"></th>
         <th scope="col">Typ</th>
-        <th scope="col">Data</th>
         <th scope="col">Producent</th>
         <th scope="col">Model</th>
         <th scope="col">IT</th>
@@ -30,97 +77,238 @@
         <th scope="col"></th>
       </tr>
     </thead>
-    <tbody>
+    <tbody id='data'>
 
         {% for item in itemList %}
-      <tr class="fw-normal">
-        <td>
-          <!-- TODO: Latin characters -->
-          {% if item.utilization_id %}
-            <font color="red" data-bs-toggle="tooltip" data-bs-placement="top" title="Przedmiot w utylizacji">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z"/></svg>
-            </font>
-          {% elif item.item_user %}
-            <font color="green" data-bs-toggle="tooltip" data-bs-placement="top" title="Przedmiot ma wlasciciela">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2" viewBox="0 0 16 16"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0"/></svg>
-            </font>
-          {% else %}
-            <font color="green" data-bs-toggle="tooltip" data-bs-placement="top" title="Przedmiot dostepny">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="blue" class="bi bi-check2-all" viewBox="0 0 16 16"><path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 1.854 7.146a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0zm-4.208 7-.896-.897.707-.707.543.543 6.646-6.647a.5.5 0 0 1 .708.708l-7 7a.5.5 0 0 1-.708 0"/><path d="m5.354 7.146.896.897-.707.707-.897-.896a.5.5 0 1 1 .708-.708"/></svg>
-            </font>
-          {% endif %}
-        </td>
-        <td>
-          <span>{{item.category}}</span>
-        </td>
-        <td>
-          <span>{{item.created|date:"d.m.Y G:i"}}</span>
-        </td>
-        <td>
-          <span>{{item.item_producent}}</span>
-        </td>
-        <td>
-          <span>{{item.item_model}}</span>
-        </td>
-        <td>
-            <span>{{item.item_it|default_if_none:""}}</span>
-          </td>
-          <td>
-            <span>{{item.item_sn|default_if_none:""}}</span>
-          </td>
-          <td>
-            <span>{{item.item_kk|default_if_none:""}}</span>
-          </td>
-          <td> 
-            {% if item.item_user %}
-            <a  class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="{%url 'singleEmployee' item.item_user.id%}"role="button"><span>{{item.item_user|default_if_none:""}}</span></a>
-            {% endif %}
-          </td>
-          
-        <td>
-          <div class="btn-group">
-            <a class="btn btn-secondary" href="{% url 'singleItem' item.id %}" role="button">Wyświetl</a>
-            <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
-              <span class="visually-hidden">Toggle Dropdown</span>
-            </button>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="{% url 'itemsEdit' item.id%}">Edycja</a></li>
-            </ul>
-          </div>
 
-          {% comment %} <a href="#!" data-mdb-toggle="tooltip" title="Remove"><i
-              class="fas fa-trash-alt text-danger"></i></a> {% endcomment %}
-        </td>
-      </tr>
 
       {%endfor%} 
 
     </tbody>
   </table>
+
+
+
+
+{% comment %} FOOTER {% endcomment %}
   <div class="card-footer text-end p-3">
-  </div>
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center" id="pagination">
+            <li class="page-item" id="first-page">
+                <button class="page-link" onclick="page(0)">&laquo; First</button>
+            </li>
+            <li class="page-item" id="previous-page">
+                <button class="page-link" onclick="page(page_no - 1)">Previous</button>
+            </li>
+            <!-- Page numbers will be inserted here dynamically -->
+            <li class="page-item" id="next-page">
+                <button class="page-link" onclick="page(page_no + 1)">Next</button>
+            </li>
+            <li class="page-item" id="last-page">
+                <button class="page-link" onclick="page(count / page_size)">&raquo; Last</button>
+            </li>
+        </ul>
+    </nav>
+</div>
 
-  <div class="container p-4">
-    <div class="pagination justify-content-center">
-        <span class="step-links">
-          {% if itemList.has_previous %}
-              <a href="?page=1&q={{q_value}}">&laquo; first</a>
-              <a href="?page={{ itemList.previous_page_number }}&q={{q_value}}">previous</a>
-          {% endif %}
+<script>
+    const page_size = 20;
+    let page_no = 0;
+    let count = -1;
+    let itemIdToDelete = null;
 
-            <span class="current">
-                Page {{ itemList.number }} of {{ itemList.paginator.num_pages }}
-            </span>
 
-          {% if itemList.has_next %}
-              <a href="?page={{ itemList.next_page_number }}&q={{q_value}}">next</a>
-              <a href="?page={{ itemList.paginator.num_pages }}&q={{q_value}}">last &raquo;</a>
-          {% endif %}
-        </span>
-        </div>
-    </div>
-  </div>   
-  </div>    
+    document.addEventListener('DOMContentLoaded', () => {
+        page(0);
+        document.getElementById('search').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                page(0);
+            }
+        });
+        document.getElementById('confirmDeleteButton').addEventListener('click', function() {
+          console.log(itemIdToDelete)
+            if (itemIdToDelete) {
+                fetch(`/items/delete/${itemIdToDelete}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken') // Ensure you have a function to get CSRF token
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Remove the employee row from the table
+                        document.querySelector(`[data-item-id="${itemIdToDelete}"]`).closest('tr').remove();
+                        itemIdToDelete = null;
+                        const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+                        deleteModal.hide();
+                    } else {
+                        alert('Failed to delete the item');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        });
+
+    });
+
+    async function page(p) {
+        if (p < 0) p = 0;
+        else if (count > 0 && (count / page_size - 1) < p) p = Math.ceil(count / page_size - 1);
+        page_no = p;
+
+        let data = document.getElementById('data');
+        data.innerHTML = '';
+        let params = {
+            limit: page_size,
+            offset: p * page_size,
+            {% if request.user.userinfo.region.id %}
+            region: "{{ request.user.userinfo.region.id }}"
+            {% endif %}
+        };
+
+        let search = document.getElementById('search').value;
+
+        if (search) params["search"] = search;
+
+        let response = await fetch("{% url 'item-list' %}?" + new URLSearchParams(params).toString());
+        let result = await response.json();
+        count = result.count;
+        let items = result.results;
+        let iconHTML = '';
+        items.forEach(item => {
+          
+           if (item.utilization_id) {
+            iconHTML = `<font color="red" data-bs-toggle="tooltip" data-bs-placement="top" title="Przedmiot w utylizacji">
+              {% bs_icon 'trash-fill' size='1.3em' color='red'%}
+            </font>`
+           }
+          else if (item.item_user) {
+            iconHTML = `<font color="green" data-bs-toggle="tooltip" data-bs-placement="top" title="Przedmiot w użyciu">
+                {% bs_icon 'person-fill' size='1.3em' color='blue'%}
+            </font>`
+          }
+          else{
+            iconHTML = `<font color="green" data-bs-toggle="tooltip" data-bs-placement="top" title="Przedmiot dostępny">
+              {% bs_icon 'check2-circle' size='1.3em' color='green'%}
+            </font>`
+          }
+            
+            let userLink = ''
+            if(item.item_user !== null){
+              userLink = `<a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="/employees/${item.item_user.id}/items"role="button"><span>${item.item_user.user_name} ${item.item_user.user_surname}</span></a>`
+            }
+
+            let dropDownOptions = ''
+            if(item.item_user === null && item.utilization_id === null){
+              dropDownOptions = `
+                          <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="visually-hidden">Toggle Dropdown</span>
+              </button><ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="/items/edit/${item.id}">Edycja</a></li>
+                <li><a class="dropdown-item delete-item" href="#" data-item-id="${item.id}">Usuń</a></li>
+              </ul>`
+            }
+
+
+            data.innerHTML += `<tr class="fw-normal">
+            <td>${iconHTML}</td>
+            <td><span>${item.category.category_name}</span></td>
+            <td><span>${item.item_producent}</span></td>
+            <td><span>${item.item_model}</span></td>
+            <td><span>${item.item_it || ''}</span></td>
+            <td><span>${item.item_sn || ''}</span></td>
+            <td><span>${item.item_kk || ''}</span></td>
+              <td>${userLink}</td>
+            <td>
+            <div class="btn-group">
+              <a class="btn btn-secondary" href="/items/${item.id}" role="button">Wyświetl</a>
+  
+              ${dropDownOptions}
+
+
+            </div>
+          </td>
+        </tr>`;
+            });
+        
+        $('[data-bs-toggle="tooltip"]').tooltip();
+
+        document.querySelectorAll('.delete-item').forEach(element => {
+            element.addEventListener('click', function(event) {
+                event.preventDefault();
+                itemIdToDelete = this.getAttribute('data-item-id');
+                const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+                deleteModal.show();
+            });
+        });
+        updatePagination();
+    }
+
+    function updatePagination() {
+        let pagination = document.getElementById('pagination');
+        let totalPages = Math.ceil(count / page_size);
+
+        // Clear existing page numbers
+        pagination.querySelectorAll('.page-number').forEach(pageNumber => pageNumber.remove());
+
+        // Calculate start and end page numbers
+        let startPage = Math.max(page_no - 1, 0);
+        let endPage = Math.min(startPage + 2, totalPages - 1);
+
+        // Adjust start page if end page is less than total pages
+        if (endPage - startPage < 2) {
+            startPage = Math.max(endPage - 2, 0);
+        }
+
+        // Generate new page numbers
+        for (let i = startPage; i <= endPage; i++) {
+            let pageNumberItem = document.createElement('li');
+            pageNumberItem.className = 'page-item page-number' + (i === page_no ? ' active' : '');
+            pageNumberItem.innerHTML = `<button class="page-link" onclick="page(${i})">${i + 1}</button>`;
+            pagination.insertBefore(pageNumberItem, pagination.children[pagination.children.length - 2]);
+        }
+
+        // Enable/Disable navigation buttons
+        document.getElementById('first-page').classList.toggle('disabled', page_no === 0);
+        document.getElementById('previous-page').classList.toggle('disabled', page_no === 0);
+        document.getElementById('next-page').classList.toggle('disabled', page_no >= totalPages - 1);
+        document.getElementById('last-page').classList.toggle('disabled', page_no >= totalPages - 1);
+    }
+
+    function dtos(date) {
+    let day = date.getDate();
+    let month = date.getMonth() + 1; // Months are zero-based
+    let year = date.getFullYear();
+    let hours = date.getHours();
+    let minutes = date.getMinutes();
+    
+    // Add leading zeros to day, month, hours, and minutes if necessary
+    if (day < 10) day = '0' + day;
+    if (month < 10) month = '0' + month;
+    if (hours < 10) hours = '0' + hours;
+    if (minutes < 10) minutes = '0' + minutes;
+    
+    return `${day}.${month}.${year} ${hours}:${minutes}`; // Format: DD-MM-YYYY HH:MM
+}
+
+function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
 
 
  

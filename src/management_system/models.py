@@ -54,6 +54,7 @@ class Item(models.Model):
     item_kk = models.CharField("Numer KK",max_length=200,blank=True,null=True)
     item_user = models.ForeignKey("users.Employee", on_delete=models.PROTECT,null=True,blank=True,verbose_name="Pracownik")
     utilization_id = models.ForeignKey("management_system.Utilization", on_delete=models.PROTECT,null=True,blank=True,verbose_name="Utylizacja")
+    editable = models.BooleanField('Edytowalny',default=True, null=False, blank=False)
 
 
 
