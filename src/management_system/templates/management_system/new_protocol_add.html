@@ -59,7 +59,6 @@
     <!-- <button type="button" onclick="step()" class="btn btn-success mt-3" name="saveAndEnd">Zapisz</button> -->
     <button type="button" onclick="addItem()" class="btn btn-secondary mt-3" name="saveAndContinue">Dodaj Kolejny</button>
 </form>
-<!-- <span class="popup" id="popup1" onclick="closePopup('popup1')"> -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
@@ -77,49 +76,48 @@
     </div>
   </div>
 </div>
-<span class="popup" id="popup1">
-  <span class="popup-cnt">
-    <section class="popup-title">Czy na pewno chcesz utworzyc nowe przekazanie?<hr /></section>
-    <section class="popup-msg" id="popup1table">
-      <table class="table w-100"></table>
-    </section>
-    <section class="popup-btns pt-1">
-      <button type="button" onclick="send()" class="btn btn-success mx-3">Tak</button>
-      <button type="button" onclick="closePopup('popup1')" class="btn btn-danger mx-3">Nie</button>
-    </section>
-  </span>
-</span>
-<!-- <span class="popup" id="popup2" onclick="closePopup('popup2')"> -->
-<span class="popup" id="popup2">
-  <span class="popup-cnt">
-    <section class="popup-title">Pole pracownik jest wymagane.<hr /></section>
-    <section class="popup-msg"></section>
-    <section class="popup-btns">
-      <button type="button" onclick="closePopup('popup2')" class="btn btn-success mx-3">OK</button>
-    </section>
-  </span>
-</span> 
-<!-- <span class="popup" id="popup3" onclick="closePopup('popup3')"> -->
-<span class="popup" id="popup3">
-  <span class="popup-cnt">
-    <section class="popup-title">Pole przedmiot jest wymagane.<hr /></section>
-    <section class="popup-msg"></section>
-    <section class="popup-btns">
-      <button type="button" onclick="closePopup('popup3')" class="btn btn-success mx-3">OK</button>
-    </section>
-  </span>
-</span> 
-<!-- <span class="popup" id="popup4" onclick="closePopup('popup4')"> -->
-<span class="popup" id="popup4">
-  <span class="popup-cnt">
-    <section class="popup-title">Zduplikowany przedmiot.<hr /></section>
-    <section class="popup-msg" id="popup4msg"></section>
-    <section class="popup-btns">
-      <button type="button" onclick="closePopup('popup4')" class="btn btn-success mx-3">OK</button>
-    </section>
-  </span>
-</span>
-
+<div class="modal fade" id="popup2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Pole pracownik jest wymagane.</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+      </div>
+    </div>
+  </div>
+</div>
+ <div class="modal fade" id="popup3" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Pole przedmiot jest wymagane.</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="popup4" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Zduplikowany przedmiot.</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid" id="popup4msg"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script type="text/javascript">
 
   const select2conf = {
@@ -199,7 +197,8 @@
     // Validate employee
     if(!employee){
       // alert('Pope pracownik jest wymagane.');
-      showPopup('popup2');
+      const modal = new bootstrap.Modal(document.getElementById('popup2'));
+      modal.show();
       return;
     }
    
@@ -211,7 +210,8 @@
         // Alert user with name (got from span)
         // alert("Zduplikowany przedmiot " + item.parentElement.children[1].innerText);
         document.getElementById('popup4msg').innerHTML = "Przedmiot: " + item.parentElement.children[1].innerText;
-        showPopup('popup4');
+        const modal = new bootstrap.Modal(document.getElementById('popup4'));
+        modal.show();
         return;
       }
       seen.push(item.value);
@@ -219,7 +219,8 @@
 
     if(seen.length <= 0){
       // alert('Podaj przynajmniej jeden przedmiot.');
-      showPopup('popup3');
+      const modal = new bootstrap.Modal(document.getElementById('popup3'));
+      modal.show();
       return;
     }
 
