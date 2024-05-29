@@ -107,6 +107,8 @@ DATABASES = {
     }
 }
 
+#apt install redis-server
+#install django-redis
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
