@@ -1,11 +1,9 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-from rest_framework import generics
 import json
 from datetime import datetime
 from django.utils.decorators import method_decorator
-from .serializers import ItemSerializer,EmployeeSerializer,ProtocolSerializer
 from .forms import EmployeeForm, ProtocolFormAdd, ItemForm, ProtocolFormReturn,ProtocolFormReturnNext,UtilizationItemForm, UtilizationFinalizationForm
 from django.contrib import messages
 from django.views import View
@@ -14,6 +12,7 @@ from django.db.models import Q
 from operator import attrgetter
 from django.views.decorators.cache import cache_page
 from django.core.cache import cache
+from .snippets import get_data_for_region, save_model_into_region
 import base64
 
 
@@ -22,16 +21,19 @@ from pprint import pprint
 
 # Create your views here.
 from users.models import Employee
-from .models import Item,Protocol, ProtocolItem, Utilization
-
+from .models import Item,Protocol, ProtocolItem, Utilization, RegionContent, Region
+from django.contrib.contenttypes.models import ContentType
 # TODO: Test if item is utilizated while adding new protocol, or in utilization
+#TODO ALERT IF ITEM/PROTOCOL/UTILIZATION WITHOUT REGION
+
+    
+
 
 @method_decorator(login_required, name="dispatch")
 class utilizationDelete(View):
     def post(self, request, pk):
         try:
             obj = get_object_or_404(Utilization, id = pk )
-            print(obj)
             obj.delete()
             return redirect('utilization')
         except Exception as e:
@@ -114,11 +116,11 @@ class utilizationFinalizationView(View):
 @method_decorator(login_required, name="dispatch")
 class utilizationView(View):
     def get(self, request):
-
+        region=request.user.userinfo.region or None
         queryCreator = str(request.GET.get('qcreator',''))
         queryCreatedDate = str(request.GET.get('qcreateddate',''))
         queryEndDate = str(request.GET.get('qenddate',''))
-        utilizationQuery = sorted(self.get_query(queryCreator,queryCreatedDate,queryEndDate), key=attrgetter('id'),reverse=True)
+        utilizationQuery = sorted(self.get_query(queryCreator,queryCreatedDate,queryEndDate,region), key=attrgetter('id'),reverse=True)
         
 
         page = request.GET.get('page',1)
@@ -140,7 +142,7 @@ class utilizationView(View):
         }
         return render(request, "management_system/utilization.html", context)
     
-    def get_query(self,qcreator,qcreated,qend):  # new
+    def get_query(self,qcreator,qcreated,qend,region):  # new
         query = Q()
         if qcreator:
             query = query & (
@@ -159,7 +161,7 @@ class utilizationView(View):
                 Q(company_transfer_date__icontains=date2)
             )      
                      
-        object_list = Utilization.objects.filter(query)
+        object_list = get_data_for_region(Utilization,region).filter(query)
 
         return object_list
     
@@ -181,21 +183,33 @@ class utilizationAddView(View):
 
     def post(self,request):
         # If pk was send to us, we use it otherwise we create new protocol
+
         if 'pk' in request.POST:
+
             newUtilization = Utilization.objects.get(id=request.POST['pk'])
         else:
+            pprint(request.POST)
+            region = request.user.userinfo.region or (Region.objects.get(id=request.POST.get('region')) if request.POST.get('region') else None )
+            pprint(region)
+            if not region:
+                return HttpResponse("Waiting for region")
+
             newUtilization = Utilization()
             newUtilization.created_by = request.user
             newUtilization.save()
-            # Send pk to client in JSON format
-            return HttpResponse('{\"pk\": \"' + str(newUtilization.id) + '\"}')
+            try:
+                save_model_into_region(Utilization,region,newUtilization.id)
+
+            except Exception as e:
+                print(e)
+                return HttpResponse("ERROR",e)
+            finally:
+                return HttpResponse('{\"pk\": \"' + str(newUtilization.id) + '\"}')
 
         utilizationForm = UtilizationItemForm(request.POST)
         if utilizationForm.is_valid():
             try:
                 utilizationFormData = utilizationForm.cleaned_data
-
-                pprint(request.POST)
 
                                 
                 #IF ITS NOT RETURN AND USER ITEM IS NOT EMPLOYEE AND ITEM USER IS NOT EMPTY
@@ -219,11 +233,20 @@ class utilizationAddView(View):
 
 
     def get(self, request):
-        pk = 'undefined'
+        pk = None
         if 'pk' in request.GET:
             pk = request.GET['pk']
-        utilizationFormClass = UtilizationItemForm
-        return render(request, self.template,{'utilizationForm':utilizationFormClass, 'pk': pk})
+            utilizationFormClass = UtilizationItemForm
+            return render(request, self.template,{
+                'utilizationForm':utilizationFormClass, 
+                'pk': pk, 
+            })
+        else:
+            context = {
+                'region': request.user.userinfo.region,
+                'regions': Region.objects.all()
+            }
+            return render(request, "management_system/utilization_add_region.html", context)
 
 
 
@@ -253,12 +276,11 @@ def deleteEmployeeView(request,pk):
 
 @login_required
 def itemsEdit(request,pk):
-
-    context ={}
- 
     # fetch the object related to passed id
     obj = get_object_or_404(Item, id = pk)
- 
+    content_type = ContentType.objects.get_for_model(Item)
+    region = RegionContent.objects.get(content_type=content_type, object_id=obj.id)
+
     # pass the object as instance in form
     form = ItemForm(request.POST or None, instance = obj)
  
@@ -267,37 +289,56 @@ def itemsEdit(request,pk):
     if form.is_valid():
         try:
             form.save()
+            region.region = request.POST.get('region') or region.region
+            region.save()
             return redirect("itemsView")
         except Exception as e:
             return HttpResponse(f"{e}")
-    context["itemForm"] = form
+    context = {
+        'region': request.user.userinfo.region,
+        'regions': Region.objects.all(),
+        'itemForm': form,
+        'item_region':region.region,
+    }
+ 
     return render(request, "management_system/items_edit.html", context)
 
 @method_decorator(login_required, name="dispatch")
 class editEmployeeView(View):
     def post(self, request):
         obj = get_object_or_404(Employee, id = request.GET.get('id',''))
+        content_type = ContentType.objects.get_for_model(Employee)
+        region = RegionContent.objects.get(content_type=content_type, object_id=obj.id)
         form = EmployeeForm(request.POST or None,instance = obj)
         if form.is_valid():
             form.save()
+            region.region = request.POST.get('region') or region.region
+            region.save()
             return redirect("employees")
         context={
-            "form":form
+            "form":form,
+            'region': request.user.userinfo.region,
+            'regions': Region.objects.all(),
+            'my_region': region.region
         }
         return render(request, "management_system/edit_employee.html", context)
 
     def get(self, request):
         obj = get_object_or_404(Employee, id = request.GET.get('id',''))
+        content_type = ContentType.objects.get_for_model(Employee)
+        region = RegionContent.objects.get(content_type=content_type, object_id=obj.id)
         form = EmployeeForm(instance = obj)
         context={
-                "form":form
+                "form":form,
+                'region': request.user.userinfo.region,
+                'regions': Region.objects.all(),
+                'my_region': region.region
             }
         return render(request, "management_system/edit_employee.html", context)
 
 @login_required
 def mainView(request):
-    print(request.user.first_name)
-    print(request.user.last_name)
+    # print(request.user.userinfo.region)
     return render(request, "management_system/home.html", {})
 
 @login_required
@@ -338,84 +379,111 @@ def itemsAddNew(request):
                 newItem = itemForm.save(commit=False)
                 if request.POST.get('item_user'):
                     newItem.item_user = Employee.objects.get(id=request.POST.get('item_user'))
-                
+
                 newItem.save()
-                return redirect('home')
-            except:
-                print('ERROR OCCURED WHILE SAVING DATA TO DB!')
+
+                region = request.user.userinfo.region or Region.objects.get(id=request.POST.get('region'))
+
+                save_model_into_region(Item,region,newItem.id)
+
+
+            except Exception as e:
+                print(e)
+                return HttpResponse("ERROR",e)
+
+            return redirect('home')
         else:
             print('Form not valid!')
             print(itemForm.errors)
 
     context={
-        'itemForm':itemForm
+        'itemForm':itemForm,
+        'region': request.user.userinfo.region,
+        'regions': Region.objects.all() 
     }
     return render(request, "management_system/items_add_new.html", context)
 
 
 
+#CURRENTLY NOT USED, CAN BE IMPLEMENTED DO TO RETURN WITHOUT CREATING PROTOCOL
 
+# @login_required
+# def newProtocolReturn(request):
+#     protocolForm = ProtocolFormReturn(request.POST or None)
 
-@login_required
-def newProtocolReturn(request):
-    protocolForm = ProtocolFormReturn(request.POST or None)
+#     if request.method == 'POST':
+#         if protocolForm.is_valid():
+#             try:
+#                 protocolFormData = protocolForm.cleaned_data
 
-    if request.method == 'POST':
-        if protocolForm.is_valid():
-            try:
-                protocolFormData = protocolForm.cleaned_data
+#                 #CHECK IF ITEM THAT WE WANT TO RETURN BELONG TO USER WE WANT TO TAKE IT FROM
+#                 #IF IS RETURN AND USER ITEM IS EMPLOYEE AND ITEM USER IS NOT EMPY
+#                 if protocolFormData['item'].item_user == protocolFormData['employee']:
+#                     protocolFormData['item'].item_user = None
+#                     protocolFormData['item'].save()
+#                     # print('OK')
 
-                #CHECK IF ITEM THAT WE WANT TO RETURN BELONG TO USER WE WANT TO TAKE IT FROM
-                #IF IS RETURN AND USER ITEM IS EMPLOYEE AND ITEM USER IS NOT EMPY
-                if protocolFormData['item'].item_user == protocolFormData['employee']:
-                    protocolFormData['item'].item_user = None
-                    protocolFormData['item'].save()
-                    print('OK')
-
-                #IF IS RETURN AND USER ITEM IS NOT EMPLOYEE AND ITEM USER IS NOT EMPTY
-                elif protocolFormData['item'].item_user != protocolFormData['employee'] and protocolFormData['item'].item_user :
-                    messages.error(request, 'Nie można zwrócic, przedmiot jest używany przez innego użytkownika')
-                    return redirect('newProtocol')
-                    #CANT COMPLETE
+#                 #IF IS RETURN AND USER ITEM IS NOT EMPLOYEE AND ITEM USER IS NOT EMPTY
+#                 elif protocolFormData['item'].item_user != protocolFormData['employee'] and protocolFormData['item'].item_user :
+#                     messages.error(request, 'Nie można zwrócic, przedmiot jest używany przez innego użytkownika')
+#                     return redirect('newProtocol')
+#                     #CANT COMPLETE
                 
-                #IF IS RETURN AND USER ITEM IS NOT EMPLOYEE AND ITEM USER IS NOT EMPTY
-                elif protocolFormData['item'].item_user != protocolFormData['employee'] and protocolFormData['item'].item_user is None:
-                    request.session['item_to_return_id'] = protocolFormData['item'].id
-                    request.session['employee_item_to_return_id'] = protocolFormData['employee'].id
+#                 #IF IS RETURN AND USER ITEM IS NOT EMPLOYEE AND ITEM USER IS NOT EMPTY
+#                 elif protocolFormData['item'].item_user != protocolFormData['employee'] and protocolFormData['item'].item_user is None:
+#                     request.session['item_to_return_id'] = protocolFormData['item'].id
+#                     request.session['employee_item_to_return_id'] = protocolFormData['employee'].id
 
-                    context={
-                        'message':'Przedmiot nie należy do żadnego pracownika',
-                    }
-                    return render(request,"management_system/confirm_add_protocol.html",context)
-                    #TODO add cofirm button
+#                     context={
+#                         'message':'Przedmiot nie należy do żadnego pracownika',
+#                     }
+#                     return render(request,"management_system/confirm_add_protocol.html",context)
+#                     #TODO add cofirm button
 
 
-                newProtocol = protocolForm.save(commit=False)
-                newProtocol.is_return = True
-                newProtocol.created_by = request.user
-                newProtocol.save()
+#                 newProtocol = protocolForm.save(commit=False)
+#                 newProtocol.is_return = True
+#                 newProtocol.created_by = request.user
+#                 newProtocol.save()
 
-                ProtocolItem(protocol_id=newProtocol,item_id=protocolFormData['item']).save()
-                if 'saveAndEnd' in request.POST:
-                    return redirect("singleProtocol",pk=newProtocol.id)
-                elif 'saveAndContinue' in request.POST:
-                    return redirect("addNextItem",status='return',pk=newProtocol.id)
+#                 region = request.user.userinfo.region or Region.objects.get(id=request.POST.get('region'))
+#                 content_type = ContentType.objects.get_for_model(Protocol)
+#                 try:
+#                     RegionContent.objects.create(
+#                     region=region,
+#                     content_type=content_type,
+#                     object_id=newProtocol.id
+#                     )
+#                 except Exception as e:
+#                     print('Failed protocol to save into region content!')
+#                     print(e)
+
+
+#                 ProtocolItem(protocol_id=newProtocol,item_id=protocolFormData['item']).save()
+#                 if 'saveAndEnd' in request.POST:
+#                     return redirect("singleProtocol",pk=newProtocol.id)
+#                 elif 'saveAndContinue' in request.POST:
+#                     return redirect("addNextItem",status='return',pk=newProtocol.id)
                 
-            except:
-                print("An exception occurred")
+#             except:
+#                 print("An exception occurred")
 
-    context={
-            "protocolForm":protocolForm,
-        }
-    return render(request, "management_system/new_protocol_return.html", context)
+#     context={
+#             "protocolForm":protocolForm,
+#             'region': request.user.userinfo.region,
+#             'regions': Region.objects.all()
+#         }
+#     return render(request, "management_system/new_protocol_return.html", context)
 
 
 @method_decorator(login_required, name="dispatch")
 class EmployeesView(View):
     def get(self,request):
+        region = request.user.userinfo.region or None
         queryName = str(request.GET.get('qname',''))
         querySurname = str(request.GET.get('qsurname',''))
-        employeeQuery = sorted(self.get_query(queryName,querySurname), key=attrgetter('id'),reverse=True)
+
+        employeeQuery = sorted(self.get_query(queryName,querySurname,region), key=attrgetter('id'),reverse=True)
         
 
         page = request.GET.get('page',1)
@@ -436,7 +504,7 @@ class EmployeesView(View):
         return render(request, "management_system/employees.html", context)
 
 
-    def get_query(self,qname,qsurname):  # new
+    def get_query(self,qname,qsurname,region):  # new
         query = Q()
         if qname:
             query = query & (
@@ -447,8 +515,9 @@ class EmployeesView(View):
             query = query & (
                 Q(user_surname__icontains=qsurname)
             )   
-                     
-        object_list = Employee.objects.filter(query)
+        
+        object_list = get_data_for_region(Employee,region).filter(query)
+
 
         return object_list
     
@@ -456,10 +525,12 @@ class EmployeesView(View):
 class ProtocolsView(View):
 
     def get(self,request):
+        region = request.user.userinfo.region or None
         queryName = str(request.GET.get('qname',''))
         querySurname = str(request.GET.get('qsurname',''))
         queryDate = str(request.GET.get('qdate',''))
-        protocolQuery = sorted(self.get_query(queryName,querySurname,queryDate), key=attrgetter('id'),reverse=True)
+        queryBarcode = str(request.GET.get('qbarcode',''))
+        protocolQuery = sorted(self.get_query(queryName,querySurname,queryDate,queryBarcode,region), key=attrgetter('id'),reverse=True)
         
 
         page = request.GET.get('page',1)
@@ -480,7 +551,7 @@ class ProtocolsView(View):
         }
         return render(request, "management_system/protocols.html", context)
     
-    def get_query(self,qname,qsurname,qdate):  # new
+    def get_query(self,qname,qsurname,qdate,qbarcode,region):  # new
         query = Q()
         if qname:
             query = query & (
@@ -491,13 +562,18 @@ class ProtocolsView(View):
             query = query & (
                 Q(employee__user_surname__icontains=qsurname)
             )   
+        
+        if qbarcode:
+            query = query & (
+                Q(barcode__icontains=qbarcode)
+            )   
 
         if qdate:
             date = datetime.strptime(qdate, '%Y-%m-%d').date()
             query = query & (
                 Q(created__icontains=date)
             )                       
-        object_list = Protocol.objects.filter(query)
+        object_list = get_data_for_region(Protocol,region).filter(query)
         return object_list
 
 @login_required
@@ -505,10 +581,20 @@ def addEmployeeView(request):
     form = EmployeeForm(request.POST or None)
     if request.method == 'POST':
         if form.is_valid():
-            form.save()
-            return redirect("home")
+            try:
+                newEmployee = form.save()
+                region = request.user.userinfo.region or Region.objects.get(id=request.POST.get('region'))
+
+                save_model_into_region(Employee,region,newEmployee.id)
+
+            except Exception as e:
+                print(e)
+                return HttpResponse("ERROR",e)
+            return redirect("employees")
     context={
-            "form":form
+            "form":form,
+            'region': request.user.userinfo.region,
+            'regions': Region.objects.all()
         }
     return render(request, "management_system/add_new_employee.html", context)
     
@@ -523,13 +609,14 @@ def itemsView(request):
 @method_decorator(login_required, name="dispatch")
 class ItemsView(View):
     def get(self,request):
+        region = request.user.userinfo.region or None
         queryType = str(request.GET.get('qtype',''))
         queryModel = str(request.GET.get('qmodel',''))
         queryIt = str(request.GET.get('qit',''))
         querySn = str(request.GET.get('qsn',''))
         queryKk = str(request.GET.get('qkk',''))
         queryQused = request.GET.get('qused','')
-        itemQuery = sorted(self.get_query(queryType,queryModel,queryIt,querySn,queryKk,queryQused), key=attrgetter('id'),reverse=True)
+        itemQuery = sorted(self.get_query(queryType,queryModel,queryIt,querySn,queryKk,queryQused,region), key=attrgetter('id'),reverse=True)
         
         page = request.GET.get('page',1)
         protocols_paginator = Paginator(itemQuery,20)
@@ -553,7 +640,7 @@ class ItemsView(View):
         }
         return render(request, "management_system/items.html", context)
     
-    def get_query(self,qtype,qmodel,qit,qsn,qkk,qused):  # new
+    def get_query(self,qtype,qmodel,qit,qsn,qkk,qused,region):  # new
         query = Q()
         if qtype:
             query = query & (
@@ -581,7 +668,7 @@ class ItemsView(View):
             query = query & (
                 Q(item_user__isnull=False)
             )    
-        object_list = Item.objects.filter(query)
+        object_list = get_data_for_region(Item,region).filter(query)
         return object_list  
 
 @login_required
@@ -645,6 +732,15 @@ def employeeItemsReturn(request, employee_id):
 
                 newProtocolItem = ProtocolItem(protocol_id=newProtocol,item_id=itemObj)
                 newProtocolItem.save()
+
+            if request.user.userinfo.region:
+                region = request.user.userinfo.region 
+            else:
+                content_type = ContentType.objects.get_for_model(Employee)
+                region = RegionContent.objects.get(content_type=content_type, object_id=employee_id).region
+
+            save_model_into_region(Protocol,region,newProtocol.id)
+
             return redirect("singleProtocol",pk=newProtocol.id)
         
         listOfItemId = json.loads(request.POST.get("idList"))
@@ -673,8 +769,12 @@ class NewProtocolAdd(View):
         if protocolForm.is_valid():
             try:
                 protocolFormData = protocolForm.save(commit=False)
+
+                
                 protocolFormData.item = Item.objects.get(id=request.POST['item'])
                 protocolFormData.employee = Employee.objects.get(id=request.POST['employee'])
+                protocolFormData.description = request.POST['description']
+
                 
                 #IF ITS NOT RETURN AND USER ITEM IS NOT EMPLOYEE AND ITEM USER IS NOT EMPTY
                 if protocolFormData.item.item_user != protocolFormData.employee and protocolFormData.item.item_user:
@@ -683,202 +783,44 @@ class NewProtocolAdd(View):
                 else:
                     protocolFormData.item.item_user = protocolFormData.employee
                     protocolFormData.item.save()
+
                     
                 # If pk was send to us, we use it otherwise we create new protocol
                 if 'pk' in request.POST:
                     newProtocol = Protocol.objects.get(id=request.POST['pk'])
+                    
+
                 else:
                     newProtocol = protocolFormData
                     newProtocol.is_return = False
                     newProtocol.created_by = request.user
                     newProtocol.save()
+                region = request.user.userinfo.region or Region.objects.get(id=request.POST.get('region'))
+                save_model_into_region(Protocol,region,newProtocol.id)
+
 
                 ProtocolItem(protocol_id=newProtocol,item_id=protocolFormData.item).save()
 
-                # This if is not used by me, but i decided not to delete it just in case
-                if 'saveAndEnd' in request.POST:
-                    return redirect("singleProtocol",pk=newProtocol.id)
-                elif 'saveAndContinue' in request.POST:
-                    return redirect("addNextItem",status='add',pk=newProtocol.id)
-                
-                # Send pk to client in JSON format
-                return HttpResponse('{\"pk\": \"' + str(newProtocol.id) + '\"}')
-                
             except Exception as e:
                 print(e)
                 return HttpResponse('ERROR')
+            finally:
+                return HttpResponse('{\"pk\": \"' + str(newProtocol.id) + '\"}')
         else:
             print("Form is invalid")
         return HttpResponse('ERROR')
 
     def get(self,request):
+        protocolFormClass = ProtocolFormAdd
+        context = {
+            'region': request.user.userinfo.region,
+            'regions': Region.objects.all(),
+            'protocolForm': protocolFormClass
+        }
         if request.GET.get('eid'):
-            # protocolFormClass = ProtocolFormAdd
-            # protocolForm = protocolFormClass(initial={
-            #     'employee': Employee.objects.get(id=request.GET.get('eid'))
-            # })
-            return render(request, self.template,{'employee':Employee.objects.get(id=request.GET.get('eid'))})
+            context['employee'] = Employee.objects.get(id=request.GET.get('eid'))
+            
+            return render(request, self.template,context)
         else:
-            protocolFormClass = ProtocolFormAdd
-            return render(request, self.template,{'protocolForm':protocolFormClass})
+            return render(request, self.template,context)
 
-@login_required
-def API2EmployeesView(request):
-    if request.GET and request.GET.get('id', False):
-        employees = [ Employee.objects.get(id=request.GET.get('id', 0)) ]
-    else:
-        employees = Employee.objects.order_by('-id')
-        if request.GET and request.GET.get('q', False):
-            employees = employees.raw("select * from users_employee where concat(user_name, \' \', user_surname) ilike %s;", ['%' + request.GET['q'] + '%'])
-        if request.GET and request.GET.get('limit', False):
-            employees = employees[:int(request.GET.get('limit', 10))]
-        employees = list(employees)
-    if len(employees) < 1:
-        return HttpResponse("[]", content_type='application/json')
-    last = employees.pop(-1)
-    json = "["
-    for e in employees:
-        json += "{" 
-        json += "\"id\":\""              + str(e.id)              + "\"," 
-        json += "\"user_name\":\""       + str(e.user_name)       + "\"," 
-        json += "\"user_surname\":\""    + str(e.user_surname)    + "\"," 
-        json += "\"user_department\":\"" + str(e.user_department) + "\"," 
-        json += "\"user_location\":\""   + str(e.user_location)   + "\"," 
-        json += "\"user_email\":\""      + str(e.user_email)      + "\"," 
-        json += "\"user_login\":\""      + str(e.user_login)      + "\""  
-        json += "},"       
-    json += "{"        
-    json += "\"id\":\""              + str(last.id)              + "\","
-    json += "\"user_name\":\""       + str(last.user_name)       + "\","
-    json += "\"user_surname\":\""    + str(last.user_surname)    + "\","
-    json += "\"user_department\":\"" + str(last.user_department) + "\","
-    json += "\"user_location\":\""   + str(last.user_location)   + "\","
-    json += "\"user_email\":\""      + str(last.user_email)      + "\","
-    json += "\"user_login\":\""      + str(last.user_login)      + "\""
-    json += "}]"
-    return HttpResponse(json, content_type='application/json')
-
-@login_required
-def API2ItemsView(request):
-    if request.GET and request.GET.get('id', False):
-        items = [ Item.objects.get(id=request.GET.get('id', 0)) ]
-    else:
-        items = Item.objects.order_by('-id')
-        if request.GET and request.GET.get('q', False):
-            items = items.raw("select * from management_system_item where concat(item_it, \' \', item_sn, \' \', item_kk, \' \', item_model) ilike %s;", ['%' + request.GET['q'] + '%'])
-        if request.GET and request.GET.get('free', False):
-            items = items.filter(utilization_id__isnull=True, item_user__isnull=True)
-        if request.GET and request.GET.get('limit', False):
-            items = items[:int(request.GET.get('limit', 10))]
-        items = list(items)
-    if len(items) < 1:
-        return HttpResponse("[]", content_type='application/json')
-    last = items.pop(-1)
-    json = "["
-    for e in items:
-        json += "{" 
-        json += "\"id\":\""             + str(e.id)             + "\"," 
-        json += "\"created\":\""        + str(e.created)        + "\"," 
-        json += "\"category\":\""       + str(e.category)       + "\"," 
-        json += "\"item_producent\":\"" + str(e.item_producent) + "\"," 
-        json += "\"item_model\":\""     + str(e.item_model)     + "\"," 
-        json += "\"item_sn\":\""        + str(e.item_sn)        + "\"," 
-        json += "\"item_it\":\""        + str(e.item_it)        + "\"," 
-        json += "\"item_kk\":\""        + str(e.item_kk)        + "\","  
-        json += "\"item_user_id\":\""   + str(e.item_user_id)   + "\","  
-        json += "\"item_user\":\""      + str(e.item_user)      + "\","  
-        json += "\"utilization_id\":\"" + str(e.utilization_id) + "\""  
-        json += "},"       
-    json += "{"        
-    json += "\"id\":\""             + str(last.id)             + "\","
-    json += "\"created\":\""        + str(last.created)        + "\"," 
-    json += "\"category\":\""       + str(last.category)       + "\"," 
-    json += "\"item_producent\":\"" + str(last.item_producent) + "\"," 
-    json += "\"item_model\":\""     + str(last.item_model)     + "\"," 
-    json += "\"item_sn\":\""        + str(last.item_sn)        + "\"," 
-    json += "\"item_it\":\""        + str(last.item_it)        + "\"," 
-    json += "\"item_kk\":\""        + str(last.item_kk)        + "\","  
-    json += "\"item_user_id\":\""   + str(last.item_user_id)   + "\","  
-    json += "\"item_user\":\""      + str(last.item_user)      + "\","  
-    json += "\"utilization_id\":\"" + str(last.utilization_id) + "\""
-    json += "}]"
-    return HttpResponse(json, content_type='application/json')
-
-#      
-@login_required
-def API2ProtocolsView(request):
-    if request.GET and request.GET.get('id', False):
-        protocols = [ Protocol.objects.get(id=request.GET.get('id', 0)) ]
-    else:
-        protocols = Protocol.objects.order_by('-id')
-        if request.GET and request.GET.get('q', False):
-            protocols = protocols.raw("select * from management_system_protocol where barcode ilike %s;", ['%' + request.GET['q'] + '%'])
-        if request.GET and request.GET.get('limit', False):
-            protocols = protocols[:int(request.GET.get('limit', 10))]
-        protocols = list(protocols)
-    if len(protocols) < 1:
-        return HttpResponse("[]", content_type='application/json')
-    last = protocols.pop(-1)
-    json = "["
-    for e in protocols:
-        json += "{" 
-        json += "\"id\":\""            + str(e.id)            + "\"," 
-        json += "\"created\":\""       + str(e.created)       + "\"," 
-        json += "\"modified\":\""      + str(e.modified)      + "\"," 
-        json += "\"description\":\""   + str(e.description)   + "\"," 
-        json += "\"is_return\":\""     + str(e.is_return)     + "\"," 
-        json += "\"employee_id\":\""   + str(e.employee_id)   + "\"," 
-        json += "\"employee\":\""      + str(e.employee)      + "\"," 
-        json += "\"barcode\":\""       + str(e.barcode)       + "\","  
-        json += "\"created_by_id\":\"" + str(e.created_by_id) + "\","  
-        json += "\"is_scanned\":\""    + str(e.is_scanned)    + "\","  
-        json += "\"protocol_scan\":\"" + str(e.protocol_scan) + "\","  
-        json += "\"printed_count\":\"" + str(e.printed_count) + "\""  
-        json += "},"       
-    json += "{"        
-    json += "\"id\":\""            + str(last.id)         + "\","
-    json += "\"created\":\""       + str(last.created)       + "\"," 
-    json += "\"modified\":\""      + str(last.modified)      + "\"," 
-    json += "\"description\":\""   + str(last.description)   + "\"," 
-    json += "\"is_return\":\""     + str(last.is_return)     + "\"," 
-    json += "\"employee_id\":\""   + str(last.employee_id)   + "\"," 
-    json += "\"employee\":\""      + str(last.employee)      + "\"," 
-    json += "\"barcode\":\""       + str(last.barcode)       + "\","  
-    json += "\"created_by_id\":\"" + str(last.created_by_id) + "\","  
-    json += "\"is_scanned\":\""    + str(last.is_scanned)    + "\","  
-    json += "\"protocol_scan\":\"" + str(last.protocol_scan) + "\","  
-    json += "\"printed_count\":\"" + str(last.printed_count) + "\""
-    json += "}]"
-    return HttpResponse(json, content_type='application/json')
-
-
-
-class ItemList(generics.ListCreateAPIView):
-    queryset = Item.objects.all()
-    serializer_class = ItemSerializer
-
-
-class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Item.objects.all()
-    serializer_class = ItemSerializer
-
-class EmployeeList(generics.ListCreateAPIView):
-    queryset = Employee.objects.all()
-    serializer_class = EmployeeSerializer
-
-
-class EmployeeDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Employee.objects.all()
-    serializer_class = EmployeeSerializer
-
-class ProtocolList(generics.ListCreateAPIView):
-    queryset = Protocol.objects.all()
-    serializer_class = ProtocolSerializer
-
-
-class ProtocolDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Protocol.objects.all()
-    serializer_class = ProtocolSerializer
-
-def MainCSSView(request):
-    return render(request, "management_system/main.css", content_type="text/css")

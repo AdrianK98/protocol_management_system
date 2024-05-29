@@ -24,7 +24,7 @@
       </div>
     </div>
     <div id="div_id_item" class="form-group">
-       <label for="search-items" class=" requiredField">Item<span class="asteriskField">*</span> </label> 
+       <label for="search-items" class=" requiredField">Przedmiot<span class="asteriskField">*</span> </label> 
        <div data-select2-id="select2-data-28-4whr"> 
          <select name="item" class="w-25 m-2 select form-control select2-hidden-accessible" id="search-items" required="" tabindex="-1" aria-hidden="true" data-select2-id="select2-data-search-items"> 
           <option value="" selected="" data-select2-id="select2-data-10-iflm">---------</option>
@@ -32,6 +32,19 @@
        </div> 
     </div>
     {{ protocolForm|crispy }}
+{% if region == None %}
+  <div id="div_id_item_region" class="form-group">
+    <label for="id_item_region">Region</label>
+    <div>
+      <select id="id_item_region" name="region" class="w-25 m-2 select form-control">
+        {% for r in regions %}
+          <option value="{{r.id}}">{{r}}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  {% endif %}
+
     <hr>
     {% if messages %}
     <div class="alert alert-danger">
@@ -42,107 +55,93 @@
         {% endfor %}
     </div>
 {% endif %}
-     
-
-
-<button type="button" class="btn btn-primary mt-3" onclick="step()">
-  Zapisz (Bootstrap ver.)
-</button>
-
-    <button type="button" onclick="step()" class="btn btn-success mt-3" name="saveAndEnd">Zapisz</button>
+    <button type="button" class="btn btn-primary mt-3" onclick="step()">Zapisz</button>
+    <!-- <button type="button" onclick="step()" class="btn btn-success mt-3" name="saveAndEnd">Zapisz</button> -->
     <button type="button" onclick="addItem()" class="btn btn-secondary mt-3" name="saveAndContinue">Dodaj Kolejny</button>
 </form>
-<!-- <span class="popup" id="popup1" onclick="closePopup('popup1')"> -->
-
-  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Czy na pewno chcesz utworzyć protokół?</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-
-          <div class="container-fluid" id="modalRowsContainer">>
-
-            
-          </div>
-
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" onclick="send()">Utwórz</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
-        </div>
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Czy na pewno chcesz utworzyć protokół?</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid" id="modalRowsContainer"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="send()">Utwórz</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
       </div>
     </div>
   </div>
-
-
-
-<span class="popup" id="popup1">
-  <span class="popup-cnt">
-    <section class="popup-title">Czy na pewno chcesz utworzyc nowe przekazanie?<hr /></section>
-    <section class="popup-msg" id="popup1table">
-      <table class="table w-100"></table>
-    </section>
-    <section class="popup-btns pt-1">
-      <button type="button" onclick="send()" class="btn btn-success mx-3">Tak</button>
-      <button type="button" onclick="closePopup('popup1')" class="btn btn-danger mx-3">Nie</button>
-    </section>
-  </span>
-</span>
-<!-- <span class="popup" id="popup2" onclick="closePopup('popup2')"> -->
-<span class="popup" id="popup2">
-  <span class="popup-cnt">
-    <section class="popup-title">Pole pracownik jest wymagane.<hr /></section>
-    <section class="popup-msg"></section>
-    <section class="popup-btns">
-      <button type="button" onclick="closePopup('popup2')" class="btn btn-success mx-3">OK</button>
-    </section>
-  </span>
-</span> 
-<!-- <span class="popup" id="popup3" onclick="closePopup('popup3')"> -->
-<span class="popup" id="popup3">
-  <span class="popup-cnt">
-    <section class="popup-title">Pole przedmiot jest wymagane.<hr /></section>
-    <section class="popup-msg"></section>
-    <section class="popup-btns">
-      <button type="button" onclick="closePopup('popup3')" class="btn btn-success mx-3">OK</button>
-    </section>
-  </span>
-</span> 
-<!-- <span class="popup" id="popup4" onclick="closePopup('popup4')"> -->
-<span class="popup" id="popup4">
-  <span class="popup-cnt">
-    <section class="popup-title">Zduplikowany przedmiot.<hr /></section>
-    <section class="popup-msg" id="popup4msg"></section>
-    <section class="popup-btns">
-      <button type="button" onclick="closePopup('popup4')" class="btn btn-success mx-3">OK</button>
-    </section>
-  </span>
-</span>
-
+</div>
+<div class="modal fade" id="popup2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Pole pracownik jest wymagane.</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+      </div>
+    </div>
+  </div>
+</div>
+ <div class="modal fade" id="popup3" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Pole przedmiot jest wymagane.</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="popup4" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Zduplikowany przedmiot.</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid" id="popup4msg"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script type="text/javascript">
 
   const select2conf = {
-    // Use AJAX to call to API2 to get the list of employees
+    // Use AJAX to call to API2 to get the list of items
     ajax: {
-      url: "{% url 'API2Items' %}",
+      url: "{% url 'item-list' %}",
       dataType: 'json',
       delay: 300,
       data: function(params){
-        // We send only query as 'q' and limit = 10
+        // item_user true because value of that field is null, we dont want to search used items
         return {
-          q: params.term,
-          free: 1,
-          limit: 10
+          item_user: true,
+          utilization_id: true,
+          search: params.term,
+          limit: 10,
+          {% if request.user.userinfo.region.id %}
+          region: {{request.user.userinfo.region.id}}
+          {% endif %}
         }
       },
       processResults: function(data){
         // We get raw data, so we are formating it that select2 can work with them
         return {
-          results: data.map(e => {
-            if(e.item_user != "None") return e;
+          results: data.results.map(e => {
             return {id: e.id, text: e.item_it + ' ' + e.item_sn + ' ' + e.item_model}
           })
         }
@@ -155,20 +154,22 @@
       $('#search-employee').select2({
       // Use AJAX to call to API2 to get the list of employees
       ajax: {
-        url: "{% url 'API2Employees' %}",
+        url: "{% url 'employee-list' %}",
         delay: 300,
         dataType: 'json',
         data: function(params){
-          // We send only query as 'q' and limit = 10
           return {
-            q: params.term,
-            limit: 10
+            search: params.term,
+            limit: 10,
+            {% if request.user.userinfo.region.id %}
+            region: {{request.user.userinfo.region.id}}
+            {% endif %}
           }
         },
         processResults: function(data){
           // We get raw data, so we are formating it that select2 can work with them
           return {
-            results: data.map(e => {
+            results: data.results.map(e => {
               return {id: e.id, text: e.user_name + ' ' + e.user_surname}
             })
           }
@@ -176,6 +177,10 @@
       }
     });
     $('#search-items').select2(select2conf);
+
+    {% if region == None %}
+      $('#id_item_region').select2();
+    {% endif %}
 
     // Add event listener to search-items 
     $('#search-items').on('select2:select', () => {
@@ -192,7 +197,8 @@
     // Validate employee
     if(!employee){
       // alert('Pope pracownik jest wymagane.');
-      showPopup('popup2');
+      const modal = new bootstrap.Modal(document.getElementById('popup2'));
+      modal.show();
       return;
     }
    
@@ -204,7 +210,8 @@
         // Alert user with name (got from span)
         // alert("Zduplikowany przedmiot " + item.parentElement.children[1].innerText);
         document.getElementById('popup4msg').innerHTML = "Przedmiot: " + item.parentElement.children[1].innerText;
-        showPopup('popup4');
+        const modal = new bootstrap.Modal(document.getElementById('popup4'));
+        modal.show();
         return;
       }
       seen.push(item.value);
@@ -212,7 +219,8 @@
 
     if(seen.length <= 0){
       // alert('Podaj przynajmniej jeden przedmiot.');
-      showPopup('popup3');
+      const modal = new bootstrap.Modal(document.getElementById('popup3'));
+      modal.show();
       return;
     }
 
@@ -233,16 +241,22 @@
   modalRowsContainer.innerHTML += headerRow;
   
     for (let e of seen) {
-      let res = await fetch(`{% url 'API2Items' %}?id=${e}`);
+      let res = await fetch(`{% url 'item-list' %}${e}`);
       let data = await res.json();
-      data = data[0];
-      
+      console.log(data);
+
       // Create a new row div
       let rowDiv = document.createElement('div');
       rowDiv.className = 'row';
       
       // Create and append individual columns
-      ['category', 'item_it', 'item_sn', 'item_kk'].forEach(field => {
+      {
+        let colDiv = document.createElement('div');
+        colDiv.className = 'col-3 mt-3';
+        colDiv.textContent = data.category.category_name;
+        rowDiv.appendChild(colDiv);
+      }
+      ['item_it', 'item_sn', 'item_kk'].forEach(field => {
         let colDiv = document.createElement('div');
         colDiv.className = 'col-3 mt-3';
         colDiv.textContent = data[field];
@@ -263,6 +277,7 @@
     const token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
     const employee = document.getElementById('search-employee').value;
     const items = document.getElementsByName('item'); // Gets all fields with name=item
+    const protocolDescription = document.getElementById('protocolDescription').value;
 
     // Validate employee
     if(!employee){
@@ -298,6 +313,12 @@
       data.append('csrfmiddlewaretoken', token);
       data.append('employee', employee);
       data.append('item', item.value);
+      data.append('description', protocolDescription);
+
+      {% if region == None %}
+    const region = document.getElementsByName('region')[0].value;
+      data.append('region', region);
+      {% endif %}
 
       // If we have pk send it too
       if(id != undefined)

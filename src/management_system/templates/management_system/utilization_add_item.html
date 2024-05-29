@@ -10,8 +10,16 @@
     <!-- Security token -->
     {% csrf_token %}
  
+<div id="div_id_item" class="form-group">
+       <label for="search-items" class=" requiredField">Przedmiot<span class="asteriskField">*</span> </label> 
+       <div data-select2-id="select2-data-28-4whr"> 
+         <select name="item" class="w-25 m-2 select form-control select2-hidden-accessible" id="search-items" required="" tabindex="-1" aria-hidden="true" data-select2-id="select2-data-search-items"> 
+          <option value="" selected="" data-select2-id="select2-data-10-iflm">---------</option>
+         </select>
+       </div> 
+    </div>
     <!-- Using the formset -->
-    {{ utilizationForm|crispy }}
+    {% comment %}{{ utilizationForm|crispy }} {% endcomment %}
     <hr>
     {% if messages %}
     <div class="alert alert-danger">
@@ -27,10 +35,39 @@
     <button type="button" onclick="addItem()" class="btn btn-secondary mt-3" name="saveAndContinue">Dodaj Kolejny</button>
 </form>
 <script type="text/javascript">
+  const select2conf = {
+    // Use AJAX to call to API2 to get the list of items
+    ajax: {
+      url: "{% url 'item-list' %}",
+      dataType: 'json',
+      delay: 300,
+      data: function(params){
+        // item_user true because value of that field is null, we dont want to search used items
+        return {
+          item_user: true,
+          utilization_id: true,
+          search: params.term,
+          limit: 10,
+          {% if request.user.userinfo.region.id %}
+            region: {{request.user.userinfo.region.id}}
+          {% endif %}
+        }
+      },
+      processResults: function(data){
+        // We get raw data, so we are formating it that select2 can work with them
+        return {
+          results: data.results.map(e => {
+            return {id: e.id, text: e.item_it + ' ' + e.item_sn + ' ' + e.item_model}
+          })
+        }
+      },
+    }
+  };
+
   $(document).ready(function() {
-    $('.select2field').select2();
+    //$('.select2field').select2();
     // Add event listener to search-items 
-    $('#search-items').on('select2:select', () => {
+    $('#search-items').select2(select2conf).on('select2:select', () => {
       // Add new search-item and get its id
       var ix = addItem();
       // Open newly created select
@@ -99,7 +136,7 @@
 
     // Redirect to the protocol
     // TODO: add URL /utilization/<id>
-    window.location.href = "{% url 'utilization' %}"// + id;
+    window.location.href = "{% url 'utilization' %}" + id;
   }
 
   // This variable holds search-item id
@@ -116,9 +153,9 @@
 
     // A 'lil trick here, for some reason we must update both new and the very first field in that order
     // Otherwise it breaks everything
-    $('#search-items' + id).select2();
-    $('#search-items').select2();
-    $('#search-items' + id).select2();
+    $('#search-items' + id).select2(select2conf);
+    $('#search-items').select2(select2conf);
+    $('#search-items' + id).select2(select2conf);
 
     // Add event listener to search-items 
     $('#search-items' + id).on('select2:select', () => {

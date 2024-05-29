@@ -4,25 +4,25 @@
 {% block content %}
 
 
-<h1>HOME</h1>
+<h1>Strona startowa</h1>
 <hr />
 
 <section id="main_panel">
 	<section class="panel-pad" id="protocols">
-		<section class="panel panel-light fill">
-			<h2 class="panel-title">Protokoly</h2>
+		<section class="panel fill">
+			<h2 class="panel-title">Ostatnie protokoły</h2>
 			<section class="panel-cnt" id="protocols_cnt"></section>
 		</section>
 	</section>
 	<section id="panel_grp">
 		<section class="panel-pad" id="alerts">
-			<section class="panel panel-light fill">
-				<h2 class="panel-title">ALERTY</h2>
-				<section class="panel-cnt" style="background-color: red;"></section>
+			<section class="panel  fill">
+				<h2 class="panel-title">Powiadomienia</h2>
+				<section class="panel-cnt"></section>
 			</section>
 		</section>
 		<section class="panel-pad" id="last_added">
-			<section class="panel panel-light fill">
+			<section class="panel fill">
 				<h2 class="panel-title">Ostatnio dodane przedmioty</h2>
 				<section class="panel-cnt" id="last_added_cnt"></section>
 			</section>
@@ -92,16 +92,21 @@
 
 <script>
 	// Like Date.toDateString() but custom (shorter)
-	function dtos(d){
-		let day = d.getDay();
-		let month = d.getMonth();
-		let year = d.getFullYear();
-
-		if(day < 10) day = "0" + day;
-		if(month < 10) month = "0" + month;
-		return day + "." + month + "." + year;
-	}
-
+function dtos(date) {
+    let day = date.getDate();
+    let month = date.getMonth() + 1; // Months are zero-based
+    let year = date.getFullYear();
+    let hours = date.getHours();
+    let minutes = date.getMinutes();
+    
+    // Add leading zeros to day, month, hours, and minutes if necessary
+    if (day < 10) day = '0' + day;
+    if (month < 10) month = '0' + month;
+    if (hours < 10) hours = '0' + hours;
+    if (minutes < 10) minutes = '0' + minutes;
+    
+    return `${day}.${month}.${year} ${hours}:${minutes}`; // Format: DD-MM-YYYY HH:MM
+}
 
 	$(document).ready(async function(){
 		// Create table in protocols
@@ -112,21 +117,22 @@
 		protocols_cnt.appendChild(protocols_table);
 
 		// Fetch data from server using API2
-		let protocols_data = await fetch("/api2/protocols?limit=15");
+		let protocols_data = await fetch("{% url 'protocol-list' %}?limit=19&region={{request.user.userinfo.region.id}}");
 		let protocols = await protocols_data.json();
+		protocols = protocols.results;
 
 		// For each element
-		for(let e of protocols){
+		for(let protocol of protocols){
 			// Prepare date
-			let d = new Date(e.created);
+			let protocol_date = new Date(protocol.created);
 
 			// Prepare table row
 			let row = "";
 			row += "<tr>";
-			row += "<td><a href=\"/protocols/" + e.id + "\">" + e.barcode + "</a></td>";
-			row += "<td>" + dtos(d) + "</td>";
-			row += "<td>" + e.employee + "</td>";
-			row += "<td>" + (e.is_return=="True"?"Zwrot":"Przekazanie") + "</td>";
+			row += "<td><a href=\"/protocols/" + protocol.id + "\">" + protocol.barcode + "</a></td>";
+			row += "<td>" + dtos(protocol_date) + "</td>";
+			row += "<td>" + protocol.employee.user_name + ' ' + protocol.employee.user_surname + "</td>";
+			row += "<td>" + (protocol.is_return?"Zwrot":"Przekazanie") + "</td>";
 			//row += "<td><a href=\"/protocols/" + e.id + "\" role=\"button\" class=\"btn btn-success\">Wyswietl</a></td>";
 			row += "</tr>";
 
@@ -142,21 +148,21 @@
 		last_added_cnt.appendChild(last_added_table);
 
 		// Fetch data from server using API2
-		let last_added_data = await fetch("/api2/items?limit=8");
-		let last_added = await last_added_data.json();
+		let last_added_items_data = await fetch("{% url 'item-list' %}?limit=8&region={{request.user.userinfo.region.id}}");
+		let last_added_items = await last_added_items_data.json();
+		last_added_items = last_added_items.results;
 
 		// For each element
-		for(let e of last_added){
+		for(let item of last_added_items){
 			// Prepare date
-			let d = new Date(e.created);
-
+			let protocol_date = new Date(item.created);
 			// Prepare table row
 			let row = "";
 			row += "<tr>";
-			row += "<td><a href=\"/items/" + e.id + "\">" + e.item_it + "</a></td>";
-			row += "<td>" + dtos(d) + "</td>";
-			row += "<td>" + e.item_producent + "</td>";
-			row += "<td>" + e.category + "</td>";
+			row += "<td><a href=\"/items/" + item.id + "\">" + (item.item_it ? item.item_it : "Brak numeru IT") + "</a></td>";
+			row += "<td>" + dtos(protocol_date) + "</td>";
+			row += "<td>" + item.item_producent + "</td>";
+			row += "<td>" + item.category.category_name + "</td>";
 			row += "</tr>";
 
 			//Append row

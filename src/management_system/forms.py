@@ -32,7 +32,7 @@ class ProtocolFormAdd(forms.ModelForm):
         for field in self.fields: 
             self.fields[field].widget.attrs.update({'class':'w-25 m-2'})
         # self.fields['item'].widget.attrs.update({'id':'search-items'})
-        # self.fields['employee'].widget.attrs.update({'id':'search-employee'})
+        self.fields['description'].widget.attrs.update({'id':'protocolDescription'})
 
 
     

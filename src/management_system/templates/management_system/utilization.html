@@ -3,6 +3,25 @@
 
 {% block content %}
 
+<script>
+    // Fetch count for utilization
+    async function fetchUtilizationCount(utilizationId) {
+        try {
+            const response = await fetch(`/api/items/?utilization_id_int=${utilizationId}`);
+            const data = await response.json();
+            const count = data.count;
+            document.getElementById(`utilizationCount_${utilizationId}`).textContent = count;
+        } catch (error) {
+            console.error(`Error fetching count for utilization ${utilizationId}:`, error);
+        }
+    }
+
+    // Call fetchUtilizationCount for each utilization in the list
+    
+</script>
+
+
+
     <!-- Security token -->
     {% csrf_token %}
 
@@ -23,14 +42,16 @@
     <table class="table mb-0">
       <tr>
         <th scope="col" style="width: 1em;"></th>
-        <th scope="col">id</th>
+        
         <th scope="col">Stworzony przez</th>
         <th scope="col">Data Stworzenia</th>
         <th scope="col">Data Zakończenia</th>
+        <th scope="col">Ilość sprzętu</th>
         <th scope="col"></th>
       </tr>
 
       {% for utilization in utilizationList %}
+
         <tr class="fw-normal">
           <td style="width: 1em;">
             {% if utilization.company_transfer_date %} <!-- TODO: Latin chars!!! -->
@@ -43,18 +64,24 @@
               </font>
             {% endif %}
           </td>
-          <td>{{utilization.id}}</td>
+          
           <td>{{utilization.created_by}}</td>
-          <td>{{utilization.created|date:"d/m/Y"}}</td>
+          <td>{{utilization.created|date:"d.m.Y"}}</td>
           <td>
         {% if utilization.company_transfer_date %}
-        {{utilization.company_transfer_date|date:"d/m/Y"}}
+        {{utilization.company_transfer_date|date:"d.m.Y"}}
           {% else %}
             W toku
           {% endif %}    
-            
-        
         </td>
+
+        <td id="utilizationCount_{{ utilization.id }}">
+            Loading...
+        </td>
+        <script>
+        fetchUtilizationCount({{ utilization.id }});
+        </script>
+
           <td>
 
             <div class="btn-group">
@@ -100,6 +127,7 @@
     </div>
   </div>  
   <!--end of Pagination-->
-  
+
+
 
 {% endblock content %}

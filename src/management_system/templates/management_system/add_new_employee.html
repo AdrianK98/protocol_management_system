@@ -12,8 +12,30 @@
  
     <!-- Using the formset -->
     {{ form|crispy }}
-     
+
+    {% if region == None %}
+  <div id="div_id_item_region" class="form-group">
+    <label for="id_item_region">Region</label>
+    <div>
+      <select id="id_item_region" name="region" class="w-25 m-2 select form-control">
+        {% for r in regions %}
+          <option value="{{r.id}}">{{r}}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  {% endif %}
+
+      <hr />
     <button type="submit" class="btn btn-primary mt-3">Stwórz</button>
 </form>
+
+<script>
+    {% if region == None %}
+  $(document).ready(function () {
+    $('#id_item_region').select2();
+  });
+    {% endif %}
+</script>
 
 {% endblock content %}

@@ -1,0 +1,1 @@
+default_app_config = 'management_system.apps.ManagementsystemConfig'
