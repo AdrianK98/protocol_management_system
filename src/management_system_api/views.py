@@ -80,8 +80,7 @@ class ProtocolViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter,DjangoFilterBackend,filters.OrderingFilter]
     filterset_class = ProtocolFilter
-    search_fields = ['barcode']
-    filterset_fields = '__all__'
+    search_fields = ['barcode','employee__user_name','employee__user_surname']
     ordering_fields = '__all__'
     #defualt ordering field
     ordering = ['-id']

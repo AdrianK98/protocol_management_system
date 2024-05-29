@@ -112,7 +112,7 @@ function dtos(date) {
 		// Create table in protocols
 		let protocols_cnt = document.getElementById('protocols_cnt');
 		let protocols_table = document.createElement('table');
-		protocols_table.innerHTML = "<tr><th scope=\"col\">Kod</th><th scope=\"col\">Data</th><th scope=\"col\">Pracownik</th><th scope=\"col\">Typ</th><!--<th class=\"w-0\" scope=\"col\"></th>--></tr>";
+		protocols_table.innerHTML = "<tr><th scope=\"col\">Kod</th><th scope=\"col\">Pracownik</th><th scope=\"col\">Data</th><th scope=\"col\">Typ</th><!--<th class=\"w-0\" scope=\"col\"></th>--></tr>";
 		protocols_table.classList = "table";
 		protocols_cnt.appendChild(protocols_table);
 
@@ -130,8 +130,8 @@ function dtos(date) {
 			let row = "";
 			row += "<tr>";
 			row += "<td><a href=\"/protocols/" + protocol.id + "\">" + protocol.barcode + "</a></td>";
-			row += "<td>" + dtos(protocol_date) + "</td>";
 			row += "<td>" + protocol.employee.user_name + ' ' + protocol.employee.user_surname + "</td>";
+			row += "<td>" + dtos(protocol_date) + "</td>";
 			row += "<td>" + (protocol.is_return?"Zwrot":"Przekazanie") + "</td>";
 			//row += "<td><a href=\"/protocols/" + e.id + "\" role=\"button\" class=\"btn btn-success\">Wyswietl</a></td>";
 			row += "</tr>";

@@ -256,23 +256,13 @@ def singleProtocolViewScan(request,pk):
     blob = base64.b64decode(obj.protocol_scan)
     return HttpResponse(blob, content_type='application/pdf')
 
-@login_required
-def deleteEmployeeView(request,pk):
-    
-    # fetch the object related to passed id
-    obj = get_object_or_404(Employee, id = pk)
-    context ={
-        'employee':obj,
-    }
-    if request.method =="POST":
-        try:
-            obj.delete()
-            return redirect("employees")
-        except Exception as e:
-            messages.error(request, f"{e}.")
-            return redirect("deleteEmployee",pk=pk)
+@method_decorator(login_required, name="dispatch")
+class deleteEmployee(View):
+    def post(self, request, pk):
+        employee = get_object_or_404(Employee, id = pk)
+        employee.delete()
+        return JsonResponse({'success': True})
 
-    return render(request, "management_system/delete_employee.html", context)
 
 @login_required
 def itemsEdit(request,pk):
@@ -311,10 +301,13 @@ class editEmployeeView(View):
         region = RegionContent.objects.get(content_type=content_type, object_id=obj.id)
         form = EmployeeForm(request.POST or None,instance = obj)
         if form.is_valid():
-            form.save()
-            region.region = request.POST.get('region') or region.region
-            region.save()
-            return redirect("employees")
+            try:
+                form.save()
+                region.region = request.POST.get('region') or region.region
+                region.save()
+                return redirect("employees")
+            except Exception as e:
+                return HttpResponse(f"{e}")
         context={
             "form":form,
             'region': request.user.userinfo.region,
@@ -479,81 +472,71 @@ def itemsAddNew(request):
 @method_decorator(login_required, name="dispatch")
 class EmployeesView(View):
     def get(self,request):
-        region = request.user.userinfo.region or None
         return render(request, "management_system/employees.html", {})
 
-
-    def get_query(self,qname,qsurname,region):  # new
-        query = Q()
-        if qname:
-            query = query & (
-                Q(user_name__icontains=qname)
-            )
-
-        if qsurname:
-            query = query & (
-                Q(user_surname__icontains=qsurname)
-            )   
-        
-        object_list = get_data_for_region(Employee,region).filter(query)
-
-
-        return object_list
     
 @method_decorator(login_required, name="dispatch")
 class ProtocolsView(View):
-
     def get(self,request):
-        region = request.user.userinfo.region or None
-        queryName = str(request.GET.get('qname',''))
-        querySurname = str(request.GET.get('qsurname',''))
-        queryDate = str(request.GET.get('qdate',''))
-        queryBarcode = str(request.GET.get('qbarcode',''))
-        protocolQuery = sorted(self.get_query(queryName,querySurname,queryDate,queryBarcode,region), key=attrgetter('id'),reverse=True)
-        
-
-        page = request.GET.get('page',1)
-        protocols_paginator = Paginator(protocolQuery,20)
-
-        try:
-            protocolQuery = protocols_paginator.page(page)
-        except PageNotAnInteger:
-            protocolQuery = protocols_paginator.page(1)
-        except EmptyPage:
-            protocolQuery = protocols_paginator.page(1)
-
-        context={
-            "protocolList":protocolQuery,
-            "qname_value": queryName,
-            "qsurname_value": querySurname,
-            "qdate_value": queryDate
-        }
-        return render(request, "management_system/protocols.html", context)
+        return render(request, "management_system/protocols.html", {})
+ 
     
-    def get_query(self,qname,qsurname,qdate,qbarcode,region):  # new
-        query = Q()
-        if qname:
-            query = query & (
-                Q(employee__user_name__icontains=qname)
-            )
-
-        if qsurname:
-            query = query & (
-                Q(employee__user_surname__icontains=qsurname)
-            )   
         
-        if qbarcode:
-            query = query & (
-                Q(barcode__icontains=qbarcode)
-            )   
+# @method_decorator(login_required, name="dispatch")
+# class ProtocolsView(View):
 
-        if qdate:
-            date = datetime.strptime(qdate, '%Y-%m-%d').date()
-            query = query & (
-                Q(created__icontains=date)
-            )                       
-        object_list = get_data_for_region(Protocol,region).filter(query)
-        return object_list
+#     def get(self,request):
+#         region = request.user.userinfo.region or None
+#         queryName = str(request.GET.get('qname',''))
+#         querySurname = str(request.GET.get('qsurname',''))
+#         queryDate = str(request.GET.get('qdate',''))
+#         queryBarcode = str(request.GET.get('qbarcode',''))
+#         protocolQuery = sorted(self.get_query(queryName,querySurname,queryDate,queryBarcode,region), key=attrgetter('id'),reverse=True)
+        
+
+#         page = request.GET.get('page',1)
+#         protocols_paginator = Paginator(protocolQuery,20)
+
+#         try:
+#             protocolQuery = protocols_paginator.page(page)
+#         except PageNotAnInteger:
+#             protocolQuery = protocols_paginator.page(1)
+#         except EmptyPage:
+#             protocolQuery = protocols_paginator.page(1)
+
+#         context={
+#             "protocolList":protocolQuery,
+#             "qname_value": queryName,
+#             "qsurname_value": querySurname,
+#             "qdate_value": queryDate
+#         }
+#         return render(request, "management_system/protocols.html", context)
+    
+#     def get_query(self,qname,qsurname,qdate,qbarcode,region):  # new
+#         query = Q()
+#         if qname:
+#             query = query & (
+#                 Q(employee__user_name__icontains=qname)
+#             )
+
+#         if qsurname:
+#             query = query & (
+#                 Q(employee__user_surname__icontains=qsurname)
+#             )   
+        
+#         if qbarcode:
+#             query = query & (
+#                 Q(barcode__icontains=qbarcode)
+#             )   
+
+#         if qdate:
+#             date = datetime.strptime(qdate, '%Y-%m-%d').date()
+#             query = query & (
+#                 Q(created__icontains=date)
+#             )                       
+#         object_list = get_data_for_region(Protocol,region).filter(query)
+#         return object_list
+
 
 @login_required
 def addEmployeeView(request):

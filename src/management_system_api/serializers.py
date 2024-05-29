@@ -62,4 +62,6 @@ class ProtocolSerializer(serializers.HyperlinkedModelSerializer):
             "description",
             "is_return",
             "employee",
+            "is_scanned",
+            "printed_count",
         )

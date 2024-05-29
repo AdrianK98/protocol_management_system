@@ -1,4 +1,4 @@
-from django_filters import FilterSet, AllValuesFilter, DateTimeFilter, NumberFilter, CharFilter, BooleanFilter
+from django_filters import FilterSet, AllValuesFilter, DateTimeFilter, NumberFilter, CharFilter, BooleanFilter, DateFromToRangeFilter
 from management_system.models import Item, Protocol
 from users.models import Employee
 
@@ -26,9 +26,11 @@ class EmployeeFilter(FilterSet):
 
 class ProtocolFilter(FilterSet):
     barcode = CharFilter(lookup_expr='icontains')
-
+    created_at = DateTimeFilter(field_name='created', lookup_expr='date')
+    date = DateFromToRangeFilter(field_name='created')
+    is_return = BooleanFilter(field_name='is_return')
 
     class Meta:
         model = Protocol
-        fields = ['barcode']
+        fields = ['barcode','created_at']
 
