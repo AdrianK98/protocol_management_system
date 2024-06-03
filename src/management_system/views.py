@@ -477,14 +477,14 @@ def itemsAddNew(request):
 #         }
 #     return render(request, "management_system/new_protocol_return.html", context)
 
-@method_decorator(cache_page(60 * 15), name='dispatch')
+# @method_decorator(cache_page(60 * 15), name='dispatch')
 @method_decorator(login_required, name="dispatch")
 class EmployeesView(View):
     def get(self,request):
         return render(request, "management_system/employees.html", {})
 
 
-@method_decorator(cache_page(60 * 15), name='dispatch')
+# @method_decorator(cache_page(60 * 15), name='dispatch')
 @method_decorator(login_required, name="dispatch")
 class ProtocolsView(View):
     def get(self,request):
@@ -570,7 +570,7 @@ def addEmployeeView(request):
         }
     return render(request, "management_system/add_new_employee.html", context)
 
-@method_decorator(cache_page(60 * 15), name='dispatch')
+# @method_decorator(cache_page(60 * 15), name='dispatch')
 @method_decorator(login_required, name="dispatch")
 class ItemsView(View):
     def get(self,request):
