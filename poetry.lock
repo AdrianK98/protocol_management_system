@@ -723,6 +723,20 @@ files = [
 Django = ">=4.2"
 
 [[package]]
+name = "django-icons"
+version = "24.3"
+description = "Icons for Django"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "django_icons-24.3-py3-none-any.whl", hash = "sha256:5dc660b93fb8f27c50065f36290a2557ebba5dc0007aba57003f0fc051e88094"},
+    {file = "django_icons-24.3.tar.gz", hash = "sha256:2f817b020c2ac4d369d3ca1608b48606e2aeb55f34638e19c346d4146a03ab51"},
+]
+
+[package.dependencies]
+Django = ">=4.2"
+
+[[package]]
 name = "django-redis"
 version = "5.4.0"
 description = "Full featured redis cache backend for Django."
@@ -2197,4 +2211,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "9b0b235237f4c59f4e85ae0e2c5bb9b4ef2af098d8b25a058c3baaba11e74fdf"
+content-hash = "b0344f6b7165516e54bdb7d318df98232751dc1a2b972ca1ea2a8e99565e50c4"
